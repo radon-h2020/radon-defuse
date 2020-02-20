@@ -1,6 +1,8 @@
-import io, yaml
+import io
+import yaml
+import random
 
-from ansiblemetrics.command_line import execute
+from ansiblemetrics.main import MetricExtractor
 
 class DefectPredictor():
 
@@ -35,16 +37,22 @@ class DefectPredictor():
             self.isPlaybook = True
         
     def extract_metrics(self):
-        type = 'playbook_and_general'
+        product_metrics = {}
 
-        if not self.isPlaybook:
-            type = 'tasks_and_general'
-            
-        self.metrics = execute(self.script, metrics_type=type)
-        return self.metrics
+        ansible_metrics = MetricExtractor().run(self.script)
+
+        for item in ansible_metrics:    
+            if ansible_metrics[item]['count'] is None:
+                break
+
+            for k in ansible_metrics[item]:
+                metric = f'{item}_{k}'
+                product_metrics[metric] = ansible_metrics[item][k]
+
+        return product_metrics
+
 
     def classify(self):
         self.extract_metrics()
-        # TODO run model
-        return False
-
+        # Predict
+        return random.choice([True, False])

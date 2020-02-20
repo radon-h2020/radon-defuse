@@ -1,4 +1,4 @@
-connexion==2.6.0
+connexion[swagger-ui]==2.6.0
 Flask==1.1.1
 Flask-Cors==3.0.8
 

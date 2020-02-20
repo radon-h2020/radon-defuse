@@ -10,9 +10,9 @@ class DefectPredictor():
         self.isValid = False 
         self.isEmpty = False 
         self.isPlaybook = False 
-        self.metrics = {}
         self.script = io.StringIO(script.decode("utf-8"))
-        
+        self.ansible_metrics = {}
+
         # Check if valid yaml
         try:
             self.yml = yaml.safe_load(self.script.getvalue())
@@ -37,8 +37,6 @@ class DefectPredictor():
             self.isPlaybook = True
         
     def extract_metrics(self):
-        product_metrics = {}
-
         ansible_metrics = MetricExtractor().run(self.script)
 
         for item in ansible_metrics:    
@@ -47,9 +45,9 @@ class DefectPredictor():
 
             for k in ansible_metrics[item]:
                 metric = f'{item}_{k}'
-                product_metrics[metric] = ansible_metrics[item][k]
+                self.ansible_metrics[metric] = ansible_metrics[item][k]
 
-        return product_metrics
+        return self.ansible_metrics
 
 
     def classify(self):

@@ -20,10 +20,10 @@ def classify(script):
     if dp.isEmpty:
         abort(Response({'Empty file.'}, 400))
 
-    dp.classify()
+    is_defective = dp.classify()
     result = {
-        "defective": bool(random.getrandbits(1)), #dp.classify(),
-        "metrics": dp.metrics
+        "defective": is_defective,
+        "metrics": dp.ansible_metrics
     }
     
     return result, 200

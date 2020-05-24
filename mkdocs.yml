@@ -1,0 +1,11 @@
+site_name: AnsibleMetrics
+repo_name: GitHub
+repo_url: https://github.com/radon-h2020/radon-defect-predictor-api/
+nav:
+    - Getting Started: 
+        - Quick Start: index.md
+        - APIs: 
+            - classification: api/classify
+            - metrics: api/metrics
+    - About: about.md
+theme: readthedocs

@@ -31,4 +31,3 @@ paths:
           description: Success!
           schema:
             type: boolean
-

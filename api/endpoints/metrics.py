@@ -1,16 +1,17 @@
 import json
 
-from ansiblemetrics.import_metrics import general_metrics, playbook_metrics, tasks_metrics
-from flask import abort, jsonify
+from io import StringIO
+from ansiblemetrics.import_metrics import general_metrics, playbook_metrics
+from ansiblemetrics.metrics_extractor import MetricExtractor
+from flask import abort, jsonify, Response
 
-from api.defect_prediction import DefectPredictor
 
 def list_all():
     """
     This function responds to a request for /api/metrics/all (GET)
     :return: a lists of metrics' names.
     """
-    metrics = dict(list(general_metrics.items()) + list(playbook_metrics.items()) + list(tasks_metrics.items()))
+    metrics = dict(list(general_metrics.items()) + list(playbook_metrics.items()))
     l = []
     for name in metrics:
         l.append(name)
@@ -22,14 +23,13 @@ def run_all(script):
     This function responds to a request for /api/metrics/all (POST)
     :return: a json object with metrics values.
     """
-    dp = DefectPredictor(script)
-    
-    if not dp.isValid:
-        abort(400, 'Not a valid yaml file.')
-    
-    # Check empty file (note: empty files are valid yaml files)
-    if dp.isEmpty:
-        abort(400, 'Empty file.')
+    script = str(script, "utf-8")
 
-    return dp.extract_metrics(), 200
+    try:
+        metrics = MetricExtractor().run(StringIO(script))
+        return metrics, 200
+
+    except ValueError:
+        abort(Response({'Not a valid yaml script:', str(script)}, 400))
+
     

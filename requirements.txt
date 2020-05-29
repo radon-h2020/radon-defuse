@@ -1,7 +1,7 @@
 connexion[swagger-ui]==2.6.0
 Flask==1.1.1
 Flask-Cors==3.0.8
-ansiblemetrics==0.2
+ansiblemetrics==0.3.2
 joblib==0.15.1
 numpy==1.18.4
 pandas==1.0.3

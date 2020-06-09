@@ -1,0 +1,53 @@
+swagger: "2.0"
+info:
+  description: This is the swagger file that goes with our server code
+  version: "0.0.1"
+  title: Defect Prediction Swagger RESTful APIs
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+
+basePath: "/api/models"
+
+# Paths supported by the server application
+paths:
+  /pre-trained-model:
+    post:
+      operationId: api.endpoints.models.get_pre_trained_model
+      tags:
+        - "pre-trained models"
+      summary: "Handle models"
+      description: "Get pre-trained models from similar projects"
+      consumes:
+        - application/json
+      parameters:
+        - in:  body
+          name: body
+          description: the attribute scores for the repository
+          schema:
+            type: object
+            properties:
+              commitFrequency:
+                type: number
+              coreContributors:
+                type: integer
+              issueFrequency:
+                type: number
+              percentComments:
+                type: number
+              percentIac:
+                type: number
+              sloc:
+                type: integer
+              releases:
+                type: integer
+              percentDefects:
+                type: number
+              commits:
+                type: integer
+      responses:
+        200:
+          description: Success!
+          schema:
+            type: boolean

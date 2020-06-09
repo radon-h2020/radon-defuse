@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 from io import StringIO
-from ansiblemetrics.metrics_extractor import MetricExtractor
+from ansiblemetrics.metrics_extractor import extract_all
 from flask import abort, Response
 from joblib import load
 
@@ -20,7 +20,7 @@ def classify(script):
     script = str(script, "utf-8")
 
     try:
-        metrics = MetricExtractor().run(StringIO(script))
+        metrics = extract_all(StringIO(script))
     except ValueError:
         abort(Response({'Not a valid yaml script:', str(script)}, 400))
 

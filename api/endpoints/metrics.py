@@ -2,7 +2,7 @@ import json
 
 from io import StringIO
 from ansiblemetrics.import_metrics import general_metrics, playbook_metrics
-from ansiblemetrics.metrics_extractor import MetricExtractor
+from ansiblemetrics.metrics_extractor import extract_all
 from flask import abort, jsonify, Response
 
 
@@ -26,7 +26,7 @@ def run_all(script):
     script = str(script, "utf-8")
 
     try:
-        metrics = MetricExtractor().run(StringIO(script))
+        metrics = extract_all(StringIO(script))
         return metrics, 200
 
     except ValueError:

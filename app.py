@@ -9,6 +9,7 @@ CORS(app.app)
 # Read the swagger.yml file to configure the endpoints
 app.add_api('classification.yml')
 app.add_api('metrics.yml')
+app.add_api('models.yml')
 
 # Create a URL route in our application for "/"
 @app.route('/')

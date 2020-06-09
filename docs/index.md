@@ -43,14 +43,25 @@ docker run -p 5000:5000 radon-dp:latest
 
 ## How to use
 
-You can test the **/classify** API as follows:
+You can test the **api/classification/classify** API as follows:
 
 ```
 curl -X POST "http://localhost:5000/api/classification/classify" -H  "accept: */*" -H  "Content-Type: plain/text" -d "- host: all"
 ```
 
+
+You can test the **api/models/pre-trained-model** API as follows:
+
+```
+curl -X POST "http://localhost:5000/api/models/pre-trained-model" -H  "accept: */*" -H  "Content-Type: application/json" -d "{'commitFrequency': 5, 'coreContributors': 3, 'issueFrequency': 0.04, 'percentComments': 25, 'percentIac': 70, 'sloc: 5000, 'releases': 10, 'percentDefects': 8, 'commits': 340}"
+```
+
+
+
+
 ## Related tools
 
-* AnsibleMetrics: [AnsibleMetrics](https://radon-h2020.github.io/radon-ansible-metrics/) is a tool to quantify the characteristic of infrastructure code used by the defect predictor to extract metrics from an Ansible blueprint and use them for the detection of defects.
+* [AnsibleMetrics](https://radon-h2020.github.io/radon-ansible-metrics/): used by the defect predictor to quantify the characteristic of infrastructure code and train the classifier.
 
-* Visual Studio Extension: available on the VSC Marketplace at this [link](https://marketplace.visualstudio.com/items?itemName=sdallapalma.radon-defect-predictor).
+* Visual Studio Extension available on the [VSC Marketplace](https://marketplace.visualstudio.com/items?itemName=sdallapalma.radon-defect-predictor). 
+  Extension's source code available on [Github](https://github.com/radon-h2020/radon-defect-prediction-plugin.git).

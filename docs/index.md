@@ -53,7 +53,7 @@ curl -X POST "http://localhost:5000/api/classification/classify" -H  "accept: */
 You can test the **api/models/pre-trained-model** API as follows:
 
 ```
-curl -X POST "http://localhost:5000/api/models/pre-trained-model" -H  "accept: */*" -H  "Content-Type: application/json" -d "{'commitFrequency': 5, 'coreContributors': 3, 'issueFrequency': 0.04, 'percentComments': 25, 'percentIac': 70, 'sloc: 5000, 'releases': 10, 'percentDefects': 8, 'commits': 340}"
+curl -X POST "http://localhost:5000/api/models/pre-trained-model" -H  "accept: */*" -H  "Content-Type: application/json" -d '{"commitFrequency": 5, "coreContributors": 3, "issueFrequency": 0.04, "percentComments": 25, "percentIac": 70, "sloc": 5000, "releases": 10, "percentDefects": 8, "commits": 340}'
 ```
 
 

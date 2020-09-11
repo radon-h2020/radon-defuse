@@ -1,12 +1,12 @@
-site_name: RADON Framework for IaC Defect Prediction
+site_name: Receptor
 repo_name: GitHub
 repo_url: https://github.com/radon-h2020/radon-defect-prediction-api/
 nav:
     - Getting Started: 
         - Quick Start: index.md
-        - Features:
-            - mine-github: mine_github
-            - mine-repository: mine_reporitory
-            - repositories: repositories
+        - APIs: 
+            - classification: api/classify
+            - metrics: api/metrics
+            - models: api/models
     - About: about.md
 theme: readthedocs

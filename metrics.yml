@@ -1,0 +1,46 @@
+swagger: "2.0"
+info:
+  description: This is the swagger file that goes with our server code
+  version: "0.0.2"
+  title: Defect Prediction Swagger RESTful APIs
+consumes:
+  - "text/plain"
+produces:
+  - "text/plain"
+
+basePath: "/api/metrics"
+
+# Paths supported by the server application
+paths:
+  /all:
+    get:
+      operationId: api.endpoints.metrics.list_all
+      tags: 
+        - "Metrics"
+      summary: "Describe metrics"
+      description: "Get list of metrics"
+      responses:
+        200:
+          description: Success!
+          schema:
+            type: boolean
+
+    post:
+      operationId: api.endpoints.metrics.run_all
+      tags: 
+        - "Metrics"
+      summary: "Run all metrics on script"
+      description: "Run metrics on script"
+      parameters:
+        - in:  body
+          name: script
+          description: Run metrics on script
+          required: True
+          schema:
+            type: object
+      responses:
+        200:
+          description: Success!
+          schema:
+            type: boolean
+

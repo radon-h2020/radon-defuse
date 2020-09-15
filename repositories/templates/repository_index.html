@@ -21,7 +21,7 @@
         <div class="card align-items-center">
             <br/>
             <i class="fa fa-exclamation-circle fa-2x" style="color:#dc3545;"></i>
-            <h2>{{ metadata.avg_issues }}</h2>
+            <h2>{{ metadata.avg_issues }} &plusmn; {{ metadata.std_issues }} </h2>
             <p class="font-weight-light ">Avg issues</p>
         </div>
     </div>
@@ -29,7 +29,7 @@
         <div class="card align-items-center">
             <br/>
             <i class="fa fa-tag fa-2x" style="color:#28a745;"></i>
-            <h2>{{ metadata.avg_releases }}</h2>
+            <h2>{{ metadata.avg_releases }} &plusmn; {{ metadata.std_releases }} </h2>
             <p class="font-weight-light ">Avg releases</p>
         </div>
     </div>
@@ -37,7 +37,7 @@
         <div class="card align-items-center">
             <br/>
             <i class="fa fa-star fa-2x" style="color:#ffc107;"></i>
-            <h2>{{ metadata.avg_stars }}</h2>
+            <h2>{{ metadata.avg_stars }} &plusmn; {{ metadata.std_stars }} </h2>
             <p class="font-weight-light text-center">Avg stars</p>
         </div>
     </div>
@@ -45,7 +45,7 @@
         <div class="card align-items-center">
             <br/>
             <i class="fa fa-eye fa-2x" style="color:#17a2b8;"></i>
-            <h2>{{ metadata.avg_watchers }}</h2>
+            <h2>{{ metadata.avg_watchers }} &plusmn; {{ metadata.std_watchers }} </h2>
             <p class="font-weight-light text-center">Avg watchers</p>
         </div>
     </div>

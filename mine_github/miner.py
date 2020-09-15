@@ -37,6 +37,8 @@ def mine(token: str, date_from: datetime.date, date_to: datetime.date,
 
     while date_from < date_to:
 
+        print(f'Crawling from: {date_from} to: {date_from + datetime.timedelta(hours=timedelta)}')
+
         # add single row over all the columns with date_from - date_to
         github_miner = GithubMiner(
             access_token=token,
@@ -66,7 +68,7 @@ def mine(token: str, date_from: datetime.date, date_to: datetime.date,
                 search_from=date_from,
                 search_to=date_from + datetime.timedelta(hours=timedelta),
                 quota=github_miner.quota,
-                quota_reset_at=github_miner.quota_reset_at,
+                quota_reset_at=github_miner.quota_reset_at
             )
             yield mining_data
 

@@ -28,9 +28,13 @@ def repository_index(request):
             'metadata': {
                 'repos': len(repos),
                 'avg_issues': int(statistics.mean([d['issues'] for d in repos])),
+                'std_issues': int(statistics.stdev([d['issues'] for d in repos])),
                 'avg_releases': int(statistics.mean([d['releases'] for d in repos])),
+                'std_releases': int(statistics.stdev([d['releases'] for d in repos])),
                 'avg_stars': int(statistics.mean([d['stars'] for d in repos])),
-                'avg_watchers': int(statistics.mean([d['watchers'] for d in repos]))
+                'std_stars': int(statistics.stdev([d['stars'] for d in repos])),
+                'avg_watchers': int(statistics.mean([d['watchers'] for d in repos])),
+                'std_watchers': int(statistics.stdev([d['watchers'] for d in repos]))
             }
         }
 

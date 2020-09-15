@@ -65,7 +65,7 @@ def start(settings: dict):
         yield """
             <tr>
               <th scope="row">{0}</th>
-              <td><a href="{1}">{2}/{3}</a></td>
+              <td><a href="{1}" target="_blank">{2}/{3}</a></td>
               <td>{4}</td>
               <td>{5}</td>
               <td>{6}</td>

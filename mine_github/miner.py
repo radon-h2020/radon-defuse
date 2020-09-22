@@ -2,11 +2,34 @@
 import datetime
 
 # Third-party
-from iacminer.filters import is_ansible_repository
-from iacminer.miners.github import GithubMiner
+from collector.github import GithubRepositoriesCollector
 
 # Project
 from radon_defect_predictor.mongodb import MongoDBManager
+
+
+def is_ansible_dir(path: str) -> bool:
+    """
+    Check whether the path is an Ansible directory
+    :param path: a path
+    :return: True if the path link to an Ansible directory. False, otherwise
+    """
+    return path and ('playbooks' == path or 'meta' == path or 'tasks' == path or 'handlers' == path or 'roles' == path)
+
+
+def is_ansible_repository(owner: str, name: str, description: str, root_dirs: list) -> bool:
+    """
+    Check if the repository has Ansible files
+    :param owner: the repository's owner
+    :param name: the repository's name
+    :param description: the repository's description
+    :param root_dirs: a list of directory names at the root of the repository
+    :return: True if the repository has Ansible files; False otherwise
+    """
+    return 'ansible' in description.lower() \
+           or 'ansible' in owner.lower() \
+           or 'ansible' in name.lower() \
+           or sum([1 for path in root_dirs if is_ansible_dir(path)]) >= 2
 
 
 def mine(token: str, date_from: datetime.date, date_to: datetime.date,
@@ -40,7 +63,7 @@ def mine(token: str, date_from: datetime.date, date_to: datetime.date,
         print(f'Crawling from: {date_from} to: {date_from + datetime.timedelta(hours=timedelta)}')
 
         # add single row over all the columns with date_from - date_to
-        github_miner = GithubMiner(
+        grc = GithubRepositoriesCollector(
             access_token=token,
             date_from=date_from,
             date_to=date_from + datetime.timedelta(hours=timedelta),
@@ -51,7 +74,7 @@ def mine(token: str, date_from: datetime.date, date_to: datetime.date,
             min_watchers=min_watchers
         )
 
-        for repo in github_miner.mine():
+        for repo in grc.collect_repositories():
 
             # Filter out non-Ansible repositories
             if not is_ansible_repository(repo['owner'], repo['name'], repo['description'], repo['dirs']):
@@ -67,8 +90,8 @@ def mine(token: str, date_from: datetime.date, date_to: datetime.date,
                 repository=repo,
                 search_from=date_from,
                 search_to=date_from + datetime.timedelta(hours=timedelta),
-                quota=github_miner.quota,
-                quota_reset_at=github_miner.quota_reset_at
+                quota=grc.quota,
+                quota_reset_at=grc.quota_reset_at
             )
             yield mining_data
 

@@ -14,6 +14,7 @@ def start(settings: dict):
         <body class="bg-dark">
             <div class="py-5 text-center bg-dark text-white">
                 <h2>Mining report</h2>
+                <p class="lead font-weight-bold">Attention! Do not close this page while the analysis is running!</p>
                 <p class="lead font-weight-light">Mining started at: {0}</p>
             </div>
             <table class="table table-striped table-dark">

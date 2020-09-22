@@ -50,8 +50,16 @@
         </div>
     </div>
 </div>
+
 <br/>
 
+<div class="text-center">
+    <a href="{% url 'repositories_dump'%}" download="repositories.json" class="btn btn-outline-primary btn-sm">
+    <i class="fa fa-download fa-2x" > </i> Database dump
+    </a>
+</div>
+
+<br/>
 
 <div class="accordion" id="accordion">
 {% for repo in repositories %}
@@ -76,7 +84,7 @@
                 <span class="badge badge-pill badge-secondary">Language: {{ repo.primary_language }}</span>
 
                 <a href="{% url 'repository_detail' repo.id %}" class="btn btn-outline-primary btn-sm" style="float: right;">
-                        Read More
+                        Go to repository
                 </a>
             </div>
         </div>

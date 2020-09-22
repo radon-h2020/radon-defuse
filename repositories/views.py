@@ -1,14 +1,21 @@
 # Built-in
+import os
+import shutil
 import statistics
 
 # Third-party
+import git
+from bson.json_util import dumps
+from django.http import HttpResponse
 from django.shortcuts import render
+from repositoryscorer.scorer import score_repository
 
 # Project
 from radon_defect_predictor.mongodb import MongoDBManager
+from repositories.forms import RepositoryScorerForm
 
 
-def repository_index(request):
+def repositories_index(request):
     repos = MongoDBManager.get_instance().get_all_repos()
 
     if not repos:
@@ -38,10 +45,62 @@ def repository_index(request):
             }
         }
 
-    return render(request, 'repository_index.html', context)
+    return render(request, 'repositories_index.html', context)
 
+
+def repositories_dump(request):
+    repos = dumps(MongoDBManager.get_instance().get_all_repos())
+    size = len(repos)
+    response = HttpResponse(repos, content_type='application/json')
+    response['Content-Length'] = size
+    response['Content-Disposition'] = 'attachment; filename=%s' % 'repositories.json'
+    return response
+
+def onerror(func, path, exc_info):
+    """
+    Error handler for ``shutil.rmtree``.
+
+    If the error is due to an access error (read only file)
+    it attempts to add write permission and then retries.
+
+    If the error is for another reason it re-raises the error.
+
+    Usage : ``shutil.rmtree(path, onerror=onerror)``
+    """
+    import stat
+    if not os.access(path, os.W_OK):
+        # Is the error an access error ?
+        os.chmod(path, stat.S_IWUSR)
+        func(path)
+    else:
+        raise
 
 def repository_detail(request, id):
     repo = MongoDBManager.get_instance().get_single_repo(id)
-    context = {'repository': repo}
+    form = RepositoryScorerForm(request.GET)
+
+    if request.method == 'POST':
+        form = RepositoryScorerForm(request.POST)
+        if form.is_valid():
+            path_to_clones = form.cleaned_data['input_path_to_clones']
+
+            # Clone repository to path_to_repo
+            git.Git(path_to_clones).clone(repo['url'])
+            path_to_repo = os.path.join(path_to_clones, repo['name'])
+
+            # Compute scores
+            repo['scores'] = score_repository(path_to_repo=path_to_repo,
+                                              access_token=form.cleaned_data['input_github_token'],
+                                              repo_owner=repo['owner'],
+                                              repo_name=repo['name'])
+            del repo['scores']['repository']
+
+            # Save scores in DB
+            MongoDBManager.get_instance().replace_repo(repo)
+
+            # Delete cloned repo
+            shutil.rmtree(path_to_repo, onerror=onerror)
+
+    context = {'repository': repo,
+               'form': form}
     return render(request, 'repository_detail.html', context)

@@ -1,11 +1,207 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<p>{{ repository.name }}</p>
-<p>{{ repository.issues }}</p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block page_content %}
+
+{% load static %}
+
+<div class="row text-center mt-4">
+    <br/>
+    <div class="col text-center">
+        <h2>{{ repository.owner }}/{{ repository.name }}</h2>
+        <a href="{{ repository.url }}" target="_blank">
+            <i class="fa fa-github fa-2x"> </i> <p class="font-weight-light">See on Github</p>
+        </a>
+
+    </div>
+</div>
+<br/>
+
+<div class="text-center">
+    <!-- Trigger modal -->
+    <a href=""  class="btn btn-outline-primary btn-sm" style="width:200px; height:60px;" data-toggle="modal" data-target="#compute-scores-modal">
+        <i class="fa fa-star-half fa-2x"> </i> <p>Compute scores</p>
+    </a>
+    <a href="#" class="btn btn-outline-primary btn-sm" style="width:200px; height:60px;">
+        <i class="fa fa-play-circle fa-2x" > </i> <p>Mine</p>
+    </a>
+</div>
+
+
+
+
+<!--
+<div class="row">
+    <div class="col">
+        <div class="card align-items-center">
+            <br/>
+            <i class="fa fa-exclamation-circle fa-2x" style="color:#dc3545;"></i>
+            <h2>{{ repo.issues }}  </h2>
+            <p class="font-weight-light ">Issues</p>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card align-items-center">
+            <br/>
+            <i class="fa fa-tag fa-2x" style="color:#28a745;"></i>
+            <h2>{{ 0}}</h2>
+            <p class="font-weight-light ">Releases</p>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card align-items-center">
+            <br/>
+            <i class="fa fa-star fa-2x" style="color:#ffc107;"></i>
+            <h2>{{ 0 }}  </h2>
+            <p class="font-weight-light text-center">Stars</p>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card align-items-center">
+            <br/>
+            <i class="fa fa-eye fa-2x" style="color:#17a2b8;"></i>
+            <h2>{{ 0 }}  </h2>
+            <p class="font-weight-light text-center">Watchers</p>
+        </div>
+    </div>
+</div>
+-->
+<br/>
+<div class="row">
+    <div class="col">
+        <div class="card align-items-center">
+            <br/>
+            <i class="fa fa-github fa-2x"></i>
+            <h2>{{ repository.scores.commit_frequency }}  </h2>
+            <p class="text-muted">Avg commits/month</p>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card align-items-center">
+            <br/>
+            <i class="fa fa-exclamation-circle fa-2x"></i>
+            <h2>{{ repository.scores.issue_frequency }}  </h2>
+            <p class="text-muted">Avg issue events/month</p>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card align-items-center">
+            <br/>
+            <i class="fa fa-exclamation-circle fa-2x"></i>
+            <h2>{{ repository.scores.core_contributors }}  </h2>
+            <p class="text-muted">Core contributors</p>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card align-items-center">
+            <br/>
+            <i class="fa fa-percent fa-2x"></i>
+            <h2>{{ repository.scores.percent_comment }}  </h2>
+            <p class="text-muted">Comments</p>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card align-items-center">
+            <br/>
+            <i class="fa fa-percent fa-2x"></i>
+            <h2>{{ repository.scores.iac_ratio }}  </h2>
+            <p class="text-muted">IaC scripts</p>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card align-items-center">
+            <br/>
+            <i class="fa fa-exclamation-circle fa-2x"></i>
+            <h2>{{ repository.scores.continuous_integration }}  </h2>
+            <p class="text-muted">Continuous Integration</p>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card align-items-center">
+            <br/>
+            <i class="fa fa-exclamation-circle fa-2x"></i>
+            <h2>{{ repository.scores.license }}  </h2>
+            <p class="text-muted">License</p>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card align-items-center">
+            <br/>
+            <i class="fa fa-code fa-2x"></i>
+            <h2>{{ repository.scores.repository_size }}  </h2>
+            <p class="text-muted">Source Lines of Code</p>
+        </div>
+    </div>
+</div>
+
+<br/>
+
+<div class="list-group">
+  <a href="#" class="list-group-item list-group-item-action flex-column align-items-start active">
+      <h5 class="mb-1">Fixing commits</h5>
+  </a>
+  <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">List group item heading</h5>
+      <div class="col col-lg-1" >
+        <small class="text-muted">3 days ago</small>
+        <i class="fa fa-trash" style="float:right;"></i>
+      </div>
+    </div>
+    <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
+    <div class="accordion" id="accordion">
+        <div class="card">
+            <div class="card-header"  data-toggle="collapse" data-target="#collapse-id2" aria-expanded="false" aria-controls="collapse-id2">
+                <div class="row">
+                    <div class="col">
+                      <small class="mb-0 text-muted font-weight-bold"> tasks/main.yaml </small>
+                    </div>
+                    <div class="col col-lg-1" >
+                        <i class="fa fa-trash" style="float:right;"></i>
+                    </div>
+                </div>
+            </div>
+            <div id="collapse-id2" class="collapse" aria-labelledby="heading-id2" data-parent="#accordion">
+                <div class="card-body">
+                    <p class="font-weight-light">
+                        ---
+                        -hosts: all
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+  </a>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="compute-scores-modal" tabindex="-1" role="dialog" aria-labelledby="compute-scores-modal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">RepositoryScorer settings</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <form class="needs-validation" method="POST">
+        {% csrf_token %}
+            <h5 class="mb-3 mt-5" style="text-align:center;">Where do you want to clone the repository?</h5>
+            <div  style="text-align:center;">
+                {{ form.input_path_to_clones }}
+            </div>
+            <h5 class="mb-3 mt-5" style="text-align:center;">Github access token</h5>
+            <div  style="text-align:center;">
+                {{ form.input_github_token }}
+            </div>
+
+            <hr class="mb-4">
+            <button class="btn btn-primary btn-lg btn-block" type="submit">Start</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

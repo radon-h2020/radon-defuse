@@ -89,12 +89,16 @@ def repository_detail(request, id):
             path_to_repo = os.path.join(path_to_clones, repo['name'])
 
             # Compute scores
-            repo['scores'] = score_repository(path_to_repo=path_to_repo,
+            scores = score_repository(path_to_repo=path_to_repo,
                                               access_token=form.cleaned_data['input_github_token'],
                                               repo_owner=repo['owner'],
                                               repo_name=repo['name'])
-            del repo['scores']['repository']
 
+            del scores['repository']
+            scores["percent_comment"] = int(scores["percent_comment"]*100)
+            scores["iac_ratio"] = int(scores["iac_ratio"]*100)
+
+            repo['scores'] = scores
             # Save scores in DB
             MongoDBManager.get_instance().replace_repo(repo)
 

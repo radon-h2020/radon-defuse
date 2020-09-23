@@ -3,6 +3,7 @@
 {% block page_content %}
 
 {% load static %}
+<div class=" ml-5 mr-5">
 
 <div class="row text-center mt-4">
     <br/>
@@ -26,45 +27,6 @@
     </a>
 </div>
 
-
-
-
-<!--
-<div class="row">
-    <div class="col">
-        <div class="card align-items-center">
-            <br/>
-            <i class="fa fa-exclamation-circle fa-2x" style="color:#dc3545;"></i>
-            <h2>{{ repo.issues }}  </h2>
-            <p class="font-weight-light ">Issues</p>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card align-items-center">
-            <br/>
-            <i class="fa fa-tag fa-2x" style="color:#28a745;"></i>
-            <h2>{{ 0}}</h2>
-            <p class="font-weight-light ">Releases</p>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card align-items-center">
-            <br/>
-            <i class="fa fa-star fa-2x" style="color:#ffc107;"></i>
-            <h2>{{ 0 }}  </h2>
-            <p class="font-weight-light text-center">Stars</p>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card align-items-center">
-            <br/>
-            <i class="fa fa-eye fa-2x" style="color:#17a2b8;"></i>
-            <h2>{{ 0 }}  </h2>
-            <p class="font-weight-light text-center">Watchers</p>
-        </div>
-    </div>
-</div>
--->
 <br/>
 <div class="row">
     <div class="col">
@@ -86,7 +48,7 @@
     <div class="col">
         <div class="card align-items-center">
             <br/>
-            <i class="fa fa-exclamation-circle fa-2x"></i>
+            <i class="fa fa-users fa-2x"></i>
             <h2>{{ repository.scores.core_contributors }}  </h2>
             <p class="text-muted">Core contributors</p>
         </div>
@@ -94,23 +56,27 @@
     <div class="col">
         <div class="card align-items-center">
             <br/>
-            <i class="fa fa-percent fa-2x"></i>
-            <h2>{{ repository.scores.percent_comment }}  </h2>
+            <i class="fa fa-comments fa-2x"></i>
+            <h2>{{ repository.scores.percent_comment }} % </h2>
             <p class="text-muted">Comments</p>
         </div>
     </div>
     <div class="col">
         <div class="card align-items-center">
             <br/>
-            <i class="fa fa-percent fa-2x"></i>
-            <h2>{{ repository.scores.iac_ratio }}  </h2>
+            <i class="fa fa-file fa-2x"></i>
+            <h2>{{ repository.scores.iac_ratio }} % </h2>
             <p class="text-muted">IaC scripts</p>
         </div>
     </div>
     <div class="col">
         <div class="card align-items-center">
             <br/>
-            <i class="fa fa-exclamation-circle fa-2x"></i>
+            {% if repository.scores.continuous_integration %}
+            <i class="fa fa-check fa-2x" style="color:#00FF00;"></i>
+            {% else %}
+            <i class="fa fa-times fa-2x" style="color:#FF0000;"></i>
+            {% endif %}
             <h2>{{ repository.scores.continuous_integration }}  </h2>
             <p class="text-muted">Continuous Integration</p>
         </div>
@@ -118,7 +84,11 @@
     <div class="col">
         <div class="card align-items-center">
             <br/>
-            <i class="fa fa-exclamation-circle fa-2x"></i>
+            {% if repository.scores.license %}
+            <i class="fa fa-check fa-2x" style="color:#00FF00;"></i>
+            {% else %}
+            <i class="fa fa-times fa-2x" style="color:#FF0000;"></i>
+            {% endif %}
             <h2>{{ repository.scores.license }}  </h2>
             <p class="text-muted">License</p>
         </div>
@@ -202,6 +172,7 @@
       </div>
     </div>
   </div>
+</div>
 </div>
 
 {% endblock %}

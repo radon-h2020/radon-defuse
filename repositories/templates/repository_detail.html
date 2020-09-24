@@ -1,178 +1,94 @@
-{% extends "base.html" %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://getbootstrap.com/docs/4.1/examples/dashboard/dashboard.css">
 
-{% block page_content %}
+{% block repository_details_head %} {% endblock %}
 
-{% load static %}
-<div class=" ml-5 mr-5">
+<nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+  <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="{% url 'repositories_index'%}"> RADON</a>
+  <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+</nav>
+<div class="container-fluid">
+  <div class="row">
+    <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+      <div class="sidebar-sticky">
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>{{ repository.owner|add:'/'|add:repository.name }}</span>
+          <a class="d-flex align-items-center text-muted" href="{{ repository.url }}" target="_blank">
+            <span data-feather="github"></span>
+          </a>
+        </h6>
 
-<div class="row text-center mt-4">
-    <br/>
-    <div class="col text-center">
-        <h2>{{ repository.owner }}/{{ repository.name }}</h2>
-        <a href="{{ repository.url }}" target="_blank">
-            <i class="fa fa-github fa-2x"> </i> <p class="font-weight-light">See on Github</p>
-        </a>
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'repository_main' repository.id %}">
+              <span data-feather="home"></span>
+              Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'repository_fixing_commits' repository.id %}" >
+              <span data-feather="git-commit"></span>
+              Fixing commits
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'repository_fixing_files' repository.id %}">
+              <span data-feather="tool"></span>
+              Fixing files
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'repository_labeled_files' repository.id %}">
+              <span data-feather="tag"></span>
+              Labeled files
+            </a>
+          </li>
+        </ul>
 
-    </div>
-</div>
-<br/>
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>ACTIONS</span>
+        </h6>
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'repository_score' repository.id %}">
+              <span data-feather="star"></span>
+              Compute scores
+            </a>
 
-<div class="text-center">
-    <!-- Trigger modal -->
-    <a href=""  class="btn btn-outline-primary btn-sm" style="width:200px; height:60px;" data-toggle="modal" data-target="#compute-scores-modal">
-        <i class="fa fa-star-half fa-2x"> </i> <p>Compute scores</p>
-    </a>
-    <a href="#" class="btn btn-outline-primary btn-sm" style="width:200px; height:60px;">
-        <i class="fa fa-play-circle fa-2x" > </i> <p>Mine</p>
-    </a>
-</div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'repository_mine' repository.id %}" >
+              <span data-feather="play-circle"></span>
+              Mine
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="tool"></span>
+              Train
+            </a>
+          </li>
+        </ul>
 
-<br/>
-<div class="row">
-    <div class="col">
-        <div class="card align-items-center">
-            <br/>
-            <i class="fa fa-github fa-2x"></i>
-            <h2>{{ repository.scores.commit_frequency }}  </h2>
-            <p class="text-muted">Avg commits/month</p>
+        <div class="mt-4" style="text-align:center;">
+          <button class="btn btn-sm btn-outline-secondary">
+            <span data-feather="download"> </span> Export</button>
         </div>
-    </div>
-    <div class="col">
-        <div class="card align-items-center">
-            <br/>
-            <i class="fa fa-exclamation-circle fa-2x"></i>
-            <h2>{{ repository.scores.issue_frequency }}  </h2>
-            <p class="text-muted">Avg issue events/month</p>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card align-items-center">
-            <br/>
-            <i class="fa fa-users fa-2x"></i>
-            <h2>{{ repository.scores.core_contributors }}  </h2>
-            <p class="text-muted">Core contributors</p>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card align-items-center">
-            <br/>
-            <i class="fa fa-comments fa-2x"></i>
-            <h2>{{ repository.scores.percent_comment }} % </h2>
-            <p class="text-muted">Comments</p>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card align-items-center">
-            <br/>
-            <i class="fa fa-file fa-2x"></i>
-            <h2>{{ repository.scores.iac_ratio }} % </h2>
-            <p class="text-muted">IaC scripts</p>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card align-items-center">
-            <br/>
-            {% if repository.scores.continuous_integration %}
-            <i class="fa fa-check fa-2x" style="color:#00FF00;"></i>
-            {% else %}
-            <i class="fa fa-times fa-2x" style="color:#FF0000;"></i>
-            {% endif %}
-            <h2>{{ repository.scores.continuous_integration }}  </h2>
-            <p class="text-muted">Continuous Integration</p>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card align-items-center">
-            <br/>
-            {% if repository.scores.license %}
-            <i class="fa fa-check fa-2x" style="color:#00FF00;"></i>
-            {% else %}
-            <i class="fa fa-times fa-2x" style="color:#FF0000;"></i>
-            {% endif %}
-            <h2>{{ repository.scores.license }}  </h2>
-            <p class="text-muted">License</p>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card align-items-center">
-            <br/>
-            <i class="fa fa-code fa-2x"></i>
-            <h2>{{ repository.scores.repository_size }}  </h2>
-            <p class="text-muted">Source Lines of Code</p>
-        </div>
-    </div>
-</div>
-
-<br/>
-
-<div class="list-group">
-  <a href="#" class="list-group-item list-group-item-action flex-column align-items-start active">
-      <h5 class="mb-1">Fixing commits</h5>
-  </a>
-  <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-    <div class="d-flex w-100 justify-content-between">
-      <h5 class="mb-1">List group item heading</h5>
-      <div class="col col-lg-1" >
-        <small class="text-muted">3 days ago</small>
-        <i class="fa fa-trash" style="float:right;"></i>
       </div>
-    </div>
-    <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-    <div class="accordion" id="accordion">
-        <div class="card">
-            <div class="card-header"  data-toggle="collapse" data-target="#collapse-id2" aria-expanded="false" aria-controls="collapse-id2">
-                <div class="row">
-                    <div class="col">
-                      <small class="mb-0 text-muted font-weight-bold"> tasks/main.yaml </small>
-                    </div>
-                    <div class="col col-lg-1" >
-                        <i class="fa fa-trash" style="float:right;"></i>
-                    </div>
-                </div>
-            </div>
-            <div id="collapse-id2" class="collapse" aria-labelledby="heading-id2" data-parent="#accordion">
-                <div class="card-body">
-                    <p class="font-weight-light">
-                        ---
-                        -hosts: all
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-  </a>
-</div>
-
-<!-- Modal -->
-<div class="modal fade" id="compute-scores-modal" tabindex="-1" role="dialog" aria-labelledby="compute-scores-modal" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">RepositoryScorer settings</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-
-        <form class="needs-validation" method="POST">
-        {% csrf_token %}
-            <h5 class="mb-3 mt-5" style="text-align:center;">Where do you want to clone the repository?</h5>
-            <div  style="text-align:center;">
-                {{ form.input_path_to_clones }}
-            </div>
-            <h5 class="mb-3 mt-5" style="text-align:center;">Github access token</h5>
-            <div  style="text-align:center;">
-                {{ form.input_github_token }}
-            </div>
-
-            <hr class="mb-4">
-            <button class="btn btn-primary btn-lg btn-block" type="submit">Start</button>
-        </form>
-      </div>
-    </div>
+    </nav>
   </div>
 </div>
-</div>
 
-{% endblock %}
+{% block repository_details_content %}{% endblock %}
+
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+<!-- Icons -->
+<script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+<script>
+  feather.replace()
+</script>

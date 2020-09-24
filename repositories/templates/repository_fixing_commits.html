@@ -1,0 +1,30 @@
+{% extends "repository_detail.html" %}
+{% block repository_details_content %}
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Fixing commits</h1>
+  </div>
+
+  {% if not repository.releases %}
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 text-center">
+    <h1 class="h2">No fixing commits. Have you already mined the repository?</h1>
+  </div>
+  {% else %}
+  <div class="list-group">
+      {% for commit in repository.fixing_commits %}
+        <div class="list-group-item list-group-item-action flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+                <a href="{{ repository.url }}/commit/{{ commit.sha }}" target="_blank" style="color:#4ab9db"> <h5 class="mb-1">{{ commit.sha }}</h5> </a>
+                <div class="col col-lg-2" >
+                    <small class="text-muted">{{ commit.date }}</small>
+                    <i class="fa fa-trash" style="float:right;"></i>
+                </div>
+            </div>
+            <p class="mb-1">{{ commit.msg }}</p>
+        </div>
+      {% endfor %}
+  </div>
+  {% endif %}
+
+</main>
+{% endblock %}

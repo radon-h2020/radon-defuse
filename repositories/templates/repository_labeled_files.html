@@ -1,0 +1,49 @@
+{% extends "repository_detail.html" %}
+{% block repository_details_head %}
+{% load static %}
+<link rel="stylesheet" href="{% static "css/timeline.css" %}">
+{% endblock %}
+
+{% block repository_details_content %}
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Labeled files</h1>
+  </div>
+
+  {% if not repository.releases %}
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 text-center">
+    <h1 class="h2">No labeled files. Have you already mined the repository?</h1>
+  </div>
+  {% else %}
+    <div class="container ml-4">
+      <div class="timeline">
+      {% for release in repository.releases %}
+        {% if release.files %}
+              <div class="timeline-date">
+                  <a style="color: white;" href="{{ repository.url }}/commit/{{ release.sha }}" target="_blank"> {{ release.sha }} </a>
+              </div>
+            <div class="row ml-4 mb-5">
+                {% for file in release.files %}
+                    <div class="col-sm-4">
+                      <div class="timeline-box">
+                        <div class="box-title">
+                           {{ file.filepath }}
+                        </div>
+                        <div class="box-content">
+                          <div class="box-item"><strong>Fixing commit</strong>:
+                              <span class="badge badge-pill badge-success"> {{ file.fixing_commit }} </span>
+                          </div>
+                        </div>
+                        <div class="box-footer"></div>
+                      </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+      {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</main>
+{% endblock %}
+

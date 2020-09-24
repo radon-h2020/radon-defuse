@@ -1,0 +1,86 @@
+{% extends "repository_detail.html" %}
+{% block repository_details_content %}
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard</h1>
+  </div>
+
+    <div class="row">
+      <div class="col">
+          <div class="card align-items-center" style="height:150px;">
+                <br/>
+                <i class="fa fa-github fa-2x"></i>
+                <h2>{{ repository.scores.commit_frequency|default:"-" }}  </h2>
+                <p class="text-muted">Avg commits/month</p>
+          </div>
+      </div>
+      <div class="col">
+        <div class="card align-items-center" style="height:150px;">
+            <br/>
+            <i class="fa fa-exclamation-circle fa-2x"></i>
+            <h2>{{ repository.scores.issue_frequency|default:"-" }} </h2>
+            <p class="text-muted">Avg issue events/month</p>
+        </div>
+      </div>
+      <div class="w-100 mt-4"></div>
+      <div class="col">
+        <div class="card align-items-center" style="height:150px;">
+            <br/>
+            <i class="fa fa-users fa-2x"></i>
+            <h2>{{ repository.scores.core_contributors|default:"-" }}  </h2>
+            <p class="text-muted">Core contributors</p>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card align-items-center" style="height:150px;">
+            <br/>
+            <i class="fa fa-comments fa-2x"></i>
+            <h2>{{ repository.scores.percent_comment|default:"-" }} % </h2>
+            <p class="text-muted">Comments</p>
+        </div>
+      </div>
+      <div class="w-100 mt-4"></div>
+      <div class="col">
+        <div class="card align-items-center" style="height:150px;">
+            <br/>
+            <i class="fa fa-file fa-2x"></i>
+            <h2>{{ repository.scores.iac_ratio|default:"-" }} % </h2>
+            <p class="text-muted">IaC scripts</p>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card align-items-center" style="height:150px;">
+            <br/>
+            <i class="fa fa-code fa-2x"></i>
+            <h2>{{ repository.scores.repository_size|default:"-" }}  </h2>
+            <p class="text-muted">Source Lines of Code</p>
+        </div>
+      </div>
+      <div class="w-100 mt-4"></div>
+      <div class="col">
+        <div class="card align-items-center" style="height:150px;">
+            <br/>
+            <i class="fa fa-copyright fa-2x"></i>
+            {% if repository.scores.license %}
+            <i class="fa fa-check fa-2x" style="color:#00FF00;"></i>
+            {% else %}
+            <i class="fa fa-times fa-2x" style="color:#FF0000;"></i>
+            {% endif %}
+            <p class="text-muted">License</p>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card align-items-center" style="height:150px;">
+            <br/>
+            <i class="fa fa-gg-circle fa-2x"></i>
+            {% if repository.scores.continuous_integration %}
+            <i class="fa fa-check fa-2x" style="color:#00FF00;"></i>
+            {% else %}
+            <i class="fa fa-times fa-2x" style="color:#FF0000;"></i>
+            {% endif %}
+            <p class="text-muted">Continuous Integration</p>
+        </div>
+      </div>
+    </div>
+</main>
+{% endblock %}

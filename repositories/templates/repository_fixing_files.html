@@ -1,0 +1,60 @@
+{% extends "repository_detail.html" %}
+{% block repository_details_content %}
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Fixing files</h1>
+  </div>
+
+  {% if not repository.releases %}
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 text-center">
+    <h1 class="h2">No fixing files. Have you already mined the repository?</h1>
+  </div>
+  {% else %}
+
+  <div class="list-group">
+      {% for commit in repository.fixing_commits %}
+        {% if commit.files %}
+            <div class="list-group-item list-group-item-action flex-column align-items-start">
+                <div class="d-flex w-100 justify-content-between">
+                    <a href="{{ repository.url }}/commit/{{ commit.sha }}" target="_blank">
+                        <span class="badge badge badge-success">{{ commit.sha }}</span>
+                    </a>
+                    <div class="col col-lg-2" >
+                        <small class="text-muted">{{ commit.date }}</small>
+                        <i class="fa fa-trash" style="float:right;"></i>
+                    </div>
+                </div>
+                <p class="mb-1">{{ commit.msg }}</p>
+
+                <!-- Accordion -->
+                <div class="accordion" id="accordion">
+                {% for file in commit.files %}
+                    <div class="card">
+                        <div class="card-header"  data-toggle="collapse" data-target="#collapse-{{ file.filepath|cut:'.'|cut:'\\' }}" aria-expanded="false" aria-controls="collapse-{{ file.filepath|cut:'.'|cut:'\\' }}">
+                            <div class="row">
+                                <div class="col">
+                                    <small class="mb-0 text-muted font-weight-bold"> {{ file.filepath }} </small>
+                                    <a href="{{ repository.url }}/commit/{{ file.bug_inducing_commit }}" target="_blank">
+                                        <span class="badge badge-pill badge-danger">{{ file.bug_inducing_commit }}</span>
+                                    </a>
+                                </div>
+                                <div class="col col-lg-1" >
+                                    <i class="fa fa-trash" style="float:right;"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="collapse-{{ file.filepath|cut:'.'|cut:'\\' }}" class="collapse" aria-labelledby="heading-{{ file.filepath|cut:'.'|cut:'\\' }}" data-parent="#accordion">
+                            <div class="card-body">
+                                <p class="font-weight-light">{{ file.diff|linebreaks }} </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+  {% endfor %}
+ </div>
+ {% endif %}
+</main>
+{% endblock %}

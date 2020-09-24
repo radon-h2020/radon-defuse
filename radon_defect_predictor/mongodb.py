@@ -2,8 +2,8 @@ import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
-class MongoDBManager:
 
+class MongoDBManager:
     __instance = None
 
     def __init__(self):

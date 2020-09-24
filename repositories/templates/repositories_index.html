@@ -1,96 +1,161 @@
-{% extends "base.html" %}
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://getbootstrap.com/docs/4.1/examples/dashboard/dashboard.css">
+</head>
+
+<body>
+
 {% load static %}
-{% block page_content %}
-<div class="row text-center">
-    <br/>
-    <div class="col text-center">
-        <h2>Repositories</h2>
-    </div>
+<nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+  <a class="navbar-brand col-sm-3 col-md-2 mr-0" href=""> RADON</a>
+  <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+</nav>
+<div class="container-fluid">
+  <div class="row">
+    <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+      <div class="sidebar-sticky">
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>Repositories</span>
+        </h6>
+
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="home"></span>
+              Dashboard
+            </a>
+          </li>
+        </ul>
+
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>ACTIONS</span>
+        </h6>
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="">
+              <span data-feather="star"></span>
+              Compute scores
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="" >
+              <span data-feather="play-circle"></span>
+              Mine all
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="tool"></span>
+              Train all
+            </a>
+          </li>
+        </ul>
+
+        <div class="mt-4" style="text-align:center;">
+            <a href="#"  class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#import_modal">
+                <span data-feather="upload"> </span> Import
+            </a>
+            <a href="{% url 'repositories_dump'%}" download="repositories.json" class="btn btn-outline-secondary btn-sm ml-2">
+                <span data-feather="download"> </span> Export
+            </a>
+        </div>
+      </div>
+    </nav>
+  </div>
 </div>
 
-<div class="row">
-    <div class="col">
-        <div class="card align-items-center">
-            <br/>
-            <i class="fa fa-git-square  fa-2x" style="color:#f34f29;"></i>
-            <h2>{{ metadata.repos }}</h2>
-            <p class="font-weight-light text-center">Repositories</p>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card align-items-center">
-            <br/>
-            <i class="fa fa-exclamation-circle fa-2x" style="color:#dc3545;"></i>
-            <h2>{{ metadata.avg_issues }} &plusmn; {{ metadata.std_issues }} </h2>
-            <p class="font-weight-light ">Avg issues</p>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card align-items-center">
-            <br/>
-            <i class="fa fa-tag fa-2x" style="color:#28a745;"></i>
-            <h2>{{ metadata.avg_releases }} &plusmn; {{ metadata.std_releases }} </h2>
-            <p class="font-weight-light ">Avg releases</p>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card align-items-center">
-            <br/>
-            <i class="fa fa-star fa-2x" style="color:#ffc107;"></i>
-            <h2>{{ metadata.avg_stars }} &plusmn; {{ metadata.std_stars }} </h2>
-            <p class="font-weight-light text-center">Avg stars</p>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card align-items-center">
-            <br/>
-            <i class="fa fa-eye fa-2x" style="color:#17a2b8;"></i>
-            <h2>{{ metadata.avg_watchers }} &plusmn; {{ metadata.std_watchers }} </h2>
-            <p class="font-weight-light text-center">Avg watchers</p>
-        </div>
-    </div>
-</div>
 
-<br/>
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Repositories</h1>
+    </div>
 
-<div class="text-center">
-    <a href="{% url 'repositories_dump'%}" download="repositories.json" class="btn btn-outline-primary btn-sm">
-    <i class="fa fa-download fa-2x" > </i> Database dump
-    </a>
-</div>
+    <div class="accordion" id="accordion">
+    {% for repo in repositories %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-{{ repo.id|cut:'=' }}" aria-expanded="false" aria-controls="collapse-{{ repo.id|cut:'=' }}">
+                        {{ repo.owner }}/{{ repo.name }} <a href="{{ repo.url }}" class="fa fa-github" aria-hidden="true"></a>
+                    </button>
+                </h5>
+            </div>
+            <div id="collapse-{{ repo.id|cut:'=' }}" class="collapse" aria-labelledby="heading-{{ repo.id|cut:'=' }}" data-parent="#accordion">
+                <div class="card-body">
+                    <p class="font-weight-light">{{ repo.description }}</p>
+                    <span class="badge badge-pill badge-dark">Created at: {{ repo.created_at }}</span>
+                    <span class="badge badge-pill badge-dark">Pushed at: {{ repo.pushed_at }}</span><br/>
+                    <span class="badge badge-pill badge-primary">Default branch: {{ repo.default_branch }}</span>
+                    <span class="badge badge-pill badge-danger">Issues: {{ repo.issues }}</span>
+                    <span class="badge badge-pill badge-success">Releases: {{ repo.releases }}</span>
+                    <span class="badge badge-pill badge-warning">Stars: {{ repo.stars }}</span>
+                    <span class="badge badge-pill badge-info">Watchers: {{ repo.watchers }}</span>
+                    <span class="badge badge-pill badge-secondary">Language: {{ repo.primary_language|default:"unknown" }}</span>
 
-<br/>
-
-<div class="accordion" id="accordion">
-{% for repo in repositories %}
-    <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-{{ repo.owner }}-{{ repo.name }}" aria-expanded="false" aria-controls="collapse-{{ repo.owner }}-{{ repo.name }}">
-                    {{ repo.owner }}/{{ repo.name }} <a href="{{ repo.url }}" class="fa fa-github" aria-hidden="true"></a>
-                </button>
-            </h5>
-        </div>
-        <div id="collapse-{{ repo.owner }}-{{ repo.name }}" class="collapse" aria-labelledby="heading-{{ repo.owner }}-{{ repo.name }}" data-parent="#accordion">
-            <div class="card-body">
-                <p class="font-weight-light">{{ repo.description }}</p>
-                <span class="badge badge-pill badge-dark">Created at: {{ repo.created_at }}</span>
-                <span class="badge badge-pill badge-dark">Pushed at: {{ repo.pushed_at }}</span><br/>
-                <span class="badge badge-pill badge-primary">Default branch: {{ repo.default_branch }}</span>
-                <span class="badge badge-pill badge-danger">Issues: {{ repo.issues }}</span>
-                <span class="badge badge-pill badge-success">Releases: {{ repo.releases }}</span>
-                <span class="badge badge-pill badge-warning">Stars: {{ repo.stars }}</span>
-                <span class="badge badge-pill badge-info">Watchers: {{ repo.watchers }}</span>
-                <span class="badge badge-pill badge-secondary">Language: {{ repo.primary_language }}</span>
-
-                <a href="{% url 'repository_detail' repo.id %}" class="btn btn-outline-primary btn-sm" style="float: right;">
-                        Go to repository
-                </a>
+                    <a href="{% url 'repository_main' repo.id %}" class="btn btn-outline-primary btn-sm" style="float: right;">
+                            Go to repository
+                    </a>
+                </div>
             </div>
         </div>
+    {% endfor %}
     </div>
-{% endfor %}
+
+</main>
+
+
+<div class="modal" id="import_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Select collection to import!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="custom-file">
+          <input type="file" class="custom-file-input" id="customFile">
+          <label class="custom-file-label" for="customFile">Choose file</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Import</button>
+      </div>
+    </div>
+  </div>
 </div>
-{% endblock %}
+
+</body>
+
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+<!-- Icons -->
+<script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+<script>
+  feather.replace()
+</script>
+
+<script>
+
+$('#customFile').on('change',function(event){
+    var fileName = document.getElementById("customFile").files[0].name;
+    console.log(event.target.files)
+    //var fileName = $(this).val();
+    //replace the "Choose a file" label
+    $(this).next('.custom-file-label').html(fileName);
+})
+</script>
+</html>
+
+
+
+
 
 

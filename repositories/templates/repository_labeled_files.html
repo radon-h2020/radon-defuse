@@ -27,12 +27,18 @@
                     <div class="col-sm-4">
                       <div class="timeline-box">
                         <div class="box-title">
-                           {{ file.filepath }}
+                          {% if file.label == 'clean' %}
+                           <span class="badge badge badge-success"> {{ file.filepath }} </span>
+                          {% else %}
+                           <span class="badge badge badge-danger"> {{ file.filepath }} </span>
+                          {% endif %}
                         </div>
                         <div class="box-content">
+                          {% if file.fixing_commit %}
                           <div class="box-item"><strong>Fixing commit</strong>:
-                              <span class="badge badge-pill badge-success"> {{ file.fixing_commit }} </span>
+                              {{ file.fixing_commit }}
                           </div>
+                          {% endif %}
                         </div>
                         <div class="box-footer"></div>
                       </div>

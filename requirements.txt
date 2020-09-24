@@ -1,8 +1,12 @@
+ansiblemetrics~=0.3.5
 django~=3.1.1
 gitpython==3.1.8
 repositories-collector~=0.0.2
-repository-miner~=0.2.1
+repository-miner>=0.2.4
 repository-scorer>=0.0.5
+pandas>=1.1.2
 pydriller>=1.15.2
 pymongo~=3.11.0
 python-dotenv~=0.14.0
+scikit-learn>=0.23.2
+imbalanced-learn>=0.7.0

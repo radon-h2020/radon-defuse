@@ -73,6 +73,7 @@
         <h1 class="h2">Repositories</h1>
     </div>
 
+    {% if repositories %}
     <div class="accordion" id="accordion">
     {% for repo in repositories %}
         <div class="card">
@@ -103,7 +104,7 @@
         </div>
     {% endfor %}
     </div>
-
+    {% endif %}
 </main>
 
 

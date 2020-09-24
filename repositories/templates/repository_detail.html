@@ -64,7 +64,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="{% url 'repository_train' repository.id %}" download="model.json">
               <span data-feather="tool"></span>
               Train
             </a>
@@ -72,8 +72,9 @@
         </ul>
 
         <div class="mt-4" style="text-align:center;">
-          <button class="btn btn-sm btn-outline-secondary">
-            <span data-feather="download"> </span> Export</button>
+          <a href="{% url 'repository_metrics_dump' repository.id %}" download="metrics.csv" class="btn btn-outline-secondary btn-sm">
+              <span data-feather="download"> </span> Export metrics
+          </a>
         </div>
       </div>
     </nav>

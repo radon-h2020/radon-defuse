@@ -2,19 +2,24 @@
 import os
 import shutil
 import statistics
+from io import StringIO
 
 # Third-party
 import git
+import pandas as pd
+
+from ansiblemetrics import metrics_extractor
 from bson.json_util import dumps
 from django.http import HttpResponse
 from django.shortcuts import render
 from repositoryscorer.scorer import score_repository
-from miner.repository import RepositoryMiner
+from miner.repository import RepositoryMiner, GitRepository
 from pydriller.repository_mining import RepositoryMining
 
 # Project
 from radon_defect_predictor.mongodb import MongoDBManager
 from repositories.forms import RepositoryScorerForm, RepositoryMinerForm
+from repositories.train import ModelsManager
 
 
 def repositories_index(request):
@@ -236,6 +241,53 @@ def repository_score(request, id: str):
     return render(request, 'repository_score.html', context)
 
 
+def get_file_content(path) -> str:
+    """
+    Return the content of a file
+    :param path: the path to the file
+    :return: the content of the file, if exists; None, otherwise.
+    """
+    if not os.path.isfile(path):
+        return ''
+
+    with open(path, 'r') as f:
+        return f.read()
+
+
+def get_files(path_to_repo) -> set:
+    """
+    Return all the files in the repository
+    :return: a set of strings representing the path of the files in the repository
+    """
+
+    files = set()
+
+    for root, _, filenames in os.walk(path_to_repo):
+        if '.git' in root:
+            continue
+        for filename in filenames:
+            path = os.path.join(root, filename)
+            path = path.replace(path_to_repo, '')
+            if path.startswith('/'):
+                path = path[1:]
+
+            files.add(path)
+
+    return files
+
+
+def is_ansible_file(path: str) -> bool:
+    """
+    Check whether the path is an Ansible file
+    :param path: a path
+    :return: True if the path link to an Ansible file. False, otherwise
+    """
+    return path and ('test' not in path) \
+           and (
+                   'ansible' in path or 'playbooks' in path or 'meta' in path or 'tasks' in path or 'handlers' in path or 'roles' in path) \
+           and path.endswith('.yml')
+
+
 def repository_mine(request, id: str):
     repo = MongoDBManager.get_instance().get_single_repo(id)
     form = RepositoryMinerForm(request.GET)
@@ -282,26 +334,60 @@ def repository_mine(request, id: str):
                                if file.fic == commit.hash]
                     ))
 
-
                 # Saving failure-prone-scripts
-                repo['releases'] = list()
+                git_repo = GitRepository(path_to_repo)
+                repo['releases_obj'] = list()
+
                 for commit in RepositoryMining(path_to_repo=path_to_repo,
                                                only_releases=True,
                                                order='reverse').traverse_commits():
+
+                    git_repo.checkout(commit.hash)
+
+                    repo_files = get_files(path_to_repo)
+
                     release = dict(
                         sha=commit.hash,
                         date=commit.committer_date.strftime("%d/%m/%Y %H:%M"),
                         files=list()
                     )
 
+                    # Label the failure-prone scripts
                     for file in labeled_file:
                         if file.commit == commit.hash:
                             release['files'].append(dict(
                                 filepath=file.filepath,
-                                fixing_commit=file.fixing_commit
+                                fixing_commit=file.fixing_commit,
+                                label='failure_prone'
                             ))
 
+                            if file.filepath in repo_files:
+                                repo_files.remove(file.filepath)
+
+                    # Label the remaining files as "clean"
+                    for filepath in repo_files:
+                        if not is_ansible_file(filepath):
+                            continue
+
+                        release['files'].append(dict(
+                            filepath=filepath,
+                            fixing_commit=None,
+                            label='clean'
+                        ))
+
+                    # Extract Ansible metrics from files
+                    for file in release['files']:
+                        content = get_file_content(os.path.join(path_to_repo, file['filepath']))
+
+                        try:
+                            file['metrics'] = metrics_extractor.extract_all(StringIO(content))
+                        except (TypeError, ValueError):
+                            # Not a valid YAML or empty content
+                            pass
+
                     repo['releases_obj'].append(release)
+
+                    git_repo.reset()
 
                 # Save scores in DB
                 MongoDBManager.get_instance().replace_repo(repo)
@@ -324,3 +410,51 @@ def repository_mine(request, id: str):
     }
 
     return render(request, 'repository_mine.html', context)
+
+
+def repository_metrics_dump(request, id: str):
+    repo = MongoDBManager.get_instance().get_single_repo(id)
+
+    df = pd.DataFrame()
+
+    for release in repo.get('releases_obj', list()):
+        for file in release['files']:
+            row = file['metrics']
+            row.update({
+                'release': release['sha'],
+                'date': release['date'],
+                'filepath': file['filepath'],
+                'label': file['label']
+            })
+
+            df = df.append(row, ignore_index=True)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=metrics.csv'
+    df.to_csv(path_or_buf=response)
+    return response
+
+
+def repository_train(request, id: str):
+    repo = MongoDBManager.get_instance().get_single_repo(id)
+
+    df = pd.DataFrame()
+
+    for release in repo.get('releases_obj', list()):
+        for file in release['files']:
+            row = file['metrics']
+            row.update({
+                'release': release['sha'],
+                'date': release['date'],
+                'filepath': file['filepath'],
+                'label': 0 if file['label'] == 'clean' else 1
+            })
+
+            df = df.append(row, ignore_index=True)
+
+    # Train model
+    model_manager = ModelsManager(df)
+    results = model_manager.train()
+    response = HttpResponse(results, content_type='text/json')
+    response['Content-Disposition'] = 'attachment; filename=model.json'
+    return response

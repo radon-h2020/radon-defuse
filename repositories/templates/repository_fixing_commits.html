@@ -1,30 +1,73 @@
 {% extends "repository_detail.html" %}
+
 {% block repository_details_content %}
 <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Fixing commits</h1>
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 border-bottom">
+    <p class="text-uppercase">Fixing-commits</p>
   </div>
+  <small>These are the commits identified as fixing defects based on the provided list of bug-related issues labels and regex.</small>
 
-  {% if not repository.fixing_commits %}
-  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 text-center">
-    <h1 class="h2">No fixing commits. Have you already mined the repository?</h1>
-  </div>
-  {% else %}
-  <div class="list-group">
-      {% for commit in repository.fixing_commits %}
-        <div class="list-group-item list-group-item-action flex-column align-items-start">
-            <div class="d-flex w-100 justify-content-between">
-                <a href="{{ repository.url }}/commit/{{ commit.sha }}" target="_blank" style="color:#4ab9db"> <h5 class="mb-1">{{ commit.sha }}</h5> </a>
-                <div class="col col-lg-2" >
-                    <small class="text-muted">{{ commit.date }}</small>
-                    <i class="fa fa-trash" style="float:right;"></i>
-                </div>
-            </div>
-            <p class="mb-1">{{ commit.msg }}</p>
-        </div>
-      {% endfor %}
-  </div>
-  {% endif %}
+  <table id="table-tp-commits" class="display table table-striped table-bordered" style="font-size: 13px; font-family: Verdana, Geneva, Tahoma, sans-serif;">
+        <thead>
+            <tr>
+                <th><span class="badge badge-pill badge-success">Sha</span></th>
+                <th><span class="badge badge-pill badge-info">Description</span></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for commit in repository.fixing_commits %}
+        <tr>
+            <td>
+                <a href="{{ repository.url }}/commit/{{ commit.sha }}" target="_blank" style="color:black;"> {{ commit.sha }} </a>
+            </td>
+            <td>
+                <p>{{ commit.msg }}</p>
+                <a class="mr-4" href="{% url 'delete_fixing_commit' repository.id commit.sha %}" style="float:right; color:red;"> <span data-feather="trash"></span></a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+  </table>
+
+    <!-- False positive fixing-commits -->
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 border-bottom">
+        <p class="text-uppercase">False positive fixing-commits</p>
+    </div>
+    <small>These are the commits identified as fixing defects, but that actually do not. For example, because they fix a typo.</small>
+
+    <table id="table-fp-commits" class="display table table-striped table-bordered" style="font-size: 13px; font-family: Verdana, Geneva, Tahoma, sans-serif;">
+        <thead>
+            <tr>
+                <th><span class="badge badge-pill badge-warning">Sha</span></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for sha in repository.fp_fixing_commits %}
+        <tr>
+            <td>
+                <a href="{{ repository.url }}/commit/{{ sha }}" target="_blank" style="color:black;"> {{ sha }} </a>
+                <a href="{% url 'delete_fixing_commit' repository.id sha %}" class="mr-4 text-warning"  style="float: right;"> <span  data-feather="trash"></span> </a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 
 </main>
+
+
+{% endblock %}
+
+
+{% block repository_details_scripts %}
+
+<script>
+   $(document).ready(function() {
+      $('#table-tp-commits').DataTable();
+   });
+
+   $(document).ready(function() {
+      $('#table-fp-commits').DataTable();
+   });
+</script>
 {% endblock %}

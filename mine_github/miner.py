@@ -81,10 +81,10 @@ def mine(token: str, date_from: datetime.date, date_to: datetime.date,
                 continue
 
             # Save repository to MongoDB
-            if db_manager.get_single_repo(repo['id']):
-                db_manager.replace_repo(repo)
+            if db_manager.get_repository(repo['id']):
+                db_manager.replace_repository(repo)
             else:
-                db_manager.add_repo(repo)
+                db_manager.add_repository(repo)
 
             mining_data = dict(
                 repository=repo,

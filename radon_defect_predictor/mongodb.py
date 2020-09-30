@@ -24,18 +24,23 @@ class MongoDBManager:
             MongoDBManager()
         return MongoDBManager.__instance
 
-    def db_exists(self) -> bool:
-        return 'iac_miner' in self.client.list_database_names()
-
-    def get_all_repos(self) -> list:
+    def get_repositories(self) -> list:
         return [document for document in self.db.repositories.find({})]
 
-    def get_single_repo(self, id: str):
+    def get_repository(self, id: str):
         return self.db.repositories.find_one({'id': id})
 
-    def add_repo(self, repo: dict):
-        repo_id = self.db.repositories.insert_one(repo).inserted_id
-        return repo_id
+    def add_repository(self, repo: dict):
+        """
+        Insert a new repository if it does not exist in the database.
+        :param repo: the repository to insert
+        :return: the inserted id; None if already exists
+        """
+        repository = self.get_repository(repo['id'])
+        if repository:
+            return None
+        else:
+            return self.db.repositories.insert_one(repo)
 
-    def replace_repo(self, repo: dict):
+    def replace_repository(self, repo: dict):
         return self.db.repositories.replace_one({'id': repo['id']}, repo)

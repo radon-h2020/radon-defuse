@@ -1,135 +1,170 @@
-<html>
+{% load static %}
 
 <head>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://getbootstrap.com/docs/4.1/examples/dashboard/dashboard.css">
+
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
 </head>
 
 <body>
 
-{% load static %}
-<nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-  <a class="navbar-brand col-sm-3 col-md-2 mr-0" href=""> RADON</a>
-  <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
-</nav>
-<div class="container-fluid">
-  <div class="row">
-    <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-      <div class="sidebar-sticky">
-        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-          <span>Repositories</span>
-        </h6>
-
-        <ul class="nav flex-column">
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span data-feather="home"></span>
-              Dashboard
-            </a>
-          </li>
-        </ul>
-
-        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-          <span>ACTIONS</span>
-        </h6>
-        <ul class="nav flex-column">
-          <li class="nav-item">
-            <a class="nav-link" href="">
-              <span data-feather="star"></span>
-              Compute scores
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="" >
-              <span data-feather="play-circle"></span>
-              Mine all
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span data-feather="tool"></span>
-              Train all
-            </a>
-          </li>
-        </ul>
-
-        <div class="mt-4" style="text-align:center;">
-            <a href="#"  class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#import_modal">
-                <span data-feather="upload"> </span> Import
-            </a>
-            <a href="{% url 'repositories_dump'%}" download="repositories.json" class="btn btn-outline-secondary btn-sm ml-2">
-                <span data-feather="download"> </span> Export
-            </a>
-        </div>
-      </div>
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href=""> RADON</a>
     </nav>
-  </div>
-</div>
+    <div class="container-fluid">
+      <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
 
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+              <span>ACTIONS</span>
+            </h6>
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" href="">
+                  <span data-feather="star"></span>
+                  Compute scores
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="" >
+                  <span data-feather="play-circle"></span>
+                  Mine all
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="tool"></span>
+                  Train all
+                </a>
+              </li>
+            </ul>
 
-<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Repositories</h1>
+            <div class="mt-4" style="text-align:center;">
+                <!--<a href="#"  class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#import_modal">
+                    <span data-feather="upload"> </span> Import
+                </a>-->
+                <a href="{% url 'repositories_dump' %}" download="repositories.json" class="btn btn-outline-secondary btn-sm ml-2">
+                    <span data-feather="download"> </span> Export
+                </a>
+            </div>
+          </div>
+        </nav>
+      </div>
     </div>
 
-    {% if repositories %}
-    <div class="accordion" id="accordion">
-    {% for repo in repositories %}
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-{{ repo.id|cut:'=' }}" aria-expanded="false" aria-controls="collapse-{{ repo.id|cut:'=' }}">
-                        {{ repo.owner }}/{{ repo.name }} <a href="{{ repo.url }}" class="fa fa-github" aria-hidden="true"></a>
-                    </button>
-                </h5>
-            </div>
-            <div id="collapse-{{ repo.id|cut:'=' }}" class="collapse" aria-labelledby="heading-{{ repo.id|cut:'=' }}" data-parent="#accordion">
-                <div class="card-body">
-                    <p class="font-weight-light">{{ repo.description }}</p>
-                    <span class="badge badge-pill badge-dark">Created at: {{ repo.created_at }}</span>
-                    <span class="badge badge-pill badge-dark">Pushed at: {{ repo.pushed_at }}</span><br/>
-                    <span class="badge badge-pill badge-primary">Default branch: {{ repo.default_branch }}</span>
-                    <span class="badge badge-pill badge-danger">Issues: {{ repo.issues }}</span>
-                    <span class="badge badge-pill badge-success">Releases: {{ repo.releases }}</span>
-                    <span class="badge badge-pill badge-warning">Stars: {{ repo.stars }}</span>
-                    <span class="badge badge-pill badge-info">Watchers: {{ repo.watchers }}</span>
-                    <span class="badge badge-pill badge-secondary">Language: {{ repo.primary_language|default:"unknown" }}</span>
 
-                    <a href="{% url 'repository_main' repo.id %}" class="btn btn-outline-primary btn-sm" style="float: right;">
-                            Go to repository
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 mt-3 border-bottom">
+            <p class="text-uppercase">Repositories</p>
+            <a href="{% url 'repositories_dump' %}" download="repositories.json" class="btn btn-outline-secondary btn-sm ml-2" style="float:right;">
+                <span data-feather="plus"> </span> Add
+            </a>
+        </div>
+
+        <table id="table-repositories" class="display table table-striped table-bordered" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-size: 12px;">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th><span class="badge badge-pill badge-danger">Issues</span></th>
+                    <th><span class="badge badge-pill badge-success">Releases</span></th>
+                    <th><span class="badge badge-pill badge-warning">Stars</span></th>
+                    <th><span class="badge badge-pill badge-info">Watchers</span></th>
+                    <!--<th><span class="badge badge-pill badge-secondary">Primary language</span></th>
+                    <th><span class="badge badge-pill badge-primary">Default branch</span></th>-->
+                    <th><span class="badge badge-primary">Commits <br/> / <br/> month</span></th>
+                    <th><span class="badge badge-primary">Issues <br/> / <br/> month</span></th>
+                    <th><span class="badge badge-primary">Core <br/> contributors</span></th>
+                    <th><span class="badge badge-primary">% <br/> comments</span></th>
+                    <th><span class="badge badge-primary">% <br/> iac files</span></th>
+                    <th><span class="badge badge-primary">Size</span></th>
+                    <th><span class="badge badge-primary">CI</span></th>
+                    <th><span class="badge badge-primary">Licence</span></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for repo in repositories %}
+            <tr><td>
+                    <a href="{{ repo.url }}" target="_blank" class="fa fa-github" aria-hidden="true" style="color:black; text-decoration: none;">
+                            {{ repo.owner }}/{{ repo.name }}
                     </a>
-                </div>
+                    <a href="{% url 'repository_details' repo.id %}" class="btn btn-outline-primary btn-sm"  style="float: right;"> <small>See more</small> </a>
+                </td>
+                <td>{{ repo.issues }}</td>
+                <td>{{ repo.releases }}</td>
+                <td>{{ repo.stars }}</td>
+                <td>{{ repo.watchers }}</td>
+                <!--<td>{{ repo.primary_language }}</td>
+                <td>{{ repo.default_branch }}</td>-->
+                <td>{{ repo.scores.commit_frequency|default:"-" }}</td>
+                <td>{{ repo.scores.issue_frequency|default:"-" }}</td>
+                <td>{{ repo.scores.core_contributors|default:"-" }}</td>
+                <td>{{ repo.scores.percent_comment|default:"-" }}</td>
+                <td>{{ repo.scores.iac_ratio|default:"-" }}</td>
+                <td>{{ repo.scores.repository_size|default:"-" }}</td>
+                <td>
+                    {% if repo.scores and repo.scores.continuous_integration %}
+                    <span data-feather="check-square" style="color: green;"></span>
+                    {% else %}
+                    <span data-feather="x-square" style="color: red;"></span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if repo.scores and repo.scores.license %}
+                    <span data-feather="check-square" style="color: green;"></span>
+                    {% else %}
+                    <span data-feather="x-square" style="color: red;"></span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- LABELS -->
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 mt-3 border-bottom">
+            <p class="text-uppercase">Labels</p>
+            <a href="{% url 'collect_repositories_labels' %}" class="btn btn-outline-secondary btn-sm ml-2" style="float:right;">
+                Collect
+            </a>
+        </div>
+
+        <table id="table-labels" class="display table table-striped table-bordered" >
+            <thead><tr><th>Bug-related labels</th></tr></thead>
+            <tbody>
+            {% for label in labels %}
+            <tr><td>{{ label }}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </main>
+
+    <!--
+    <div class="modal" id="import_modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Select collection to import!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="customFile">
+              <label class="custom-file-label" for="customFile">Choose file</label>
             </div>
-        </div>
-    {% endfor %}
-    </div>
-    {% endif %}
-</main>
-
-
-<div class="modal" id="import_modal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Select collection to import!</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="custom-file">
-          <input type="file" class="custom-file-input" id="customFile">
-          <label class="custom-file-label" for="customFile">Choose file</label>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Import</button>
+          </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-dismiss="modal">Import</button>
-      </div>
     </div>
-  </div>
-</div>
-
+    -->
 </body>
 
 <!-- Placed at the end of the document so the pages load faster -->
@@ -137,14 +172,39 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
+<!-- DataTables -->
+<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+
+<script>
+   $(document).ready(function() {
+      $('#table-repositories').DataTable( {
+            processing: true
+      });
+   });
+
+   $(document).ready(function() {
+      $('#table-labels').DataTable();
+   });
+</script>
+
 <!-- Icons -->
 <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
 <script>
   feather.replace()
 </script>
 
-<script>
 
+<script>
+    function sendDelete(event){
+        event.preventDefault();
+        xhttp.open("DELETE", this.href, true);
+        xhttp.send();
+    }
+</script>
+
+<script>
 $('#customFile').on('change',function(event){
     var fileName = document.getElementById("customFile").files[0].name;
     console.log(event.target.files)
@@ -153,10 +213,4 @@ $('#customFile').on('change',function(event){
     $(this).next('.custom-file-label').html(fileName);
 })
 </script>
-</html>
-
-
-
-
-
 

@@ -67,7 +67,7 @@ class MinerSettingsForm(forms.Form):
 
     input_github_token = forms.CharField(
         required=True,
-        widget=forms.PasswordInput(attrs={'placeholder': 'Paste here your token'}),
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Paste here your personal token'}),
         error_messages={
             'required': 'Access token is required. You can generate one from https://github.com/settings/tokens. \
                         Please, make sure to select access to public repositories and issues.'

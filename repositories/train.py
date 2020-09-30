@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import jsonpickle
 
 from sklearn import tree
 from sklearn import feature_selection
@@ -115,4 +116,6 @@ class ModelsManager:
         cv_results['y_0'] = y.tolist().count(0)
         cv_results['y_1'] = y.tolist().count(1)
 
-        return cv_results.to_json(orient='table', index=False)
+        pkl_model = jsonpickle.encode(pipe)
+
+        return cv_results.to_json(orient='table', index=False), pkl_model

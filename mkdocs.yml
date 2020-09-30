@@ -4,9 +4,6 @@ repo_url: https://github.com/radon-h2020/radon-defect-prediction-api/
 nav:
     - Getting Started: 
         - Quick Start: index.md
-        - Features:
-            - mine-github: mine_github
-            - mine-repository: mine_reporitory
-            - repositories: repositories
+    - APIs Reference: apis.md
     - About: about.md
 theme: readthedocs

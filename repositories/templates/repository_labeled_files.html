@@ -20,7 +20,7 @@
       {% for release in repository.releases %}
         {% if release.files %}
               <div class="timeline-date">
-                  <a style="color: white;" href="{{ repository.url }}/commit/{{ release.sha }}" target="_blank"> {{ release.sha }} </a>
+                  <a style="color: white;" href="{{ repository.url }}/commit/{{ release.sha }}" target="_blank"> {{ release.date }} </a>
               </div>
             <div class="row ml-4 mb-5">
                 {% for file in release.files %}

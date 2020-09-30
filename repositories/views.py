@@ -1,91 +1,195 @@
 # Built-in
 import os
 import shutil
-import statistics
-from io import StringIO
 
 # Third-party
 import git
 import pandas as pd
 
-from ansiblemetrics import metrics_extractor
 from bson.json_util import dumps
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
+from github import Github, Repository
 from repositoryscorer.scorer import score_repository
-from miner.repository import RepositoryMiner, GitRepository
-from pydriller.repository_mining import RepositoryMining
 
 # Project
 from radon_defect_predictor.mongodb import MongoDBManager
 from repositories.forms import RepositoryScorerForm, RepositoryMinerForm
+from repositories.miners import Mining
 from repositories.train import ModelsManager
 
 
-def repositories_index(request):
-    repos = MongoDBManager.get_instance().get_all_repos()
+# /repositories/
+def list_repositories(request):
+    repositories = MongoDBManager.get_instance().get_repositories()
+    repositories_to_show = []
+    labels = set()
 
-    light_repos = []
-    for repo in repos:
-        light_repos.append(
+    for repo in repositories:
+        language = repo['primary_language'] if repo['primary_language'] else '-'
+        repositories_to_show.append(
             dict(
                 id=repo['id'],
                 url=repo['url'],
                 owner=repo['owner'],
                 name=repo['name'],
                 default_branch=repo['default_branch'],
-                description=repo['description'],
-                created_at=repo['pushed_at'],
-                pushed_at=repo['created_at'],
-                issues=repo['created_at'],
+                issues=repo['issues'],
                 releases=repo['releases'],
                 stars=repo['stars'],
                 watchers=repo['watchers'],
-                primary_language=repo['primary_language']
+                primary_language=language,
+                scores=repo.get('scores', list())
             )
         )
 
-    if not repos:
-        context = {
-            'repositories': repos,
-            'metadata': {
-                'repos': 0,
-                'avg_issues': 0,
-                'std_issues': 0,
-                'avg_releases': 0,
-                'std_releases': 0,
-                'avg_stars': 0,
-                'std_stars': 0,
-                'avg_watchers': 0,
-                'std_watchers': 0
-            }
-        }
-    else:
-        context = {
-            'repositories': light_repos,
-            'metadata': {
-                'repos': len(repos),
-                'avg_issues': int(statistics.mean([d['issues'] for d in repos])),
-                'std_issues': int(statistics.stdev([d['issues'] for d in repos])),
-                'avg_releases': int(statistics.mean([d['releases'] for d in repos])),
-                'std_releases': int(statistics.stdev([d['releases'] for d in repos])),
-                'avg_stars': int(statistics.mean([d['stars'] for d in repos])),
-                'std_stars': int(statistics.stdev([d['stars'] for d in repos])),
-                'avg_watchers': int(statistics.mean([d['watchers'] for d in repos])),
-                'std_watchers': int(statistics.stdev([d['watchers'] for d in repos]))
-            }
-        }
+        labels = labels.union(set(repo.get('bug_related_labels', set())))
 
-    return render(request, 'repositories_index.html', context)
+    context = dict()
+    context['repositories'] = repositories_to_show
+    context['labels'] = labels
+    return render(request=request, context=context, template_name='repositories_index.html', status=200)
 
 
-def repositories_dump(request):
-    repos = dumps(MongoDBManager.get_instance().get_all_repos())
-    size = len(repos)
-    response = HttpResponse(repos, content_type='application/json')
+# /repositories/labels/
+def collect_repositories_labels(request):
+    """
+    Collect bug-related labels from all the repositories
+    :param request:
+    :return:
+    """
+    """
+    repositories = MongoDBManager.get_instance().get_repositories()
+
+    repo = self.__github.get_repo('/'.join([self.repo_owner, self.repo_name]))  # repo_owner/repo_name
+    labels = set()
+    for label in repo.get_labels():
+        if type(label) == github.Label.Label:
+            labels.add(label.name)
+
+    return labels
+    """
+
+
+# /repositories/dump/
+def dump_repositories(request):
+    repositories = dumps(MongoDBManager.get_instance().get_repositories())
+    size = len(repositories)
+    response = HttpResponse(repositories, content_type='application/json')
     response['Content-Length'] = size
     response['Content-Disposition'] = 'attachment; filename=%s' % 'repositories.json'
     return response
+
+
+# /repository/{id}/
+def repository_details(request, id: str):
+    repo = MongoDBManager.get_instance().get_repository(id)
+
+    context = {
+        'repository': {
+            'id': repo['id'],
+            'url': repo['url'],
+            'owner': repo['owner'],
+            'name': repo['name'],
+            'scores': repo.get('scores', {})
+        }
+    }
+    return render(request=request, context=context, template_name='repository_home.html', status=200)
+
+
+# /repository/{id}/delete/
+def delete_repository(request, id: str):
+    data = {'is_taken': True}
+    return JsonResponse(data)
+
+
+# /repository/{id}/dump/
+def dump_repository(request, id: str):
+    repository = MongoDBManager.get_instance().get_repository(id)
+    name = repository['name']
+    repository = dumps(repository)
+    size = len(repository)
+    response = HttpResponse(repository, content_type='application/json')
+    response['Content-Length'] = size
+    response['Content-Disposition'] = 'attachment; filename=%s.json' % name
+    return response
+
+
+# /repository/{id}/fixing-commits/
+def repository_fixing_commits(request, id: str):
+    repo = MongoDBManager.get_instance().get_repository(id)
+    context = {
+        'repository': {
+            'id': repo['id'],
+            'url': repo['url'],
+            'owner': repo['owner'],
+            'name': repo['name'],
+            'fixing_commits': repo.get('fixing_commits', list()),
+            'fp_fixing_commits': repo.get('false_positive_fixing_commits', list())
+        }
+    }
+    return render(request, 'repository_fixing_commits.html', context)
+
+
+# /repository/{id}/fixing-commits/{sha}/delete
+def delete_fixing_commit(request, id: str, sha: str):
+    repo = MongoDBManager.get_instance().get_repository(id)
+
+    if sha in repo.get('false_positive_fixing_commits', list()):
+        # First search in false-positive fixing-commits
+        repo['false_positive_fixing_commits'].remove(sha)
+    else:
+        # the user is moving a commit from fixing_commits to false_positive_fixing_commits
+        index = [index for index, commit in enumerate(repo['fixing_commits']) if commit['sha'] == sha][0]
+        if index >= 0:
+            repo.setdefault('false_positive_fixing_commits', list()).append(repo['fixing_commits'][index]['sha'])
+            del repo['fixing_commits'][index]
+
+    MongoDBManager.get_instance().replace_repository(repo)
+
+    return repository_fixing_commits(request, id)
+
+
+# /repository/{id}/fixing-files/
+def repository_fixing_files(request, id: str):
+    repo = MongoDBManager.get_instance().get_repository(id)
+
+    files = list()
+    for commit in repo.get('fixing_commits', list()):
+        for file in commit.get('files', list()):
+            files.append({
+                'filepath': file['filepath'],
+                'sha_fixing_commit': commit['sha'],
+                'sha_bug_inducing_commit': file['bug_inducing_commit']
+            })
+
+    context = {
+        'repository': {
+            'id': repo['id'],
+            'url': repo['url'],
+            'owner': repo['owner'],
+            'name': repo['name'],
+        },
+        'files': files
+    }
+
+    return render(request, 'repository_fixing_files.html', context)
+
+
+# /repository/{id}/labeled-files/
+def repository_labeled_files(request, id: str):
+    repo = MongoDBManager.get_instance().get_repository(id)
+    context = {
+        'repository': {
+            'id': repo['id'],
+            'url': repo['url'],
+            'owner': repo['owner'],
+            'name': repo['name'],
+            'releases': repo.get('releases_obj', list())
+        }
+    }
+
+    return render(request, 'repository_labeled_files.html', context)
 
 
 def onerror(func, path, exc_info):
@@ -108,77 +212,8 @@ def onerror(func, path, exc_info):
         raise
 
 
-def repository_detail(request, id):
-    repo = MongoDBManager.get_instance().get_single_repo(id)
-
-    context = {'repository': {
-        'id': repo['id']
-    }}
-
-    return render(request, 'repository_detail.html', context)
-
-
-def repository_home(request, id: str):
-    repo = MongoDBManager.get_instance().get_single_repo(id)
-
-    context = {
-        'repository': {
-            'id': repo['id'],
-            'url': repo['url'],
-            'owner': repo['owner'],
-            'name': repo['name'],
-            'scores': repo.get('scores', {})
-        }
-    }
-    return render(request, 'repository_home.html', context)
-
-
-def repository_fixing_commits(request, id: str):
-    repo = MongoDBManager.get_instance().get_single_repo(id)
-    context = {
-        'repository': {
-            'id': repo['id'],
-            'url': repo['url'],
-            'owner': repo['owner'],
-            'name': repo['name'],
-            'fixing_commits': repo.get('fixing_commits', list())
-        }
-    }
-    return render(request, 'repository_fixing_commits.html', context)
-
-
-def repository_fixing_files(request, id: str):
-    repo = MongoDBManager.get_instance().get_single_repo(id)
-    context = {
-        'repository': {
-            'id': repo['id'],
-            'url': repo['url'],
-            'owner': repo['owner'],
-            'name': repo['name'],
-            'fixing_commits': repo.get('fixing_commits', list())
-        }
-    }
-
-    return render(request, 'repository_fixing_files.html', context)
-
-
-def repository_labeled_files(request, id: str):
-    repo = MongoDBManager.get_instance().get_single_repo(id)
-    context = {
-        'repository': {
-            'id': repo['id'],
-            'url': repo['url'],
-            'owner': repo['owner'],
-            'name': repo['name'],
-            'releases': repo.get('releases_obj', list())
-        }
-    }
-
-    return render(request, 'repository_labeled_files.html', context)
-
-
 def repository_score(request, id: str):
-    repo = MongoDBManager.get_instance().get_single_repo(id)
+    repo = MongoDBManager.get_instance().get_repository(id)
     form = RepositoryScorerForm(request.GET)
 
     if request.method == 'POST':
@@ -186,7 +221,7 @@ def repository_score(request, id: str):
 
         if form.is_valid():
             path_to_clones = form.cleaned_data['input_path_to_clones']
-            path_to_repo = os.path.join(path_to_clones, repo['name'])
+            path_to_repo = str(os.path.join(path_to_clones, repo['name']))
             is_cloned = False
 
             try:
@@ -209,7 +244,7 @@ def repository_score(request, id: str):
                 repo['scores'] = scores
 
                 # Save scores in DB
-                MongoDBManager.get_instance().replace_repo(repo)
+                MongoDBManager.get_instance().replace_repository(repo)
 
                 context = {
                     'repository': {
@@ -241,156 +276,30 @@ def repository_score(request, id: str):
     return render(request, 'repository_score.html', context)
 
 
-def get_file_content(path) -> str:
-    """
-    Return the content of a file
-    :param path: the path to the file
-    :return: the content of the file, if exists; None, otherwise.
-    """
-    if not os.path.isfile(path):
-        return ''
-
-    with open(path, 'r') as f:
-        return f.read()
-
-
-def get_files(path_to_repo) -> set:
-    """
-    Return all the files in the repository
-    :return: a set of strings representing the path of the files in the repository
-    """
-
-    files = set()
-
-    for root, _, filenames in os.walk(path_to_repo):
-        if '.git' in root:
-            continue
-        for filename in filenames:
-            path = os.path.join(root, filename)
-            path = path.replace(path_to_repo, '')
-            if path.startswith('/'):
-                path = path[1:]
-
-            files.add(path)
-
-    return files
-
-
-def is_ansible_file(path: str) -> bool:
-    """
-    Check whether the path is an Ansible file
-    :param path: a path
-    :return: True if the path link to an Ansible file. False, otherwise
-    """
-    return path and ('test' not in path) \
-           and (
-                   'ansible' in path or 'playbooks' in path or 'meta' in path or 'tasks' in path or 'handlers' in path or 'roles' in path) \
-           and path.endswith('.yml')
-
-
 def repository_mine(request, id: str):
-    repo = MongoDBManager.get_instance().get_single_repo(id)
+    repository = MongoDBManager.get_instance().get_repository(id)
     form = RepositoryMinerForm(request.GET)
 
     if request.method == 'POST':
         form = RepositoryMinerForm(request.POST)
         if form.is_valid():
             path_to_clones = form.cleaned_data['input_path_to_clones']
-            path_to_repo = os.path.join(path_to_clones, repo['name'])
+            path_to_repo = str(os.path.join(path_to_clones, repository['name']))
             is_cloned = False
 
             try:
 
-                if repo['name'] not in os.listdir(path_to_clones):
+                if repository['name'] not in os.listdir(path_to_clones):
                     # Clone repository to path_to_repo
-                    git.Git(path_to_clones).clone(repo['url'])
+                    git.Git(path_to_clones).clone(repository['url'])
                     is_cloned = True
 
-                # Mine
-                miner = RepositoryMiner(
-                    access_token=form.cleaned_data['input_github_token'],
-                    path_to_repo=path_to_repo,
-                    repo_owner=repo['owner'],
-                    repo_name=repo['name'],
-                    branch=repo['default_branch']
-                )
-
-                labeled_file = [file for file in miner.mine()]
-
-                # Fixing-commits
-                repo['fixing_commits'] = list()
-                for commit in RepositoryMining(path_to_repo=path_to_repo,
-                                               only_commits=miner.fixing_commits,
-                                               order='reverse').traverse_commits():
-                    repo['fixing_commits'].append(dict(
-                        sha=commit.hash,
-                        msg=commit.msg,
-                        date=commit.committer_date.strftime("%d/%m/%Y %H:%M"),
-                        files=[{'filepath': file.filepath,
-                                'bug_inducing_commit': file.bic,
-                                'diff': [modified_file.diff for modified_file in commit.modifications][0]
-                                }
-                               for file in miner.fixing_files
-                               if file.fic == commit.hash]
-                    ))
-
-                # Saving failure-prone-scripts
-                git_repo = GitRepository(path_to_repo)
-                repo['releases_obj'] = list()
-
-                for commit in RepositoryMining(path_to_repo=path_to_repo,
-                                               only_releases=True,
-                                               order='reverse').traverse_commits():
-
-                    git_repo.checkout(commit.hash)
-
-                    repo_files = get_files(path_to_repo)
-
-                    release = dict(
-                        sha=commit.hash,
-                        date=commit.committer_date.strftime("%d/%m/%Y %H:%M"),
-                        files=list()
-                    )
-
-                    # Label the failure-prone scripts
-                    for file in labeled_file:
-                        if file.commit == commit.hash:
-                            release['files'].append(dict(
-                                filepath=file.filepath,
-                                fixing_commit=file.fixing_commit,
-                                label='failure_prone'
-                            ))
-
-                            if file.filepath in repo_files:
-                                repo_files.remove(file.filepath)
-
-                    # Label the remaining files as "clean"
-                    for filepath in repo_files:
-                        if not is_ansible_file(filepath):
-                            continue
-
-                        release['files'].append(dict(
-                            filepath=filepath,
-                            fixing_commit=None,
-                            label='clean'
-                        ))
-
-                    # Extract Ansible metrics from files
-                    for file in release['files']:
-                        content = get_file_content(os.path.join(path_to_repo, file['filepath']))
-
-                        try:
-                            file['metrics'] = metrics_extractor.extract_all(StringIO(content))
-                        except (TypeError, ValueError):
-                            # Not a valid YAML or empty content
-                            pass
-
-                    repo['releases_obj'].append(release)
-
-                    git_repo.reset()
-
-                # Save scores in DB
-                MongoDBManager.get_instance().replace_repo(repo)
+                Mining(access_token=form.cleaned_data['input_github_token'],
+                       path_to_repo=path_to_repo,
+                       repo_id=id,
+                       labels=None,
+                       regex=None
+                       ).mine()
 
                 return repository_fixing_commits(request, id)
 
@@ -401,10 +310,10 @@ def repository_mine(request, id: str):
 
     context = {
         'repository': {
-            'id': repo['id'],
-            'url': repo['url'],
-            'owner': repo['owner'],
-            'name': repo['name']
+            'id': repository['id'],
+            'url': repository['url'],
+            'owner': repository['owner'],
+            'name': repository['name']
         },
         'form': form
     }
@@ -413,7 +322,7 @@ def repository_mine(request, id: str):
 
 
 def repository_metrics_dump(request, id: str):
-    repo = MongoDBManager.get_instance().get_single_repo(id)
+    repo = MongoDBManager.get_instance().get_repository(id)
 
     df = pd.DataFrame()
 
@@ -436,7 +345,7 @@ def repository_metrics_dump(request, id: str):
 
 
 def repository_train(request, id: str):
-    repo = MongoDBManager.get_instance().get_single_repo(id)
+    repo = MongoDBManager.get_instance().get_repository(id)
 
     df = pd.DataFrame()
 
@@ -454,7 +363,8 @@ def repository_train(request, id: str):
 
     # Train model
     model_manager = ModelsManager(df)
-    results = model_manager.train()
-    response = HttpResponse(results, content_type='text/json')
+    cv_results, pkl_model = model_manager.train()
+    # response = HttpResponse(cv_results, content_type='text/json')
+    response = HttpResponse(pkl_model, content_type='text/json')
     response['Content-Disposition'] = 'attachment; filename=model.json'
     return response

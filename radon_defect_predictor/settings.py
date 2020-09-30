@@ -37,9 +37,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'mine_github',
     'repositories'
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
+    #'DEFAULT_RENDERER_CLASSES': [
+    #    'rest_framework.renderers.TemplateHTMLRenderer',
+    #]
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

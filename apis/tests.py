@@ -12,12 +12,12 @@ class BaseViewTest(APITestCase):
 
     @staticmethod
     def create_repository(id: str, owner: str, name: str, url: str, default_branch: str, description: str,
-                          num_issues: int,
-                          num_releases: int, num_stars: int, num_watchers: int, primary_language: str, created_at: str,
+                          issue_count: int,
+                          releases_count: int, stars_count: int, watcher_count: int, primary_language: str, created_at: str,
                           pushed_at: str):
         Repositories.objects.create(id=id, owner=owner, name=name, url=url, default_branch=default_branch,
-                                    description=description, num_issues=num_issues, num_releases=num_releases,
-                                    num_stars=num_stars, num_watchers=num_watchers, primary_language=primary_language,
+                                    description=description, issue_count=issue_count, release_count=releases_count,
+                                    star_count=stars_count, watcher_count=watcher_count, primary_language=primary_language,
                                     created_at=created_at, pushed_at=pushed_at)
 
     def setUp(self):
@@ -26,14 +26,14 @@ class BaseViewTest(APITestCase):
                                name='ansible-role-unattended-upgrades',
                                url='https://github.com/jnv/ansible-role-unattended-upgrades', default_branch='master',
                                description='Setup unattended-upgrades on Debian-based systems',
-                               num_issues=37, num_releases=15, num_stars=201, num_watchers=10, primary_language='shell',
+                               issue_count=37, releases_count=15, stars_count=201, watcher_count=10, primary_language='shell',
                                created_at='2014-01-18T23:56:09Z', pushed_at='2020-08-18T12:28:29Z')
 
         self.create_repository(id='MDEwOlJlcG9zaXRvcnkxNjAzNjY0Ng==', owner='jnv',
                                name='ansible-role-debian-backports',
                                url='https://github.com/jnv/ansible-role-debian-backports', default_branch='master',
                                description='Setup backports repository for Debian and Ubuntu',
-                               num_issues=5, num_releases=6, num_stars=7, num_watchers=1, primary_language='shell',
+                               issue_count=5, releases_count=6, stars_count=7, watcher_count=1, primary_language='shell',
                                created_at='2014-01-15T16:46:51Z', pushed_at='2020-08-09T12:22:24Z')
 
     def _post_teardown(self):

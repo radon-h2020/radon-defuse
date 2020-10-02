@@ -49,6 +49,8 @@ paths:
           description: 'The request has been fulfilled, resulting in the creation of a new resource.'
         '400':
           description: 'Bad request. One among (id, owner, name, url) is missing.'
+        '409':
+          description: 'Conflict. There already exists a repository with this id.'
       tags:
       - api
 

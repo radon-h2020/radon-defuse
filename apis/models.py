@@ -15,16 +15,19 @@ class File(models.Model):
         blank=True
     )
 
+"""
+
 
 class FixingCommit(models.Model):
-    sha = models.CharField(max_length=50, blank=False, editable=False)
-    msg = models.CharField(blank=True)
-    date = models.DateTimeField(blank=True)
+    sha = models.CharField(max_length=50, blank=False, editable=False, primary_key=True, unique=True)
+    msg = models.TextField(blank=True, default='')
+    date = models.CharField(max_length=30, blank=True, default='')
+    """
     files = models.ArrayField(
         model_container=File,
         blank=True
     )
-"""
+    """
 
 
 class Repositories(models.Model):
@@ -41,12 +44,11 @@ class Repositories(models.Model):
     primary_language = models.CharField(max_length=50, blank=True, default='')
     created_at = models.CharField(max_length=30, blank=True, default='')
     pushed_at = models.CharField(max_length=30, blank=True, default='')
-    """
+
     fixing_commits = models.ArrayField(
         model_container=FixingCommit,
         blank=True
     )
-    """
 
     # fp_fixing_commits = ArrayField(models.CharField(max_length=50), blank=True)
     def __hash__(self):

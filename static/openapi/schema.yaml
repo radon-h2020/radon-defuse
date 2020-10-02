@@ -1,0 +1,192 @@
+openapi: 3.0.2
+info:
+  title: ''
+  version: ''
+paths:
+  /api/repositories/:
+    get:
+      operationId: listRepositories
+      description: Retrieve all repositories.
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+              example:
+                - id: MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ
+                  owner: Juniper
+                  name: ansible-junos-stdlib
+                  url: https://github.com/Juniper/ansible-junos-stdlib
+                  default_branch: master
+                  description: Junos modules for Ansible
+                  num_issues: 149
+                  num_releases: 27
+                  num_stars: 252
+                  num_watchers: 68
+                  primary_language: python
+          description: 'The list of repositories.'
+      tags:
+      - api
+
+    # ========== POST ========== #
+    post:
+      operationId: createRepositories
+      description: Create a repository.
+      parameters:
+        - in: body
+          name: id
+          required: True
+          schema:
+            type: string
+          example: 'MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ=='
+
+      requestBody:
+        $ref: '#/components/requestBodies/RepositoriesBody'
+      responses:
+        '201':
+          description: 'The request has been fulfilled, resulting in the creation of a new resource.'
+        '400':
+          description: 'Bad request. One among (id, owner, name, url) is missing.'
+      tags:
+      - api
+
+
+  # ========== GET /api/repositories/{id}/ ========== #
+  /api/repositories/{id}/:
+    get:
+      operationId: retrieveRepositories
+      description: Retrieve a repository.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique value identifying this repository.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                - id: MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ==
+                  owner: Juniper
+                  name: ansible-junos-stdlib
+                  url: https://github.com/Juniper/ansible-junos-stdlib
+                  default_branch: master
+                  description: Junos modules for Ansible
+                  num_issues: 149
+                  num_releases: 27
+                  num_stars: 252
+                  num_watchers: 68
+                  primary_language: python
+          description: 'A repository.'
+        '404':
+          description: 'No repository found with this id.'
+      tags:
+      - api
+
+    # ========== GET /api/repositories/{id}/ ========== #
+    patch:
+      operationId: partialUpdateRepositories
+      description: Update one or more fields on an existing repository.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique value identifying this repositories.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+          application/x-www-form-urlencoded:
+            schema: {}
+          multipart/form-data:
+            schema: {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+      tags:
+      - api
+
+    # ========== DELETE /api/repositories/{id}/ ========== #
+    delete:
+      operationId: destroyRepositories
+      description: Delete a repository.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique value identifying this repositories.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+      tags:
+      - api
+components:
+  requestBodies:
+    RepositoriesBody:
+      description: A JSON object containing repository information
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Repository'
+          example:
+            id: MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ==
+            owner: jnv
+            name: ansible-role-unattended-upgrades
+            url: https://github.com/jnv/ansible-role-unattended-upgrades
+  # Reusable schemas (data models)
+  schemas:
+    Repository:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The repository unique identifier
+          example: MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ==
+        owner:
+          type: string
+          description: The repository owner
+          example: radon-h2020
+        name:
+          type: string
+          description: The repository name
+          example: radon-defect-predictor
+        url:
+          type: string
+          description: The url to the Github repository
+        default_branch:
+          type: string
+          description: 'The repository primary branch default: master'
+          example: master
+        description:
+          type: string
+          description: 'The repository description'
+        others:
+          type: string
+      required:
+        - id
+        - owner
+        - name
+        - url
+  parameters:
+    Repository:
+      id: The repository unique identifier
+      type: string
+      example:
+        id: MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ==
+      required:
+        - id
+

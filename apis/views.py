@@ -73,6 +73,7 @@ class GetPredictionView(APIView):
     get:
     Get the prediction for an IaC script.
     """
+
     def get(self, request, pk):
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
@@ -85,7 +86,6 @@ class UpdatePredictionView(APIView):
 
     def put(self, request, pk):
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
-
 
 
 class ModelsViewSet(viewsets.ViewSet):

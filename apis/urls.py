@@ -11,5 +11,5 @@ router.register('repositories', views.RepositoriesViewSet, basename='repositorie
 urlpatterns = [
    path('', include(router.urls)),
    #path('predictions/', views.GetPredictionView.as_view(), name='get-prediction'),
-   #path('predictions/<int:id>', views.UpdatePredictionView.as_view(), name='update-prediction')
+   #path('predictions/<int:id>/', views.UpdatePredictionView.as_view(), name='update-prediction')
 ]

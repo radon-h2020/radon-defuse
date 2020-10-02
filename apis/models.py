@@ -47,4 +47,13 @@ class Repositories(models.Model):
         blank=True
     )
     """
+
     # fp_fixing_commits = ArrayField(models.CharField(max_length=50), blank=True)
+    def __hash__(self):
+        return super().__hash__()
+
+    def __eq__(self, other):
+        if not isinstance(other, Repositories):
+            return False
+
+        return self.id == other.id

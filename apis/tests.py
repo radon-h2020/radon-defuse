@@ -83,7 +83,7 @@ class RepositoriesTest(BaseViewTest):
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-    
+
     def test_create_invalid_repository(self):
         invalid_payloads = [{
             # no id passed
@@ -138,3 +138,36 @@ class RepositoriesTest(BaseViewTest):
             content_type='application/json'
         )
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+
+    def test_delete_existing_repository(self):
+        """
+        Delete a repository from the database and compare the database before and after deleting.
+        If the database differs, than the repository has been deleted
+        """
+        repositories_before_delete = Repositories.objects.all()
+        serializer_before_delete = RepositorySerializer(repositories_before_delete, many=True).data
+
+        response = self.client.delete(
+            reverse('repositories-detail', kwargs={'pk': 'MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ=='})
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        repositories_after_delete = Repositories.objects.all()
+        serializer_after_delete = RepositorySerializer(repositories_after_delete, many=True).data
+
+        self.assertLess(len(serializer_after_delete), len(serializer_before_delete))
+
+    def test_delete_unexisting_repository(self):
+        """
+        Try to delete a repository that does not exist in the db.
+        :except: HTTP_404_NOT_FOUND
+        """
+        repositories_before_delete = Repositories.objects.all()
+        serializer_before_delete = RepositorySerializer(repositories_before_delete, many=True)
+
+        response = self.client.delete(
+            reverse('repositories-detail', kwargs={'pk': 'NoTPrEsEnT=='})
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

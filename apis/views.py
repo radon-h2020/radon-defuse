@@ -26,6 +26,9 @@ class RepositoriesViewSet(viewsets.ViewSet):
     Delete a repository.
     """
 
+    queryset = Repositories.objects.all()
+    serializer_class = RepositorySerializer
+
     def list(self, request):
         repositories = Repositories.objects.all()
         serializer = RepositorySerializer(repositories, many=True)
@@ -65,7 +68,12 @@ class RepositoriesViewSet(viewsets.ViewSet):
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
     def destroy(self, request, pk=None):
-        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+        try:  # to get the repository, if exists
+            repository = Repositories.objects.get(id=pk)
+            repository.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Repositories.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class GetPredictionView(APIView):

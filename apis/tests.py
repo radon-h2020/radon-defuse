@@ -76,6 +76,8 @@ class RepositoriesTest(BaseViewTest):
             'url': 'https://github.com/Juniper/ansible-junos-stdlib'
         }
 
+        repositories_before_create = RepositorySerializer(Repositories.objects.all(), many=True).data
+
         response = self.client.post(
             reverse('repositories-list'),
             data=json.dumps(valid_payload),
@@ -83,6 +85,10 @@ class RepositoriesTest(BaseViewTest):
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        repositories_after_create = RepositorySerializer(Repositories.objects.all(), many=True).data
+
+        self.assertGreater(len(repositories_after_create), len(repositories_before_create))
 
     def test_create_invalid_repository(self):
         invalid_payloads = [{
@@ -107,6 +113,8 @@ class RepositoriesTest(BaseViewTest):
             # no url passed
         }]
 
+        repositories_before_create = RepositorySerializer(Repositories.objects.all(), many=True).data
+
         for payload in invalid_payloads:
             response = self.client.post(
                 reverse('repositories-list'),
@@ -116,7 +124,14 @@ class RepositoriesTest(BaseViewTest):
 
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+        repositories_after_create = RepositorySerializer(Repositories.objects.all(), many=True).data
+        self.assertEqual(repositories_after_create, repositories_before_create)
+
     def test_create_repository_conflict(self):
+        """
+        Try to create a repository with the same ID of one already present in the database.
+        :except: status.HTTP_409_CONFLICT
+        """
         payload = {
             'id': 'MDEwOlJlcG9zaXRvcnkxNjMwMDY5NQ==',
             'owner': 'angstwad',
@@ -129,7 +144,10 @@ class RepositoriesTest(BaseViewTest):
             data=json.dumps(payload),
             content_type='application/json'
         )
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        repositories_before_conflict = RepositorySerializer(Repositories.objects.all(), many=True).data
 
         # here the conflict
         response = self.client.post(
@@ -137,7 +155,11 @@ class RepositoriesTest(BaseViewTest):
             data=json.dumps(payload),
             content_type='application/json'
         )
+
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+
+        repositories_after_conflict = RepositorySerializer(Repositories.objects.all(), many=True).data
+        self.assertEqual(repositories_after_conflict, repositories_before_conflict)
 
     def test_delete_existing_repository(self):
         """
@@ -163,9 +185,6 @@ class RepositoriesTest(BaseViewTest):
         Try to delete a repository that does not exist in the db.
         :except: HTTP_404_NOT_FOUND
         """
-        repositories_before_delete = Repositories.objects.all()
-        serializer_before_delete = RepositorySerializer(repositories_before_delete, many=True)
-
         response = self.client.delete(
             reverse('repositories-detail', kwargs={'pk': 'NoTPrEsEnT=='})
         )

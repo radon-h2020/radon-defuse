@@ -51,6 +51,14 @@ def list_repositories(request):
     return render(request=request, context=context, template_name='repositories_index.html', status=200)
 
 
+
+# /repositories/add/
+def add_repository(request):
+    print(request)
+    data = {'is_added': True}
+    return JsonResponse(data)
+
+
 # /repositories/labels/
 def collect_repositories_labels(request):
     """

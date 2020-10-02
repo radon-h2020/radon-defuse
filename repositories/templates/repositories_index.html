@@ -60,9 +60,12 @@
     <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 mt-3 border-bottom">
             <p class="text-uppercase">Repositories</p>
-            <a href="{% url 'repositories_dump' %}" download="repositories.json" class="btn btn-outline-secondary btn-sm ml-2" style="float:right;">
+            <!--<a href="{% url 'repositories_dump' %}" download="repositories.json" class="btn btn-outline-secondary btn-sm ml-2" style="float:right;">
                 <span data-feather="plus"> </span> Add
-            </a>
+            </a>-->
+            <button id="id_add_repository" class="btn btn-outline-secondary btn-sm ml-2" style="float:right;">
+                <span data-feather="plus"> </span> Add
+            </button>
         </div>
 
         <table id="table-repositories" class="display table table-striped table-bordered" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-size: 12px;">
@@ -188,6 +191,27 @@
       $('#table-labels').DataTable();
    });
 </script>
+
+
+<script>
+$("#id_add_repository").click(function(e) {
+   console.log('CLICKED')
+
+   $.ajax({
+        url: '{% url "repositories_add" %}',
+        data: {
+          'username': 'hello'
+        },
+        dataType: 'json',
+        success: function (data) {
+          if (data.is_added) {
+            alert("A user with this username already exists.");
+          }
+        }
+   });
+});
+</script>
+
 
 <!-- Icons -->
 <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>

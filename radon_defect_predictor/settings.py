@@ -38,15 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'api',
     'mine_github',
     'repositories'
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
-    #'DEFAULT_RENDERER_CLASSES': [
-    #    'rest_framework.renderers.TemplateHTMLRenderer',
-    #]
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
 }
 
 MIDDLEWARE = [
@@ -85,8 +84,10 @@ WSGI_APPLICATION = 'radon_defect_predictor.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'djongo',
+        'NAME': 'iac_miner', #TODO: replace with env variable
+        'HOST': '127.0.0.1',
+        'PORT': 27017,
     }
 }
 
@@ -107,6 +108,11 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+]
+
+# CORS WHITELIST
+CORS_ORIGIN_WHITELIST = [
+    "http://127.0.0.1:8000"
 ]
 
 

@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
-  title: ''
-  version: ''
+  title: 'Radon Defect Predictor APIs'
+  version: 'v0'
 paths:
   /api/repositories/:
     get:
@@ -127,12 +127,14 @@ paths:
       - name: id
         in: path
         required: true
-        description: A unique value identifying this repositories.
+        description: A unique value identifying this repository.
         schema:
           type: string
       responses:
         '204':
-          description: ''
+          description: 'The repository has been deleted.'
+        '404':
+          description: 'No repository found with this id.'
       tags:
       - api
 components:

@@ -5,5 +5,5 @@ urlpatterns = [
     path('api-docs/', TemplateView.as_view(template_name="swagger-ui.html"), name="api-docs"),
     path('', TemplateView.as_view(template_name='main.html')),
     path('api/', include('apis.urls')),
-    path('web/', include('web.urls')),
+    path('web/', include(('web.urls', 'web'), namespace='web')),
 ]

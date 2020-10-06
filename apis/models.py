@@ -17,18 +17,6 @@ class File(models.Model):
 """
 
 
-
-class FixingCommit(models.Model):
-    sha = models.CharField(max_length=50, blank=False, editable=False, primary_key=True, unique=True)
-    msg = models.TextField(blank=True, default='')
-    date = models.CharField(max_length=30, blank=True, default='')
-
-    #files = models.ArrayField(
-        #model_container=File,
-    #    blank=True
-    #)
-
-
 class Repositories(models.Model):
     id = models.CharField(max_length=32, blank=False, unique=True, primary_key=True)
     owner = models.CharField(max_length=100, blank=False)
@@ -44,11 +32,6 @@ class Repositories(models.Model):
     created_at = models.CharField(max_length=30, blank=True, default='')
     pushed_at = models.CharField(max_length=30, blank=True, default='')
 
-    fixing_commits = models.ArrayField(
-        model_container=FixingCommit,
-        blank=True
-    )
-
     # fp_fixing_commits = ArrayField(models.CharField(max_length=50), blank=True)
     def __hash__(self):
         return super().__hash__()
@@ -58,3 +41,15 @@ class Repositories(models.Model):
             return False
 
         return self.id == other.id
+
+
+class FixingCommit(models.Model):
+    sha = models.CharField(max_length=50, blank=False, editable=False, primary_key=True, unique=True)
+    msg = models.TextField(blank=True, default='')
+    date = models.CharField(max_length=30, blank=True, default='')
+    is_false_positive = models.BooleanField(blank=True, default=False)
+    repository = models.ForeignKey(Repositories, on_delete=models.CASCADE)
+    # files = models.ArrayField(
+    # model_container=File,
+    #    blank=True
+    # )

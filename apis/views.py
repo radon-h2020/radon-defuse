@@ -1,9 +1,10 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Repositories
-from .serializers import RepositorySerializer
+from .models import FixingCommit, Repositories
+from .serializers import FixingCommitSerializer, RepositorySerializer
 
 
 class RepositoriesViewSet(viewsets.ViewSet):
@@ -26,21 +27,15 @@ class RepositoriesViewSet(viewsets.ViewSet):
     Delete a repository.
     """
 
-    queryset = Repositories.objects.all()
-    serializer_class = RepositorySerializer
-
     def list(self, request):
         repositories = Repositories.objects.all()
         serializer = RepositorySerializer(repositories, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        try:
-            repository = Repositories.objects.get(id=pk)
-            serializer = RepositorySerializer(repository)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Repositories.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        repository = get_object_or_404(Repositories, id=pk)
+        serializer = RepositorySerializer(repository)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request):
 
@@ -75,6 +70,50 @@ class RepositoriesViewSet(viewsets.ViewSet):
         except Repositories.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+
+# ===================================== FIXING COMMITS ===============================================================#
+
+class FixingCommitsViewSet(viewsets.ViewSet):
+    """
+    API endpoint that allows fixing-commits to be viewed or edited.
+
+    list:
+    Retrieve all the fixing-commits.
+
+    retrieve:
+    Retrieve a fixing-commit.
+
+    create:
+    Create a fixing-commit.
+
+    partial_update:
+    Update one or more fields on an existing fixing-commit.
+
+    destroy:
+    Delete a fixing-commit.
+    """
+
+    def list(self, request):
+        fixing_commits = FixingCommit.objects.all()
+        serializer = FixingCommitSerializer(fixing_commits, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk):
+        fixing_commit = get_object_or_404(FixingCommit, sha=pk)
+        serializer = FixingCommitSerializer(fixing_commit)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def create(self, request):
+        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+
+    def partial_update(self, request, pk=None):
+        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+
+    def destroy(self, request, pk=None):
+        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+
+
+# ===================================================================================================================#
 
 class GetPredictionView(APIView):
     """

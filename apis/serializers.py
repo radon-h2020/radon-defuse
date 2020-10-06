@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apis.models import Repositories
+from apis.models import FixingCommit, Repositories
 
 
 class RepositorySerializer(serializers.ModelSerializer):
@@ -18,3 +18,13 @@ class RepositorySerializer(serializers.ModelSerializer):
                   'primary_language',
                   'created_at',
                   'pushed_at')
+
+
+class FixingCommitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FixingCommit
+        fields = ('sha',
+                  'msg',
+                  'date',
+                  'is_false_positive',
+                  'repository')

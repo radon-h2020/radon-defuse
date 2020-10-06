@@ -6,9 +6,10 @@ from pathlib import Path
 from pydriller.repository_mining import RepositoryMining, GitRepository
 from repositoryminer.repository import RepositoryMiner
 
-from apis.models import Repositories
+from apis.models import FixingCommit, Repositories
 from apis.serializers import RepositorySerializer
 
+from django.core import serializers
 
 def is_ansible_file(path: str) -> bool:
     """
@@ -97,16 +98,10 @@ class BackendRepositoryMiner:
                                                   list()) and commit.hash in miner.fixing_commits:
                 miner.fixing_commits.remove(commit.hash)
             else:
-                fixing_commits.append(dict(
-                    sha=commit.hash,
-                    msg=commit.msg,
-                    date=commit.committer_date.strftime("%d/%m/%Y %H:%M"),
-                    #files=[{'filepath': file.filepath, 'bug_inducing_commit': file.bic}
-                    #       for file in miner.fixing_files
-                    #       if file.fic == commit.hash]
-                ))
-
+                fixing_commits.append(
+                    FixingCommit(sha=commit.hash, msg=commit.msg, date=commit.committer_date.strftime("%d/%m/%Y %H:%M"))
+                )
+                #FixingCommit.objects.create()
 
         # Save scores in DB
-        #self.repository.save()
         return len(miner.fixing_commits)

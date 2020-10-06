@@ -28,3 +28,4 @@ class FixingCommitSerializer(serializers.ModelSerializer):
                   'date',
                   'is_false_positive',
                   'repository')
+

@@ -104,7 +104,20 @@ class FixingCommitsViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request):
-        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+
+        try:  # to get the fixing-commit, if exists
+            FixingCommit.objects.get(sha=request.data.get('sha', None))
+            return Response(status=status.HTTP_409_CONFLICT)
+        except FixingCommit.DoesNotExist:
+            if not request.data.get('sha'):
+                return Response('Primary key \'sha\' is missing.', status=status.HTTP_400_BAD_REQUEST)
+
+            serializer = FixingCommitSerializer(data=request.data)
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                serializer.save()
+                return Response(status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, pk=None):
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)

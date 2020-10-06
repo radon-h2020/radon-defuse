@@ -32,7 +32,6 @@ class Repositories(models.Model):
     created_at = models.CharField(max_length=30, blank=True, default='')
     pushed_at = models.CharField(max_length=30, blank=True, default='')
 
-    # fp_fixing_commits = ArrayField(models.CharField(max_length=50), blank=True)
     def __hash__(self):
         return super().__hash__()
 
@@ -49,7 +48,12 @@ class FixingCommit(models.Model):
     date = models.CharField(max_length=30, blank=True, default='')
     is_false_positive = models.BooleanField(blank=True, default=False)
     repository = models.ForeignKey(Repositories, on_delete=models.CASCADE)
-    # files = models.ArrayField(
-    # model_container=File,
-    #    blank=True
-    # )
+
+    def __hash__(self):
+        return super().__hash__()
+
+    def __eq__(self, other):
+        if not isinstance(other, FixingCommit):
+            return False
+
+        return self.sha == other.sha

@@ -28,9 +28,7 @@ paths:
                   primary_language: python
           description: 'The list of repositories.'
       tags:
-      - api
-
-    # ========== POST ========== #
+      - repositories
     post:
       operationId: createRepositories
       description: Create a repository.
@@ -46,13 +44,92 @@ paths:
         $ref: '#/components/requestBodies/RepositoriesBody'
       responses:
         '201':
-          description: 'The request has been fulfilled, resulting in the creation of a new resource.'
+          description: 'The request has been fulfilled, resulting in the creation of a new repository.'
         '400':
           description: 'Bad request. One among (id, owner, name, url) is missing.'
         '409':
-          description: 'Conflict. There already exists a repository with this id.'
+          description: 'Conflict. There already exists a fixing-commit with this id.'
       tags:
-      - api
+      - repositories
+
+  /api/repositories/{id}/:
+      get:
+        operationId: retrieveRepositories
+        description: Retrieve a repository.
+        parameters:
+          - name: id
+            in: path
+            required: true
+            description: A unique value identifying this repository.
+            schema:
+              type: string
+        responses:
+          '200':
+            content:
+              application/json:
+                schema:
+                  type: object
+                example:
+                  - id: MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ==
+                    owner: Juniper
+                    name: ansible-junos-stdlib
+                    url: https://github.com/Juniper/ansible-junos-stdlib
+                    default_branch: master
+                    description: Junos modules for Ansible
+                    num_issues: 149
+                    num_releases: 27
+                    num_stars: 252
+                    num_watchers: 68
+                    primary_language: python
+            description: 'A repository.'
+          '404':
+            description: 'No repository found with this id.'
+        tags:
+          - repositories
+      patch:
+        operationId: partialUpdateRepositories
+        description: Update one or more fields on an existing repository.
+        parameters:
+          - name: id
+            in: path
+            required: true
+            description: A unique value identifying this repositories.
+            schema:
+              type: string
+        requestBody:
+          content:
+            application/json:
+              schema: { }
+            application/x-www-form-urlencoded:
+              schema: { }
+            multipart/form-data:
+              schema: { }
+        responses:
+          '200':
+            content:
+              application/json:
+                schema: { }
+            description: ''
+        tags:
+          - Not implemented
+      delete:
+        operationId: destroyRepositories
+        description: Delete a repository.
+        parameters:
+          - name: id
+            in: path
+            required: true
+            description: A unique value identifying this repository.
+            schema:
+              type: string
+        responses:
+          '204':
+            description: 'The repository has been deleted.'
+          '404':
+            description: 'No repository found with this id.'
+        tags:
+          - repositories
+
   /api/fixing-commits/:
     get:
       operationId: listFixingCommitsViewSets
@@ -64,108 +141,59 @@ paths:
             application/json:
               schema:
                 type: array
-                items: { }
-          description: ''
+                example:
+                  - sha: "d1f923c66126a1af0e2515ffc2643d9c7585e9de"
+                    msg: "fix wrong variable"
+                    date: "22/06/2020 20:39"
+                    is_false_positive: false
+                    repository: "6853087"
+                  - sha: "f9ec5c62381014e6370fafe705dbd70d9391b315"
+                    msg: "fix copy and paste error, in zammad version settings"
+                    date: "20/06/2020 12:27"
+                    is_false_positive: false
+                    repository: "6853087"
+          description: 'The list of all fixing-commits'
       tags:
-        - api
+        - fixing-commits
     post:
       operationId: createFixingCommitsViewSet
       description: Create a fixing-commit.
-      parameters: [ ]
+      parameters:
+        - in: body
+          name: sha
+          required: True
+          schema:
+            type: string
+          example: 'd1f923c66126a1af0e2515ffc2643d9c7585e9de'
+        - in: body
+          name: repository
+          required: True
+          schema:
+            type: string
+          example: '6853087'
       requestBody:
-        content:
-          application/json:
-            schema: { }
-          application/x-www-form-urlencoded:
-            schema: { }
-          multipart/form-data:
-            schema: { }
+        $ref: '#/components/requestBodies/FixingCommitBody'
       responses:
         '201':
-          content:
-            application/json:
-              schema: { }
-          description: ''
+          description: 'The request has been fulfilled, resulting in the creation of a new fixing-commit.'
+        '400':
+          description: 'Bad request. One among (id or repository) is missing or the repository id is wrong.'
+        '409':
+          description: 'Conflict. There already exists a fixing-commit with this sha.'
       tags:
-        - api
+        - fixing-commits
 
-  /api/fixing-commits/{id}/:
+  /api/fixing-commits/{sha}/:
     get:
       operationId: retrieveFixingCommitsViewSet
       description: Retrieve a fixing-commit.
       parameters:
-        - name: id
+        - name: sha
           in: path
           required: true
-          description: ''
+          description: The commit hash.
           schema:
             type: string
-      responses:
-        '200':
-          content:
-            application/json:
-              schema: { }
-          description: ''
-      tags:
-        - api
-    patch:
-      operationId: partialUpdateFixingCommitsViewSet
-      description: 'Set up the is_false_positive field of a fixing-commit. If is_false_positive
-        equals False,
-
-        then it switches to True, and vice-versa.'
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: ''
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema: { }
-          application/x-www-form-urlencoded:
-            schema: { }
-          multipart/form-data:
-            schema: { }
-      responses:
-        '200':
-          content:
-            application/json:
-              schema: { }
-          description: ''
-      tags:
-        - api
-    delete:
-      operationId: destroyFixingCommitsViewSet
-      description: Delete a fixing-commit.
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: ''
-          schema:
-            type: string
-      responses:
-        '204':
-          description: ''
-      tags:
-        - api
-
-
-  # ========== GET /api/repositories/{id}/ ========== #
-  /api/repositories/{id}/:
-    get:
-      operationId: retrieveRepositories
-      description: Retrieve a repository.
-      parameters:
-      - name: id
-        in: path
-        required: true
-        description: A unique value identifying this repository.
-        schema:
-          type: string
       responses:
         '200':
           content:
@@ -173,69 +201,52 @@ paths:
               schema:
                 type: object
               example:
-                - id: MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ==
-                  owner: Juniper
-                  name: ansible-junos-stdlib
-                  url: https://github.com/Juniper/ansible-junos-stdlib
-                  default_branch: master
-                  description: Junos modules for Ansible
-                  num_issues: 149
-                  num_releases: 27
-                  num_stars: 252
-                  num_watchers: 68
-                  primary_language: python
-          description: 'A repository.'
+                sha: "d1f923c66126a1af0e2515ffc2643d9c7585e9de"
+                msg: "fix wrong variable"
+                date: "22/06/2020 20:39"
+                is_false_positive: false
+                repository: "6853087"
+          description: 'The fixing-commit.'
         '404':
-          description: 'No repository found with this id.'
+          description: 'No fixing-commit found with this sha.'
       tags:
-      - api
-
-    # ========== GET /api/repositories/{id}/ ========== #
+        - fixing-commits
     patch:
-      operationId: partialUpdateRepositories
-      description: Update one or more fields on an existing repository.
+      operationId: partialUpdateFixingCommitsViewSet
+      description: 'Set up the is_false_positive field of a fixing-commit. If is_false_positive
+        equals False, then it switches to True, and vice-versa.'
       parameters:
-      - name: id
-        in: path
-        required: true
-        description: A unique value identifying this repositories.
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema: {}
-          application/x-www-form-urlencoded:
-            schema: {}
-          multipart/form-data:
-            schema: {}
-      responses:
-        '200':
-          content:
-            application/json:
-              schema: {}
-          description: ''
-      tags:
-      - api
-
-    # ========== DELETE /api/repositories/{id}/ ========== #
-    delete:
-      operationId: destroyRepositories
-      description: Delete a repository.
-      parameters:
-      - name: id
-        in: path
-        required: true
-        description: A unique value identifying this repository.
-        schema:
-          type: string
+        - name: sha
+          in: path
+          required: true
+          description: 'The commit hash.'
+          schema:
+            type: string
       responses:
         '204':
-          description: 'The repository has been deleted.'
+          description: 'is_false_positive switched to the complementary boolean value.'
         '404':
-          description: 'No repository found with this id.'
+          description: 'No fixing-commit found with this sha.'
       tags:
-      - api
+        - fixing-commits
+    delete:
+      operationId: destroyFixingCommitsViewSet
+      description: Delete a fixing-commit.
+      parameters:
+        - name: sha
+          in: path
+          required: true
+          description: 'The commit hash.'
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'The fixing-commit has been deleted.'
+        '404':
+          description: 'No fixing-commit found with this sha.'
+      tags:
+        - fixing-commits
+
 components:
   requestBodies:
     RepositoriesBody:
@@ -250,7 +261,19 @@ components:
             owner: jnv
             name: ansible-role-unattended-upgrades
             url: https://github.com/jnv/ansible-role-unattended-upgrades
-  # Reusable schemas (data models)
+    FixingCommitBody:
+      description: A JSON object containing fixing-commit information
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FixingCommit'
+          example:
+            sha: "d1f923c66126a1af0e2515ffc2643d9c7585e9de"
+            msg: "fix wrong variable"
+            date: "22/06/2020 20:39"
+            repository: "6853087"
+
   schemas:
     Repository:
       type: object

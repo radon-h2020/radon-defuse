@@ -11,6 +11,7 @@ from apis.serializers import RepositorySerializer
 
 from django.core import serializers
 
+
 def is_ansible_file(path: str) -> bool:
     """
     Check whether the path is an Ansible file
@@ -18,7 +19,8 @@ def is_ansible_file(path: str) -> bool:
     :return: True if the path link to an Ansible file. False, otherwise
     """
     return path and ('test' not in path) \
-           and ('ansible' in path or 'playbooks' in path or 'meta' in path or 'tasks' in path or 'handlers' in path or 'roles' in path) \
+           and (
+                       'ansible' in path or 'playbooks' in path or 'meta' in path or 'tasks' in path or 'handlers' in path or 'roles' in path) \
            and path.endswith('.yml')
 
 
@@ -47,7 +49,8 @@ class BackendRepositoryMiner:
         """
         self.access_token = access_token
         self.path_to_repo = str(Path(path_to_repo))
-        self.repository = RepositorySerializer(Repositories.objects.get(pk=repo_id)).data
+        self.repository = Repositories.objects.get(pk=repo_id)
+        self.repository_data = RepositorySerializer(self.repository).data
         self.labels = labels
         self.regex = regex
 
@@ -76,32 +79,31 @@ class BackendRepositoryMiner:
         miner = RepositoryMiner(
             access_token=self.access_token,
             path_to_repo=self.path_to_repo,
-            repo_owner=self.repository['owner'],
-            repo_name=self.repository['name'],
-            branch=self.repository['default_branch']
+            repo_owner=self.repository_data['owner'],
+            repo_name=self.repository_data['name'],
+            branch=self.repository_data['default_branch']
         )
 
         # miner.get_fixing_commits_from_closed_issues(self.labels) (currently only supported for Github)
         print(f'Mining fixing commits with regex {self.regex}')
         miner.get_fixing_commits_from_commit_messages(self.regex)
-        #miner.get_fixing_files()
+        # miner.get_fixing_files()
 
-        # Fixing-commits
-        fixing_commits = list()
-        i = 0
+        # Save fixing-commits that are not false-positive
         for commit in RepositoryMining(path_to_repo=self.path_to_repo,
                                        only_commits=list(miner.fixing_commits),
                                        order='reverse').traverse_commits():
 
             # Filter-out false positive previously discarded by the user
-            if commit.hash in self.repository.get('false_positive_fixing_commits',
-                                                  list()) and commit.hash in miner.fixing_commits:
-                miner.fixing_commits.remove(commit.hash)
-            else:
-                fixing_commits.append(
-                    FixingCommit(sha=commit.hash, msg=commit.msg, date=commit.committer_date.strftime("%d/%m/%Y %H:%M"))
-                )
-                #FixingCommit.objects.create()
+            if commit.hash in miner.fixing_commits:
+                try:
+                    FixingCommit.objects.get(sha=commit.hash)
+                except FixingCommit.DoesNotExist:
+                    # Save fixing-commits in DB
+                    FixingCommit.objects.create(sha=commit.hash,
+                                                msg=commit.msg,
+                                                date=commit.committer_date.strftime("%d/%m/%Y %H:%M"),
+                                                is_false_positive=False,
+                                                repository=self.repository)
 
-        # Save scores in DB
         return len(miner.fixing_commits)

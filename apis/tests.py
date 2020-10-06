@@ -301,6 +301,36 @@ class FixingCommitsTest(BaseViewTest):
         fixing_commits_after_conflict = FixingCommitSerializer(FixingCommit.objects.all(), many=True).data
         self.assertEqual(fixing_commits_after_conflict, fixing_commits_before_conflict)
 
+    def test_patch_existing_fixing_commit(self):
+        """
+        Delete a repository from the database and compare the database before and after deleting.
+        If the database differs, than the repository has been deleted
+        """
+        fixing_commit_before_patch = FixingCommit.objects.get(sha='123456789')
+        serializer_before_patch = FixingCommitSerializer(fixing_commit_before_patch).data
+        self.assertFalse(serializer_before_patch['is_false_positive'])
+
+        response = self.client.patch(
+            reverse('fixing-commits-detail', kwargs={'pk': '123456789'})
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        fixing_commit_after_patch = FixingCommit.objects.get(sha='123456789')
+        serializer_after_patch = FixingCommitSerializer(fixing_commit_after_patch).data
+        self.assertTrue(serializer_after_patch['is_false_positive'])
+
+    def test_patch_unexisting_fixing_commit(self):
+        """
+        Try to delete a repository that does not exist in the db.
+        :except: HTTP_404_NOT_FOUND
+        """
+        response = self.client.patch(
+            reverse('fixing-commits-detail', kwargs={'pk': 'ShANoTPrEsEnT'})
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_delete_existing_fixing_commit(self):
         """
         Delete a repository from the database and compare the database before and after deleting.

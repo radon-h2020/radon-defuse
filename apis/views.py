@@ -86,8 +86,8 @@ class FixingCommitsViewSet(viewsets.ViewSet):
     create:
     Create a fixing-commit.
 
-    partial_update:
-    Update one or more fields on an existing fixing-commit.
+    partial_update: Set up the is_false_positive field of a fixing-commit. If is_false_positive equals False,
+    then it switches to True, and vice-versa.
 
     destroy:
     Delete a fixing-commit.
@@ -119,8 +119,11 @@ class FixingCommitsViewSet(viewsets.ViewSet):
                 serializer.save()
                 return Response(status=status.HTTP_201_CREATED)
 
-    def partial_update(self, request, pk=None):
-        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+    def partial_update(self, request, pk):
+        fixing_commit = get_object_or_404(FixingCommit, sha=pk)
+        fixing_commit.is_false_positive = not fixing_commit.is_false_positive
+        fixing_commit.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, pk=None):
         fixing_commit = get_object_or_404(FixingCommit, sha=pk)

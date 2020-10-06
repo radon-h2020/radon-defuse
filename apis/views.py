@@ -123,7 +123,9 @@ class FixingCommitsViewSet(viewsets.ViewSet):
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
     def destroy(self, request, pk=None):
-        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+        fixing_commit = get_object_or_404(FixingCommit, sha=pk)
+        fixing_commit.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # ===================================================================================================================#

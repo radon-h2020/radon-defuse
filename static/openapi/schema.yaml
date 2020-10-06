@@ -53,6 +53,105 @@ paths:
           description: 'Conflict. There already exists a repository with this id.'
       tags:
       - api
+  /api/fixing-commits/:
+    get:
+      operationId: listFixingCommitsViewSets
+      description: Retrieve all the fixing-commits.
+      parameters: [ ]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { }
+          description: ''
+      tags:
+        - api
+    post:
+      operationId: createFixingCommitsViewSet
+      description: Create a fixing-commit.
+      parameters: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema: { }
+          application/x-www-form-urlencoded:
+            schema: { }
+          multipart/form-data:
+            schema: { }
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: { }
+          description: ''
+      tags:
+        - api
+
+  /api/fixing-commits/{id}/:
+    get:
+      operationId: retrieveFixingCommitsViewSet
+      description: Retrieve a fixing-commit.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { }
+          description: ''
+      tags:
+        - api
+    patch:
+      operationId: partialUpdateFixingCommitsViewSet
+      description: 'Set up the is_false_positive field of a fixing-commit. If is_false_positive
+        equals False,
+
+        then it switches to True, and vice-versa.'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema: { }
+          application/x-www-form-urlencoded:
+            schema: { }
+          multipart/form-data:
+            schema: { }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { }
+          description: ''
+      tags:
+        - api
+    delete:
+      operationId: destroyFixingCommitsViewSet
+      description: Delete a fixing-commit.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ''
+          schema:
+            type: string
+      responses:
+        '204':
+          description: ''
+      tags:
+        - api
 
 
   # ========== GET /api/repositories/{id}/ ========== #
@@ -185,6 +284,29 @@ components:
         - owner
         - name
         - url
+    FixingCommit:
+      type: object
+      properties:
+        sha:
+          type: string
+          description: The commit sha
+          example: 434669058b54a19b9eed1cc32b12a5834cca1de8
+        msg:
+          type: string
+          description: The message associate to the commit
+          example: "Fixed bug in issue #1"
+        date:
+          type: string
+          description: The commit date
+          example: "06/10/2020 19:30"
+        repository:
+          type: string
+          description: The id of the repository the commit belong to
+          example: MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ==
+      required:
+        - sha
+        - repository
+
   parameters:
     Repository:
       id: The repository unique identifier

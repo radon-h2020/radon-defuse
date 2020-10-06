@@ -10,24 +10,23 @@ class File(models.Model):
     filepath = models.CharField(max_length=200, blank=False)
     fixing_commit = models.CharField(max_length=50, blank=True)
     bug_inducing_commit = models.CharField(max_length=50)
-    metrics = models.ArrayField(
-        model_container=Metric,
-        blank=True
-    )
-
+    #metrics = models.ArrayField(
+    #    model_container=Metric,
+    #    blank=True
+    #)
 """
+
 
 
 class FixingCommit(models.Model):
     sha = models.CharField(max_length=50, blank=False, editable=False, primary_key=True, unique=True)
     msg = models.TextField(blank=True, default='')
     date = models.CharField(max_length=30, blank=True, default='')
-    """
-    files = models.ArrayField(
-        model_container=File,
-        blank=True
-    )
-    """
+
+    #files = models.ArrayField(
+        #model_container=File,
+    #    blank=True
+    #)
 
 
 class Repositories(models.Model):

@@ -67,7 +67,7 @@ class RepositoriesTest(BaseViewTest):
         repositories/ endpoint
         """
         # get API response
-        response = self.client.get(reverse('repositories-list'))
+        response = self.client.get(reverse('api:repositories-list'))
 
         # get data from db
         repositories = Repositories.objects.all()
@@ -77,14 +77,14 @@ class RepositoriesTest(BaseViewTest):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_valid_single_repository(self):
-        response = self.client.get(reverse('repositories-detail', kwargs={'pk': 'MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ=='}))
+        response = self.client.get(reverse('api:repositories-detail', kwargs={'pk': 'MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ=='}))
         repository = Repositories.objects.get(pk='MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ==')
         serializer = RepositorySerializer(repository)
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_invalid_single_repository(self):
-        response = self.client.get(reverse('repositories-detail', kwargs={'pk': 'WrOnGrEpOsItOrYsHa=='}))
+        response = self.client.get(reverse('api:repositories-detail', kwargs={'pk': 'WrOnGrEpOsItOrYsHa=='}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_valid_repository(self):
@@ -98,7 +98,7 @@ class RepositoriesTest(BaseViewTest):
         repositories_before_create = RepositorySerializer(Repositories.objects.all(), many=True).data
 
         response = self.client.post(
-            reverse('repositories-list'),
+            reverse('api:repositories-list'),
             data=json.dumps(valid_payload),
             content_type='application/json'
         )
@@ -136,7 +136,7 @@ class RepositoriesTest(BaseViewTest):
 
         for payload in invalid_payloads:
             response = self.client.post(
-                reverse('repositories-list'),
+                reverse('api:repositories-list'),
                 data=json.dumps(payload),
                 content_type='application/json'
             )
@@ -156,7 +156,7 @@ class RepositoriesTest(BaseViewTest):
 
         # here the conflict
         response = self.client.post(
-            reverse('repositories-list'),
+            reverse('api:repositories-list'),
             data=json.dumps(existing_payload),
             content_type='application/json'
         )
@@ -175,7 +175,7 @@ class RepositoriesTest(BaseViewTest):
         serializer_before_delete = RepositorySerializer(repositories_before_delete, many=True).data
 
         response = self.client.delete(
-            reverse('repositories-detail', kwargs={'pk': 'MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ=='})
+            reverse('api:repositories-detail', kwargs={'pk': 'MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ=='})
         )
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -191,7 +191,7 @@ class RepositoriesTest(BaseViewTest):
         :except: HTTP_404_NOT_FOUND
         """
         response = self.client.delete(
-            reverse('repositories-detail', kwargs={'pk': 'NoTPrEsEnT=='})
+            reverse('api:repositories-detail', kwargs={'pk': 'NoTPrEsEnT=='})
         )
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -206,7 +206,7 @@ class FixingCommitsTest(BaseViewTest):
         fixing-commits/ endpoint
         """
         # get API response
-        response = self.client.get(reverse('fixing-commits-list'))
+        response = self.client.get(reverse('api:fixing-commits-list'))
 
         # get data from db
         fixing_commits = FixingCommit.objects.all()
@@ -216,14 +216,14 @@ class FixingCommitsTest(BaseViewTest):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_valid_single_fixing_commit(self):
-        response = self.client.get(reverse('fixing-commits-detail', kwargs={'pk': '123456789'}))
+        response = self.client.get(reverse('api:fixing-commits-detail', kwargs={'pk': '123456789'}))
         fixing_commit = FixingCommit.objects.get(sha='123456789')
         serializer = FixingCommitSerializer(fixing_commit)
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_invalid_single_fixing_commit(self):
-        response = self.client.get(reverse('fixing-commits-detail', kwargs={'pk': '000000000'}))
+        response = self.client.get(reverse('api:fixing-commits-detail', kwargs={'pk': '000000000'}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_valid_fixing_commits(self):
@@ -239,7 +239,7 @@ class FixingCommitsTest(BaseViewTest):
         fixing_commits_before_create = FixingCommitSerializer(FixingCommit.objects.all(), many=True).data
 
         response = self.client.post(
-            reverse('fixing-commits-list'),
+            reverse('api:fixing-commits-list'),
             data=json.dumps(valid_payload),
             content_type='application/json'
         )
@@ -271,7 +271,7 @@ class FixingCommitsTest(BaseViewTest):
 
         for payload in invalid_payloads:
             response = self.client.post(
-                reverse('fixing-commits-list'),
+                reverse('api:fixing-commits-list'),
                 data=json.dumps(payload),
                 content_type='application/json'
             )
@@ -291,7 +291,7 @@ class FixingCommitsTest(BaseViewTest):
 
         # here the conflict
         response = self.client.post(
-            reverse('fixing-commits-list'),
+            reverse('api:fixing-commits-list'),
             data=json.dumps(existing_payload),
             content_type='application/json'
         )
@@ -311,7 +311,7 @@ class FixingCommitsTest(BaseViewTest):
         self.assertFalse(serializer_before_patch['is_false_positive'])
 
         response = self.client.patch(
-            reverse('fixing-commits-detail', kwargs={'pk': '123456789'})
+            reverse('api:fixing-commits-detail', kwargs={'pk': '123456789'})
         )
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -326,7 +326,7 @@ class FixingCommitsTest(BaseViewTest):
         :except: HTTP_404_NOT_FOUND
         """
         response = self.client.patch(
-            reverse('fixing-commits-detail', kwargs={'pk': 'ShANoTPrEsEnT'})
+            reverse('api:fixing-commits-detail', kwargs={'pk': 'ShANoTPrEsEnT'})
         )
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -340,7 +340,7 @@ class FixingCommitsTest(BaseViewTest):
         serializer_before_delete = FixingCommitSerializer(fixing_commits_before_delete, many=True).data
 
         response = self.client.delete(
-            reverse('fixing-commits-detail', kwargs={'pk': '123456789'})
+            reverse('api:fixing-commits-detail', kwargs={'pk': '123456789'})
         )
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -356,7 +356,7 @@ class FixingCommitsTest(BaseViewTest):
         :except: HTTP_404_NOT_FOUND
         """
         response = self.client.delete(
-            reverse('fixing-commits-detail', kwargs={'pk': 'ShANoTPrEsEnT'})
+            reverse('api:fixing-commits-detail', kwargs={'pk': 'ShANoTPrEsEnT'})
         )
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

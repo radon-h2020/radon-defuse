@@ -16,18 +16,6 @@
             </tr>
         </thead>
         <tbody>
-       <!-- {% for commit in fixing_commits %}
-        <tr>
-            <td>
-                <a href="{{ repository.url }}/commit/{{ commit.sha }}" target="_blank" style="color:black;"> {{ commit.sha }} </a>
-            </td>
-            <td>
-                <p>{{ commit.msg }}</p>
-                <a class="mr-4" href="#" style="float:right; color:red;"> <span data-feather="trash"></span></a>
-            </td>
-        </tr>
-        {% endfor %}
-        </tbody> -->
   </table>
 
 
@@ -77,7 +65,6 @@ $(document).ready(function() {
     });
 
     $('#table-fixing-commits tbody').on( 'click', 'small.change-positiveness', function () {
-        // console.log($(this).parents('td').val())
         var data = table.row($(this).parents('tr')).data();
 
         // patch is_false_positive
@@ -86,7 +73,7 @@ $(document).ready(function() {
             method: 'PATCH',
             statusCode: {
                 204: function(){
-                    table.ajax.reload()
+                    table.ajax.reload(null, false)
                     toastr['success']('Resource updated successfully' , 'Success.')
                 },
                 404: function(){

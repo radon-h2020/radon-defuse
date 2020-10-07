@@ -140,7 +140,7 @@
       var table = $('#table-repositories').DataTable({
             processing: true,
             ajax:  {
-                url: '{% url "repositories-list" %}',
+                url: '{% url "api:repositories-list" %}',
                 type: "GET",
                 dataSrc: ''
             },
@@ -185,7 +185,7 @@
                     data: 'uses_continuous_integration',
                     render: function ( data, type, row ) {
                         if(data && data.uses_continuous_integration)
-                            return '<span class="fa fa-times" style="color: green;"></span>'
+                            return '<span class="fa fa-check" style="color: green;"></span>'
                         else
                             return '<span class="fa fa-times" style="color: red;"></span>'
                     }
@@ -195,7 +195,7 @@
                     data: 'has_license',
                     render: function ( data, type, row ) {
                         if(data && data.has_license)
-                            return '<span class="fa fa-times" style="color: green;"></span>'
+                            return '<span class="fa fa-check" style="color: green;"></span>'
                         else
                             return '<span class="fa fa-times" style="color: red;"></span>'
                     }
@@ -224,7 +224,7 @@
 
             // Delete from db
             $.ajax({
-                url: '{% url "repositories-list" %}' + data.id,
+                url: '{% url "api:repositories-list" %}' + data.id,
                 method: 'DELETE',
                 //data: {pk: data.id},
                 statusCode: {
@@ -277,7 +277,7 @@ $("#confirm-add-repository").click(function(){
                     }
 
                     $.ajax({
-                         url: '{% url "repositories-list" %}',
+                         url: '{% url "api:repositories-list" %}',
                          type: "POST",
                          data: body,
                          dataType: 'json',

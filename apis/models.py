@@ -18,7 +18,7 @@ class File(models.Model):
 
 
 class Repositories(models.Model):
-    id = models.CharField(max_length=32, blank=False, unique=True, primary_key=True)
+    id = models.CharField(max_length=40, blank=False, unique=True, primary_key=True)
     owner = models.CharField(max_length=100, blank=False)
     name = models.CharField(max_length=100, blank=False)
     url = models.CharField(max_length=200, blank=False)

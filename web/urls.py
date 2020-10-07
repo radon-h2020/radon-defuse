@@ -5,6 +5,7 @@ from . import views
 
 urlpatterns = [
     path('repositories/', TemplateView.as_view(template_name='repositories_index.html'), name='repositories_index'),
-    path('repositories/<pk>/', views.repository_home),
-    path('repositories/<pk>/mine', views.repository_mine, name='repository_mine'),
+    path('repositories/<pk>/', views.repository_home, name='repository_home'),
+    path('repositories/<str:pk>/fixing-commits', views.repository_fixing_commits, name='repository_fixing_commits'),
+    path('repositories/<str:pk>/mine', views.repository_mine, name='repository_mine'),
 ]

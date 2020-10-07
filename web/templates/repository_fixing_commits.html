@@ -1,10 +1,100 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends "repository_template.html" %}
+
+{% block body %}
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 border-bottom">
+    <p class="text-uppercase">Fixing-commits</p>
+  </div>
+  <small>These are the commits identified as fixing defects based on the provided list of bug-related issues labels and regex.</small>
+
+  <table id="table-fixing-commits" class="display table table-striped table-bordered" style="font-size: 13px; font-family: Verdana, Geneva, Tahoma, sans-serif;">
+        <thead>
+            <tr>
+                <th><span class="badge badge-pill badge-success">Sha</span></th>
+                <th><span class="badge badge-pill badge-info">Description</span></th>
+                <th><span class="badge badge-pill badge-info">True Positive</span></th>
+            </tr>
+        </thead>
+        <tbody>
+       <!-- {% for commit in fixing_commits %}
+        <tr>
+            <td>
+                <a href="{{ repository.url }}/commit/{{ commit.sha }}" target="_blank" style="color:black;"> {{ commit.sha }} </a>
+            </td>
+            <td>
+                <p>{{ commit.msg }}</p>
+                <a class="mr-4" href="#" style="float:right; color:red;"> <span data-feather="trash"></span></a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody> -->
+  </table>
+
+
+</main>
+
+
+{% endblock %}
+
+
+{% block javascript %}
+
+<script>
+$(document).ready(function() {
+
+    toastr.options = {
+        "closeButton": true,
+        "positionClass": "toast-bottom-right",
+        "preventDuplicates": true,
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut",
+        "timeOut": 1000
+    }
+
+    var table = $( "#table-fixing-commits" ).DataTable({
+        //data: {{ fixing_commits|safe }},
+        processing: true,
+        ajax:  {
+            url: '{% url "api:fixing-commits-list" %}',
+            type: "GET",
+            dataSrc: ''
+        },
+        columns: [
+            {data: 'sha'},
+            {data: 'msg'},
+            {
+                data: 'is_false_positive',
+                render: function ( data, type, row ) {
+                    if(data)
+                        return '<span class="fa fa-times" style="color: red;"></span>'+
+                               '<small class="change-positiveness" style="float:right;cursor: pointer;">change</small>'
+                    else
+                        return '<span class="fa fa-check" style="color: green;"></span>' +
+                               '<small class="change-positiveness" style="float:right;cursor: pointer;">change</small>'
+                }
+            }
+        ]
+    });
+
+    $('#table-fixing-commits tbody').on( 'click', 'small.change-positiveness', function () {
+        // console.log($(this).parents('td').val())
+        var data = table.row($(this).parents('tr')).data();
+
+        // patch is_false_positive
+        $.ajax({
+            url: '{% url "api:fixing-commits-list" %}' + data.sha + '/', // Note the trailing slash. It is mandatory
+            method: 'PATCH',
+            statusCode: {
+                204: function(){
+                    table.ajax.reload()
+                    toastr['success']('Resource updated successfully' , 'Success.')
+                },
+                404: function(){
+                     toastr['error']('Resource not found.' , 'Ops.')
+                }
+            }
+        })
+    })
+});
+</script>
+{% endblock %}

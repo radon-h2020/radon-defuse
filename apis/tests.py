@@ -398,3 +398,19 @@ class FixingFilesTest(BaseViewTest):
 
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_fixing_commit_fixing_files(self):
+        """
+        This test ensures that the fixing-files belonging to a fixing-commit added in the setUp method exist when we \
+        make a GET request to the fixing-files/ endpoint
+        """
+        # get API response
+        response = self.client.get('%s?fixing_commit=%s' % (reverse('api:fixing-files-list'), self.fic1.sha))
+
+        # get data from db
+        fixing_files = FixingFile.objects.filter(fixing_commit=self.fic1.sha)
+        serializer = FixingFileSerializer(fixing_files, many=True)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, serializer.data)
+        self.assertEqual(len(response.data), 3)

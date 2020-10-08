@@ -154,15 +154,17 @@ class FixingFilesViewSet(viewsets.ViewSet):
     """
 
     def list(self, request):
-        fixing_files = FixingFile.objects.all()
+        fixing_commit = self.request.query_params.get('fixing_commit', None)
+        if fixing_commit:
+            fixing_files = FixingFile.objects.filter(fixing_commit=fixing_commit)
+        else:
+            fixing_files = FixingFile.objects.all()
+
         serializer = FixingFileSerializer(fixing_files, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, pk):
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
-        #fixing_commit = get_object_or_404(FixingCommit, sha=pk)
-        #serializer = FixingCommitSerializer(fixing_commit)
-        #return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request):
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
@@ -184,16 +186,17 @@ class FixingFilesViewSet(viewsets.ViewSet):
 
     def partial_update(self, request, pk):
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
-        #fixing_commit = get_object_or_404(FixingCommit, sha=pk)
-        #fixing_commit.is_false_positive = not fixing_commit.is_false_positive
-        #fixing_commit.save()
-        #return Response(status=status.HTTP_204_NO_CONTENT)
+        # fixing_commit = get_object_or_404(FixingCommit, sha=pk)
+        # fixing_commit.is_false_positive = not fixing_commit.is_false_positive
+        # fixing_commit.save()
+        # return Response(status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, pk=None):
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
-        #fixing_commit = get_object_or_404(FixingCommit, sha=pk)
-        #fixing_commit.delete()
-        #return Response(status=status.HTTP_204_NO_CONTENT)
+        # fixing_commit = get_object_or_404(FixingCommit, sha=pk)
+        # fixing_commit.delete()
+        # return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 # ===================================================================================================================#
 

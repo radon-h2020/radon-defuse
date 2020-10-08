@@ -1,142 +1,106 @@
+{% extends "base.html" %}
 {% load static %}
+{% block sidebar_header %}
+<h1 class="text-white">RADON</h1>
+<h6 class="text-white">DEFECT PREDICTION </h6>
+{% endblock %}
+{% block sidebar_content %}
 
-<head>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="https://getbootstrap.com/docs/4.1/examples/dashboard/dashboard.css">
+<p class="px-3 text-white" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-size: 12px;">
+    <span class="fa fa-book text-white"> </span> DOCUMENTATION</p>
 
-  <!-- DataTables -->
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
-</head>
+<ul class="nav flex-column">
+  <li class="nav-item">
+    <a class="nav-link text-white" href="{% url 'api-docs' %}" target="_blank"> API Reference </a>
+  </li>
+</ul>
+{% endblock %}
 
-<body>
+{% block navbar_content %}{% endblock %}
 
-    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href=""> RADON</a>
-    </nav>
-    <div class="container-fluid">
-      <div class="row">
-        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-          <div class="sidebar-sticky">
-
-            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-              <span>Documentation</span>
-            </h6>
-            <ul class="nav flex-column">
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'api-docs' %}" target="_blank">
-                  <span data-feather="book"></span>
-                  API Reference
-                </a>
-              </li>
-            </ul>
-
-            <div class="mt-4" style="text-align:center;">
-                <!--<a href="#"  class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#import_modal">
-                    <span data-feather="upload"> </span> Import
-                </a>
-                <a href="#" download="repositories.json" class="btn btn-outline-secondary btn-sm ml-2">
-                    <span data-feather="download"> </span> Export
-                </a>-->
-            </div>
-          </div>
-        </nav>
-      </div>
+{% block body %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 mt-3 border-bottom">
+    <p class="text-uppercase">Repositories</p>
+    <div class="row" style="float:right;">
+        <button id="id_add_repository" class="col btn btn-outline-secondary btn-sm ml-2 mr-2" style="float:right;" data-toggle="modal" data-target="#id_modal_add_repository">
+            <span class="fa fa-plus"> </span>
+        </button>
+        <a class="col btn btn-primary btn-sm mr-3 fa fa-download" href="" download="repositories.json"  style="float:right;"> </a>
     </div>
 
+</div>
+<table id="table-repositories" class="display table table-striped table-bordered" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-size: 12px;">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th><span class="badge badge-primary">Commits/month</span></th>
+            <th><span class="badge badge-primary">Issues/month</span></th>
+            <th><span class="badge badge-primary">Core contributors</span></th>
+            <th><span class="badge badge-primary">% comments</span></th>
+            <th><span class="badge badge-primary">% iac files</span></th>
+            <th><span class="badge badge-primary">Size</span></th>
+            <th><span class="badge badge-primary">CI</span></th>
+            <th><span class="badge badge-primary">License</span></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
 
-    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 mt-3 border-bottom">
-            <p class="text-uppercase">Repositories</p>
-            <button id="id_add_repository" class="btn btn-outline-secondary btn-sm ml-2" style="float:right;" data-toggle="modal" data-target="#id_modal_add_repository">
-                <span data-feather="plus"> </span> Add
-            </button>
+<!-- MODAL: add repository -->
+<div class="modal" id="id_modal_add_repository" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <p class="modal-title text-uppercase">Add repository</p>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <div class="form-group text-center mb-2" >
+          <button id="dropdown-svc-button" type="button" class="btn btn-dark dropdown-toggle fa fa-github" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:150px; color:white; background-color:black;">
+          &nbsp;Github
+          </button>
+          <div class="dropdown-menu">
+            <a id="dropdown-svc-item" class="dropdown-item">Gitlab</a>
+          </div>
         </div>
-        <div class="added_deleted_msg alert alert-danger text-center pt-3 pb-3 mb-3 mt-3 " style="display:none" role="alert"></div>
-        <table id="table-repositories" class="display table table-striped table-bordered" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-size: 12px;">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <!--<th><span class="badge badge-pill badge-danger">Issues</span></th>
-                    <th><span class="badge badge-pill badge-success">Releases</span></th>
-                    <th><span class="badge badge-pill badge-warning">Stars</span></th>
-                    <th><span class="badge badge-pill badge-info">Watchers</span></th>-->
-                    <th><span class="badge badge-primary">Commits/month</span></th>
-                    <th><span class="badge badge-primary">Issues/month</span></th>
-                    <th><span class="badge badge-primary">Core contributors</span></th>
-                    <th><span class="badge badge-primary">% comments</span></th>
-                    <th><span class="badge badge-primary">% iac files</span></th>
-                    <th><span class="badge badge-primary">Size</span></th>
-                    <th><span class="badge badge-primary">CI</span></th>
-                    <th><span class="badge badge-primary">License</span></th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-    </main>
 
-    <div class="modal" id="id_modal_add_repository" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <p class="modal-title text-uppercase">Add repository</p>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-
-            <div class="form-group text-center mb-2" >
-              <button id="dropdown-svc-button" type="button" class="btn btn-dark dropdown-toggle fa fa-github" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:150px; color:white; background-color:black;">
-              &nbsp;Github
-              </button>
-              <div class="dropdown-menu">
-                <a id="dropdown-svc-item" class="dropdown-item">Gitlab</a>
-              </div>
-            </div>
-
-            <div class="form-group">
-                <span id="alert-missing-svc" class="badge alert-danger pull-right" style="display:none"> This field is mandatory!</span>
-                <input id="input-svc-identifier" type="text" class="form-control" placeholder="https://github.com/<owner>/<name>" >
-                <small id="svc-identifier-description" class="form-text text-muted">This is the url to the Github repository.</small>
-            </div>
-            <div class="form-group">
-                <span id="alert-missing-token" class="badge alert-danger pull-right" style="display:none"> This field is mandatory!</span>
-                <input id="input-svc-api-token" type="password" class="form-control" placeholder="Personal access token">
-                <small id="svc-api-token-description" class="form-text text-muted">This is the personal token to access the Github APIs.</small>
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button id="confirm-add-repository" type="button" class="btn btn-primary">Add</button>
-          </div>
+        <div class="form-group">
+            <input id="input-svc-identifier" type="text" class="form-control" placeholder="https://github.com/<owner>/<name>" >
+            <small id="svc-identifier-description" class="form-text text-muted">This is the url to the Github repository.</small>
+        </div>
+        <div class="form-group">
+            <input id="input-svc-api-token" type="password" class="form-control" placeholder="Personal access token">
+            <small id="svc-api-token-description" class="form-text text-muted">This is the personal token to access the Github APIs.</small>
         </div>
       </div>
+
+      <div class="modal-footer">
+        <button id="confirm-add-repository" type="button" class="btn btn-primary">Add</button>
+      </div>
     </div>
-</body>
+  </div>
+</div>
+{% endblock %}
 
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-
-<!-- DataTables -->
-<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.3.1.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-
-<!-- Icons -->
-<script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
-<script>
-  feather.replace()
-</script>
+{% block javascript %}
+<script src="{% static 'web/js/add-repository.js' %}"> </script>
 
 <script>
    // ====================== Populate repositories DataTable ====================== //
    $(document).ready(function() {
+      toastr.options = {
+        "closeButton": true,
+        "positionClass": "toast-bottom-right",
+        "preventDuplicates": true,
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut",
+      }
+
       var table = $('#table-repositories').DataTable({
             processing: true,
             ajax:  {
@@ -145,7 +109,8 @@
                 dataSrc: ''
             },
             columns: [
-                { data: null,
+                {
+                  data: null,
                   render: function ( data, type, row ) {
                     // Combine the owner and name into a single table field
                     var tag_a_name = `<a href="${data.url}" target="_blank"> ${data.owner}/${data.name}</a>`
@@ -184,7 +149,7 @@
                     defaultContent: 'NA',
                     data: 'uses_continuous_integration',
                     render: function ( data, type, row ) {
-                        if(data && data.uses_continuous_integration)
+                        if(data && data)
                             return '<span class="fa fa-check" style="color: green;"></span>'
                         else
                             return '<span class="fa fa-times" style="color: red;"></span>'
@@ -194,7 +159,7 @@
                     defaultContent: 'NA',
                     data: 'has_license',
                     render: function ( data, type, row ) {
-                        if(data && data.has_license)
+                        if(data && data)
                             return '<span class="fa fa-check" style="color: green;"></span>'
                         else
                             return '<span class="fa fa-times" style="color: red;"></span>'
@@ -214,7 +179,8 @@
 
         var data = table.row( $(this).parents('tr') ).data();
 
-        userWantsToDeleteRow = confirm("Do you really want to delete this repository?");
+        userWantsToDeleteRow = confirm("Do you really want to delete this repository? All data related to this" +
+                                       "repository (e.g., fixing-commits) will be erased.");
 
         if(userWantsToDeleteRow){
             // Remove row from DataTable
@@ -229,93 +195,82 @@
                 //data: {pk: data.id},
                 statusCode: {
                     204: function(){
-                        // Show success message
-                        $('.added_deleted_msg').addClass('alert-success').removeClass('alert-danger')
-                        $('.added_deleted_msg').html('Repository deleted!');
-                        $('.added_deleted_msg').show();
-                        setTimeout(function () { $('.added_deleted_msg').fadeOut('fast'); }, 2500);
+                        table.ajax.reload(null, false)
+                        toastr['success']('Repository deleted successfully' , 'Success.')
                     },
-                    404: function(){alert('Repository not found!')},
+                    404: function(){
+                        toastr['warning']('Repository not found.' , 'Warning.')
+                    },
                 }
             });
         }
       });
-   });
-</script>
 
-<script src="{% static 'web/js/add-repository.js' %}"> </script>
-<script>
-// ====================== ADD/confirm button ====================== //
-$("#confirm-add-repository").click(function(){
-
-    if($("#input-svc-identifier").val().length == 0)
-        $("#alert-missing-svc").show()
-    if($("#input-svc-api-token").val().length == 0)
-        $("#alert-missing-token").show()
-
-    if($("#input-svc-identifier").val() && $("#input-svc-api-token").val()){
-        svc_item = $("#dropdown-svc-button").text().trim().toLowerCase()
-        var token = $("#input-svc-api-token").val()
-
-        if(svc_item == 'gitlab'){
-            var project_id = $("#input-svc-identifier").val()
-
-            $.ajax({
-                 url: "https://gitlab.com/api/v4/projects/" + project_id,
-                 type: "GET",
-                 headers: {'PRIVATE-TOKEN': token },
-                 success: function(response) {
-                    var body = {
-                        'id': response.id,
-                        'owner': response.namespace.full_path,
-                        'name': response.name,
-                        'url': response.web_url,
-                        'default_branch': response.default_branch,
-                        'description': response.description,
-                        'created_at': response.created_at,
-                        'star_count': response.star_count,
-                    }
-
-                    $.ajax({
-                         url: '{% url "api:repositories-list" %}',
-                         type: "POST",
-                         data: body,
-                         dataType: 'json',
-                         statusCode: {
-                            201: function(){
-                                // Show success message
-                                $('.added_deleted_msg').addClass('alert-success').removeClass('alert-danger alert-warning')
-                                $('.added_deleted_msg').html('Repository added correctly! Re-load the page to see it');
-                                $('.added_deleted_msg').show();
-                                setTimeout(function () { $('.added_deleted_msg').fadeOut('fast'); }, 2500);
-                            },
-                            409: function(){
-                                // Show warning message
-                                $('.added_deleted_msg').addClass('alert-warning').removeClass('alert-danger alert-success')
-                                $('.added_deleted_msg').html('This repository already exists');
-                                $('.added_deleted_msg').show();
-                                setTimeout(function () { $('.added_deleted_msg').fadeOut('fast'); }, 2500);
-                            },
-                         }
-                    })
-                 }
-            }).fail(function (msg) {
-                // Show warning message
-                $('.added_deleted_msg').addClass('alert-danger').removeClass('alert-warning alert-success')
-                $('.added_deleted_msg').html('Repository not found. Make sure you inserted the right id/url or token.');
-                $('.added_deleted_msg').show();
-                setTimeout(function () { $('.added_deleted_msg').fadeOut('fast'); }, 3500);
-            });
-        }else{ // github
-
+      // ====================== ADD/confirm button ====================== //
+      $("#confirm-add-repository").click(function(){
+        if($("#input-svc-identifier").val().length == 0){
+            toastr['warning']('Url/id is mandatory!' , 'Warning.')
+        }
+        if($("#input-svc-api-token").val().length == 0){
+            toastr['warning']('Token is mandatory!' , 'Warning.')
         }
 
-        // finally, dismiss modal
-        $('#id_modal_add_repository').modal('hide');
-    }
-});
-</script>
+        if($("#input-svc-identifier").val() && $("#input-svc-api-token").val()){
+            svc_item = $("#dropdown-svc-button").text().trim().toLowerCase()
+            var token = $("#input-svc-api-token").val()
 
+            if(svc_item == 'gitlab'){
+                var project_id = $("#input-svc-identifier").val()
+
+                $.ajax({
+                     url: "https://gitlab.com/api/v4/projects/" + project_id,
+                     type: "GET",
+                     headers: {'PRIVATE-TOKEN': token },
+                     success: function(response) {
+                        var body = {
+                            'id': response.id,
+                            'owner': response.namespace.full_path,
+                            'name': response.name,
+                            'url': response.web_url,
+                            'default_branch': response.default_branch,
+                            'description': response.description,
+                            'created_at': response.created_at,
+                            'star_count': response.star_count,
+                        }
+
+                        $.ajax({
+                             url: '{% url "api:repositories-list" %}',
+                             type: "POST",
+                             data: body,
+                             dataType: 'json',
+                             statusCode: {
+                                201: function(){
+                                    toastr['success']('Repository added successfully' , 'Success.')
+                                    table.ajax.reload(null, false)
+                                },
+                                409: function(){
+                                    toastr['warning']('There already exists a repository like this.' , 'Warning.')
+                                },
+                             }
+                        })
+                     }
+                }).fail(function (msg) {
+                    toastr['error']('Repository not found. Make sure you inserted the right id/url or token.' , 'Error.')
+                });
+            }else{ // github
+
+            }
+
+            // finally, dismiss modal
+            $('#id_modal_add_repository').modal('hide');
+        }
+      });
+   });
+</script>
+<script>
+
+</script>
+{% endblock %}
 
 
 

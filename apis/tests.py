@@ -235,6 +235,24 @@ class FixingCommitsTest(BaseViewTest):
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+
+    def test_get_repository_fixing_commits(self):
+        """
+        This test ensures that the fixing-commits belonging to a repository added in the setUp method exist when we \
+        make a GET request to the fixing-commit/repository={id_repository} endpoint
+        """
+        # get API response
+        response = self.client.get('%s?repository=%s' % (reverse('api:fixing-commits-list'), self.repo1.id))
+
+        # get data from db
+        fixing_commits = FixingCommit.objects.filter(repository=self.repo1.id)
+        serializer = FixingCommitSerializer(fixing_commits, many=True)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data, serializer.data)
+
+
     def test_get_valid_single_fixing_commit(self):
         response = self.client.get(reverse('api:fixing-commits-detail', kwargs={'pk': '123456789'}))
         fixing_commit = FixingCommit.objects.get(sha='123456789')
@@ -413,7 +431,7 @@ class FixingFilesTest(BaseViewTest):
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(len(response.data), 3)
 
-    def test_get_repository_commit_fixing_files(self):
+    def test_get_repository_fixing_files(self):
         """
         This test ensures that the fixing-files belonging to a fixing-commit added in the setUp method exist when we \
         make a GET request to the fixing-files/ endpoint

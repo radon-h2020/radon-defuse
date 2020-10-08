@@ -94,7 +94,13 @@ class FixingCommitsViewSet(viewsets.ViewSet):
     """
 
     def list(self, request):
-        fixing_commits = FixingCommit.objects.all()
+        repository = self.request.query_params.get('repository', None)
+
+        if repository:
+            fixing_commits = FixingCommit.objects.filter(repository=repository)
+        else:
+            fixing_commits = FixingCommit.objects.all()
+
         serializer = FixingCommitSerializer(fixing_commits, many=True)
         return Response(serializer.data)
 

@@ -1,90 +1,16 @@
+{% extends "base.html" %}
 {% load static %}
-<html lang="en">
-<head>
-  <title>Bootstrap Example</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{% block title %}{{ repository.owner }}/{{ repository.name }}{% endblock %}
+{% block sidebar_header %}
+<p class="text-white">
+  <span>{{ repository.owner }}/{{ repository.name }}</span>
+</p>
+{% endblock %}
+{% block sidebar_content %}
+<a href="{% url 'web:repository_home' repository.id %}" class="list-group-item list-group-item-action bg-dark text-white">Dashboard</a>
+<a href="{% url 'web:repository_fixing_commits' repository.id %}" class="list-group-item list-group-item-action bg-dark text-white">Fixing commits</a>
+<a href="#" class="list-group-item list-group-item-action bg-dark text-white">Fixing files</a>
+{% endblock %}
 
-  <!-- Sidebar css -->
-  <link href="{% static "web/css/sidebar.css" %}" rel="stylesheet">
-  <!-- DataTables -->
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
-
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
-  {% block head %} {% endblock %}
-</head>
-<body>
-<div class="d-flex" id="wrapper">
-
-    <!-- Sidebar -->
-    <div class="bg-dark border-right" id="sidebar-wrapper">
-      <div class="sidebar-heading">
-        <p class="text-white">
-              <span>{{ repository.owner }}/{{ repository.name }}</span>
-        </p>
-      </div>
-      <div class="list-group list-group-flush">
-        <a href="{% url 'web:repository_home' repository.id %}" class="list-group-item list-group-item-action bg-dark text-white">Dashboard</a>
-        <a href="{% url 'web:repository_fixing_commits' repository.id %}" class="list-group-item list-group-item-action bg-dark text-white">Fixing commits</a>
-        <a href="#" class="list-group-item list-group-item-action bg-dark text-white">Fixing files</a>
-        <a href="#" class="list-group-item list-group-item-action bg-dark text-white">Labeled files</a>
-      </div>
-    </div>
-
-    <!-- Page Content -->
-    <div id="page-content-wrapper">
-
-      <nav class="navbar navbar-expand-lg navbar-white ">
-        <button class="btn btn-dark fa fa-bars" id="menu-toggle"></button>
-
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
-            <li class="nav-item active">
-              <a class="btn btn-primary btn-sm mr-4" href="" download="{{ repository.name }}.json" style="color:white;" > JSON <span data-feather="download"></span></a>
-            </li>
-          </ul>
-        </div>
-      </nav>
-
-      <div class="container mt-4" >
-        {% block body %} {% endblock %}
-      </div>
-    </div>
-    <!-- /#page-content-wrapper -->
-
-</div>
-
-</body>
-
-<!-- DataTables -->
-<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.3.1.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
-
-
-<!-- Icons -->
-<script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
-<script>
-  feather.replace()
-</script>
-
-<!-- Menu Toggle Script -->
-<script>
-  $("#menu-toggle").click(function(e) {
-    e.preventDefault();
-    $("#wrapper").toggleClass("toggled");
-  });
-</script>
-
+{% block body %} {% endblock %}
 {% block javascript %}{% endblock %}

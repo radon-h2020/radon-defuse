@@ -29,8 +29,6 @@
 <div class="modal" id="modal-mine" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 
-    <form method="POST" id="mine-form" enctype="multipart/form-data">
-      {% csrf_token %}
       <div class="modal-content">
         <div class="modal-header">
           <p class="modal-title text-uppercase">Mining settings</p>
@@ -40,6 +38,8 @@
         </div>
 
         <div class="modal-body">
+          <form method="POST" id="mine-form" enctype="multipart/form-data">
+            {% csrf_token %}
 
             <div class="form-group">
               <label>Bug-related labels</label><br/>
@@ -63,15 +63,11 @@
               <label>Github access token</label>
               <input id="input-svc-api-token" type="password" class="form-control" placeholder="Personal access token">
             </div>
+            <button id="btn-mine" type="submit" class="btn btn-primary btn-md btn-block">Mine</button>
+          </form>
         </div>
 
-        <div class="modal-footer">
-          <button id="btn-mine" type="submit" class="btn btn-primary btn-md btn-block">Mine</button>
-        </div>
       </div>
-
-    </form>
-
   </div>
 </div>
 

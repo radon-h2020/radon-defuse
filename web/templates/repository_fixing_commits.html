@@ -3,8 +3,9 @@
 {% block body %}
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 border-bottom">
 <p class="text-uppercase">Fixing-commits</p>
+<a class="btn btn-primary btn-sm  fa fa-download" href="" download="{{ repository.name }}_fixing_commits.json"  style="float:right;"> </a>
 </div>
-<small>These are the commits identified as fixing defects based on the provided list of bug-related issues labels and regex.</small>
+<small class="mb-4">These are the commits identified as fixing defects based on the provided list of bug-related issues labels and regex.</small>
 
 <table id="table-fixing-commits" class="display table table-striped table-bordered" style="font-size: 13px; font-family: Verdana, Geneva, Tahoma, sans-serif;">
     <thead>
@@ -16,9 +17,6 @@
     </thead>
     <tbody>
 </table>
-
-
-
 {% endblock %}
 
 
@@ -40,7 +38,7 @@ $(document).ready(function() {
         //data: {{ fixing_commits|safe }},
         processing: true,
         ajax:  {
-            url: '{% url "api:fixing-commits-list" %}',
+            url: '{% url "api:fixing-commits-list" %}?repository=' + {{ repository.id }},
             type: "GET",
             dataSrc: ''
         },

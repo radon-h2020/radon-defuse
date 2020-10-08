@@ -414,3 +414,30 @@ class FixingFilesTest(BaseViewTest):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(len(response.data), 3)
+
+    def test_get_repository_commit_fixing_files(self):
+        """
+        This test ensures that the fixing-files belonging to a fixing-commit added in the setUp method exist when we \
+        make a GET request to the fixing-files/ endpoint
+        """
+        # get API response
+        response = self.client.get('%s?repository=%s' % (reverse('api:fixing-files-list'), self.repo1.id))
+
+        # get data from db
+        fixing_files = FixingFile.objects.filter(fixing_commit__repository=self.repo1.id)
+        serializer = FixingFileSerializer(fixing_files, many=True)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, serializer.data)
+        self.assertEqual(len(response.data), 5)
+
+
+    def test_get_fixing_files_invalid(self):
+        """
+        This test ensures that the passing both query parameters (fixing_commit and repository) to the GET request
+        result in a HTTP_400_BAD_REQUEST
+        """
+        # get API response
+        response = self.client.get('%s?fixing_commit=%s&repository=%s'
+                                   % (reverse('api:fixing-files-list'), self.fic1.sha, self.repo1.id))
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

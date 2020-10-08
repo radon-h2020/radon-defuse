@@ -155,8 +155,17 @@ class FixingFilesViewSet(viewsets.ViewSet):
 
     def list(self, request):
         fixing_commit = self.request.query_params.get('fixing_commit', None)
-        if fixing_commit:
+        repository = self.request.query_params.get('repository', None)
+
+        if fixing_commit and repository:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        elif fixing_commit:
             fixing_files = FixingFile.objects.filter(fixing_commit=fixing_commit)
+
+        elif repository:
+            fixing_files = FixingFile.objects.filter(fixing_commit__repository=repository)
+
         else:
             fixing_files = FixingFile.objects.all()
 

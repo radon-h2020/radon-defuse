@@ -235,7 +235,6 @@ class FixingCommitsTest(BaseViewTest):
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-
     def test_get_repository_fixing_commits(self):
         """
         This test ensures that the fixing-commits belonging to a repository added in the setUp method exist when we \
@@ -251,7 +250,6 @@ class FixingCommitsTest(BaseViewTest):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
         self.assertEqual(response.data, serializer.data)
-
 
     def test_get_valid_single_fixing_commit(self):
         response = self.client.get(reverse('api:fixing-commits-detail', kwargs={'pk': '123456789'}))
@@ -342,12 +340,12 @@ class FixingCommitsTest(BaseViewTest):
         Patch an existing fixing-commit.
         :except: HTTP_204_NO_CONTENT
         """
-        fixing_commit_before_patch = FixingCommit.objects.get(sha='123456789')
+        fixing_commit_before_patch = FixingCommit.objects.get(sha=self.fic1.sha)
         serializer_before_patch = FixingCommitSerializer(fixing_commit_before_patch).data
         self.assertFalse(serializer_before_patch['is_false_positive'])
 
         response = self.client.patch(
-            reverse('api:fixing-commits-detail', kwargs={'pk': '123456789'})
+            reverse('api:fixing-commits-detail', kwargs={'pk': self.fic1.sha})
         )
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -388,7 +386,7 @@ class FixingCommitsTest(BaseViewTest):
 
     def test_delete_unexisting_fixing_commit(self):
         """
-        Try to delete a repository that does not exist in the db.
+        Try to delete a fixing-commit that does not exist in the db.
         :except: HTTP_404_NOT_FOUND
         """
         response = self.client.delete(
@@ -446,6 +444,12 @@ class FixingFilesTest(BaseViewTest):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(len(response.data), 5)
+
+        # Make sure only fixing-files belonging to true-positive fixing-commits are returned
+        self.fic1.is_false_positive = True
+        self.fic1.save()
+        response = self.client.get('%s?repository=%s' % (reverse('api:fixing-files-list'), self.repo1.id))
+        self.assertEqual(len(response.data), 2)
 
     def test_get_fixing_files_invalid(self):
         """

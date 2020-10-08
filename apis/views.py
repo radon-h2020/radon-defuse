@@ -170,7 +170,9 @@ class FixingFilesViewSet(viewsets.ViewSet):
             fixing_files = FixingFile.objects.filter(fixing_commit=fixing_commit)
 
         elif repository:
-            fixing_files = FixingFile.objects.filter(fixing_commit__repository=repository)
+            fixing_commits = FixingCommit.objects.filter(repository=repository)
+            fixing_commits = [commit.sha for commit in list(fixing_commits) if not commit.is_false_positive]
+            fixing_files = FixingFile.objects.filter(fixing_commit__in=fixing_commits)
 
         else:
             fixing_files = FixingFile.objects.all()

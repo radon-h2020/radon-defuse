@@ -233,12 +233,12 @@ paths:
       operationId: destroyFixingCommitsViewSet
       description: Delete a fixing-commit.
       parameters:
-        - name: sha
-          in: path
-          required: true
-          description: 'The commit hash.'
-          schema:
-            type: string
+      - name: sha
+        in: path
+        required: true
+        description: 'The commit hash.'
+        schema:
+          type: string
       responses:
         '204':
           description: 'The fixing-commit has been deleted.'
@@ -258,7 +258,12 @@ paths:
           description: 'The fixing-commit hash. It allows to retrieve all fixing-files for a given fixing-commit'
           schema:
             type: string
-
+        - name: repository
+          in: path
+          required: false
+          description: 'The id of the repository the file belongs to'
+          schema:
+            type: string
       responses:
         '200':
           content:
@@ -271,28 +276,80 @@ paths:
                     is_false_positive: false
                     bug_inducing_commit: "d1f923c66126a1af0e2515ffc2643d9c7585e9de"
                     fixing_commit: "f9ec5c62381014e6370fafe705dbd70d9391b315"
-          description: ''
+          description: 'The list of fixing-files. If the parameter repository is passed, then it returns the list of fixing-files related to true-positive fixing-commits only'
+        '400':
+          description: 'Bad request. Pass only one parameter among fixing_commit and repository, or none.'
       tags:
         - fixing-files
 
     post:
       operationId: createFixingFilesViewSet
       description: Create a fixing-file.
-      parameters: []
+      parameters:
+        - in: body
+          name: filepath
+          required: True
+          schema:
+            type: string
+          example: 'tasks/main.yml'
+        - in: body
+          name: bug_inducing_commit
+          required: True
+          schema:
+            type: string
+          example: 'd1f923c66126a1af0e2515ffc2643d9c7585e9de'
+        - in: body
+          name: fixing_commit
+          required: True
+          schema:
+            type: string
+          example: 'f9ec5c62381014e6370fafe705dbd70d9391b315'
       requestBody:
-        content:
-          application/json:
-            schema: {}
-          application/x-www-form-urlencoded:
-            schema: {}
-          multipart/form-data:
-            schema: {}
+        $ref: '#/components/requestBodies/FixingFileBody'
       responses:
         '201':
-          content:
-            application/json:
-              schema: {}
-          description: ''
+          description: 'The request has been fulfilled, resulting in the creation of a new fixing-file.'
+        '400':
+          description: 'Bad request. One among (filepath, bug_inducing_commit, fixing_commit) is missing or the fixing_commit does not exist.'
+        '409':
+          description: 'Conflict. There already exists a fixing-file with this properties.'
+      tags:
+      - fixing-files
+
+  /api/fixing-files/{id}/:
+    patch:
+      operationId: partialUpdateFixingFilesViewSet
+      description: 'Set up the is_false_positive field of a fixing-file. If is_false_positive
+        equals False, then it switches to True, and vice-versa.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: 'The file auto-generated id.'
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: 'is_false_positive switched to the complementary boolean value.'
+        '404':
+          description: 'No fixing-file found with this id.'
+      tags:
+      - fixing-files
+    delete:
+      operationId: destroyFixingFilesViewSet
+      description: Delete a fixing-file.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: 'The file auto-generated id.'
+        schema:
+          type: string
+      responses:
+        '204':
+          description: 'The fixing-file has been deleted.'
+        '404':
+          description: 'No fixing-file found with this id.'
       tags:
       - fixing-files
 
@@ -323,6 +380,18 @@ components:
             msg: "fix wrong variable"
             date: "22/06/2020 20:39"
             repository: "6853087"
+    FixingFileBody:
+      description: A JSON object containing fixing-file information
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FixingFile'
+          example:
+            filepath: "tasks/main.yaml"
+            bug_inducing_commit: "d1f923c66126a1af0e2515ffc2643d9c7585e9de"
+            fixing_commit: "f9ec5c62381014e6370fafe705dbd70d9391b315"
+            is_false_positive: false
 
   schemas:
     Repository:
@@ -374,7 +443,7 @@ components:
           example: "06/10/2020 19:30"
         is_false_positive:
           type: boolean
-          description: Whether the identified fixing-commit is a false positive (i.e., it is not)
+          description: Whether the identified fixing-commit is a false positive
           default: false
         repository:
           type: string

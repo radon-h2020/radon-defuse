@@ -146,8 +146,7 @@ class FixingFilesViewSet(viewsets.ViewSet):
     list:
     Retrieve all the fixing-files.
 
-    retrieve:
-    Retrieve a fixing-file.
+    retrieve: NOT IMPLEMENTED
 
     create:
     Create a fixing-file.

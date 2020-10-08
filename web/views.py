@@ -15,7 +15,14 @@ def repository_home(request, pk):
 
 def repository_fixing_commits(request, pk):
     repository = get_object_or_404(Repositories, pk=pk)
-    return render(request=request, context={'repository': repository}, template_name='repository_fixing_commits.html', status=200)
+    return render(request=request, context={'repository': repository}, template_name='repository_fixing_commits.html',
+                  status=200)
+
+
+def repository_fixing_files(request, pk):
+    repository = get_object_or_404(Repositories, pk=pk)
+    return render(request=request, context={'repository': repository}, template_name='repository_fixing_files.html',
+                  status=200)
 
 
 @require_POST
@@ -31,7 +38,7 @@ def repository_mine(request, pk):
     if not (access_token and path_to_repo):
         return HttpResponse(status=400)  # Bad request
 
-    fixing_commit_count = BackendRepositoryMiner(
+    fixing_commits_count, fixing_files_count = BackendRepositoryMiner(
         access_token=access_token,
         path_to_repo=str(body.get('path_to_repo')),
         repo_id=pk,
@@ -39,7 +46,8 @@ def repository_mine(request, pk):
         regex=regex).mine()
 
     results = json.dumps({
-        'fixing_commit_count': fixing_commit_count
+        'fixing_commits_count': fixing_commits_count,
+        'fixing_files_count': fixing_files_count
     })
 
     response = HttpResponse(results, content_type='application/json', status=200)

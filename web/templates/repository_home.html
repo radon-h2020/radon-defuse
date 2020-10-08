@@ -121,7 +121,12 @@ $(document).ready(function(){
                     "showMethod": "fadeIn",
                     "hideMethod": "fadeOut"
                 }
-                toastr['success']('Mining ended: ' + response.fixing_commit_count + ' fixing commits identified.' , 'Hooray!')
+
+                msg = `<ul>
+                        <li>${response.fixing_commits_count} fixing-commits;</li>
+                        <li>${response.fixing_files_count} fixing-files.</li>
+                       </ul>`
+                toastr['success']('Mining ended: ' + msg, 'Hooray!')
             },
             500: function(response) {
               toastr.remove()

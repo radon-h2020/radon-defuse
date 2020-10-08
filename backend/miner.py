@@ -6,7 +6,7 @@ from pathlib import Path
 from pydriller.repository_mining import RepositoryMining, GitRepository
 from repositoryminer.repository import RepositoryMiner
 
-from apis.models import FixingCommit, Repositories
+from apis.models import FixingCommit, FixingFile, Repositories
 from apis.serializers import RepositorySerializer
 
 from django.core import serializers
@@ -20,7 +20,7 @@ def is_ansible_file(path: str) -> bool:
     """
     return path and ('test' not in path) \
            and (
-                       'ansible' in path or 'playbooks' in path or 'meta' in path or 'tasks' in path or 'handlers' in path or 'roles' in path) \
+                   'ansible' in path or 'playbooks' in path or 'meta' in path or 'tasks' in path or 'handlers' in path or 'roles' in path) \
            and path.endswith('.yml')
 
 
@@ -39,7 +39,7 @@ def get_file_content(path: str) -> str:
 
 class BackendRepositoryMiner:
 
-    def __init__(self, access_token: str, path_to_repo: str, repo_id: str, labels:list=None, regex: str = None):
+    def __init__(self, access_token: str, path_to_repo: str, repo_id: str, labels: list = None, regex: str = None):
         """
         :param access_token:
         :param path_to_repo:
@@ -107,12 +107,25 @@ class BackendRepositoryMiner:
                                                 is_false_positive=False,
                                                 repository=self.repository)
 
-        # fixing_files = miner.get_fixing_files()
         # Filter-out false positive fixing-files previously discarded by the user
+        for file in miner.get_fixing_files():
+            try:
+                fixing_file = FixingFile.objects.get(filepath=file.filepath,
+                                                     bug_inducing_commit=file.bic,
+                                                     fixing_commit=file.fic)
 
+                if fixing_file.is_false_positive:
+                    miner.fixing_files.remove(file)
+
+            except FixingFile.DoesNotExist:
+                fixing_commit = FixingCommit.objects.get(sha=file.fic)
+                # Save fixing-file in DB
+                FixingFile.objects.create(filepath=file.filepath,
+                                          is_false_positive=False,
+                                          bug_inducing_commit=file.bic,
+                                          fixing_commit=fixing_commit)
         # Get all fixing files from the db about this repository: MOVE in training.data_extraction/preparation
         # miner.fixing_files = [FixingFile for file in db.fixing_files]
         # miner.label()
 
-
-        return len(miner.fixing_commits)
+        return len(miner.fixing_commits), len(miner.fixing_files)

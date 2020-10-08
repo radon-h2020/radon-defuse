@@ -194,17 +194,15 @@ class FixingFilesViewSet(viewsets.ViewSet):
                 return Response(status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, pk):
-        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
-        # fixing_commit = get_object_or_404(FixingCommit, sha=pk)
-        # fixing_commit.is_false_positive = not fixing_commit.is_false_positive
-        # fixing_commit.save()
-        # return Response(status=status.HTTP_204_NO_CONTENT)
+        fixing_file = get_object_or_404(FixingFile, id=pk)
+        fixing_file.is_false_positive = not fixing_file.is_false_positive
+        fixing_file.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, pk=None):
-        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
-        # fixing_commit = get_object_or_404(FixingCommit, sha=pk)
-        # fixing_commit.delete()
-        # return Response(status=status.HTTP_204_NO_CONTENT)
+        fixing_file = get_object_or_404(FixingFile, id=pk)
+        fixing_file.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # ===================================================================================================================#

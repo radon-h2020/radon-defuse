@@ -321,8 +321,8 @@ class FixingCommitsTest(BaseViewTest):
 
     def test_patch_existing_fixing_commit(self):
         """
-        Delete a repository from the database and compare the database before and after deleting.
-        If the database differs, than the repository has been deleted
+        Patch an existing fixing-commit.
+        :except: HTTP_204_NO_CONTENT
         """
         fixing_commit_before_patch = FixingCommit.objects.get(sha='123456789')
         serializer_before_patch = FixingCommitSerializer(fixing_commit_before_patch).data
@@ -340,7 +340,7 @@ class FixingCommitsTest(BaseViewTest):
 
     def test_patch_unexisting_fixing_commit(self):
         """
-        Try to delete a repository that does not exist in the db.
+        Try to patch a fixing-commit that does not exist in the db.
         :except: HTTP_404_NOT_FOUND
         """
         response = self.client.patch(
@@ -351,8 +351,8 @@ class FixingCommitsTest(BaseViewTest):
 
     def test_delete_existing_fixing_commit(self):
         """
-        Delete a repository from the database and compare the database before and after deleting.
-        If the database differs, than the repository has been deleted
+        Delete a fixing-commit from the database and compare the collection before and after deleting.
+        If the collections differ, than the fixing-commit has been deleted
         """
         fixing_commits_before_delete = FixingCommit.objects.all()
         serializer_before_delete = FixingCommitSerializer(fixing_commits_before_delete, many=True).data
@@ -522,3 +522,63 @@ class FixingFilesTest(BaseViewTest):
 
         fixing_files_after_conflict = FixingFileSerializer(FixingFile.objects.all(), many=True).data
         self.assertEqual(fixing_files_after_conflict, fixing_files_before_conflict)
+
+    def test_patch_existing_fixing_file(self):
+        """
+        Patch a fixing-file.
+        :except: HTTP_204_NO_CONTENT
+        """
+        fixing_file_before_patch = FixingFile.objects.get(id=self.file1.id)
+        serializer_before_patch = FixingFileSerializer(fixing_file_before_patch).data
+        self.assertFalse(serializer_before_patch['is_false_positive'])
+
+        response = self.client.patch(
+            reverse('api:fixing-files-detail', kwargs={'pk': self.file1.id})
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        fixing_file_after_patch = FixingFile.objects.get(id=self.file1.id)
+        serializer_after_patch = FixingFileSerializer(fixing_file_after_patch).data
+        self.assertTrue(serializer_after_patch['is_false_positive'])
+
+    def test_patch_unexisting_fixing_file(self):
+        """
+        Patch a fixing-file
+        :except: HTTP_404_NOT_FOUND
+        """
+        response = self.client.patch(
+            reverse('api:fixing-files-detail', kwargs={'pk': -1})
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_existing_fixing_file(self):
+        """
+        Delete a fixing-file from the database and compare the collection before and after deletion.
+        If the collections differ, than the fixing-file has been deleted
+        """
+        fixing_files_before_delete = FixingFile.objects.all()
+        serializer_before_delete = FixingFileSerializer(fixing_files_before_delete, many=True).data
+
+        response = self.client.delete(
+            reverse('api:fixing-files-detail', kwargs={'pk': self.file1.id})
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        fixing_files_after_delete = FixingFile.objects.all()
+        serializer_after_delete = FixingFileSerializer(fixing_files_after_delete, many=True).data
+
+        self.assertLess(len(serializer_after_delete), len(serializer_before_delete))
+
+    def test_delete_unexisting_fixing_file(self):
+        """
+        Try to delete a repository that does not exist in the db.
+        :except: HTTP_404_NOT_FOUND
+        """
+        response = self.client.delete(
+            reverse('api:fixing-files-detail', kwargs={'pk': -1})
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

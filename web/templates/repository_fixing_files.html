@@ -45,8 +45,18 @@ $(document).ready(function() {
         },
         columns: [
             {data: 'filepath'},
-            {data: 'fixing_commit'},
-            {data: 'bug_inducing_commit'},
+            {
+                data: 'fixing_commit',
+                render: function ( data, type, row ) {
+                    return `<a href="{{ repository.url }}/commit/${data}" target="_blank" style="color:black;"> ${data} </a>`
+                }
+            },
+            {
+                data: 'bug_inducing_commit',
+                render: function ( data, type, row ) {
+                    return `<a href="{{ repository.url }}/commit/${data}" target="_blank" style="color:black;"> ${data} </a>`
+                }
+            },
             {
                 data: 'is_false_positive',
                 render: function ( data, type, row ) {

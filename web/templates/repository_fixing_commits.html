@@ -43,7 +43,12 @@ $(document).ready(function() {
             dataSrc: ''
         },
         columns: [
-            {data: 'sha'},
+            {
+                data: 'sha',
+                render: function ( data, type, row ) {
+                    return `<a href="{{ repository.url }}/commit/${data}" target="_blank" style="color:black;"> ${data} </a>`
+                }
+            },
             {data: 'msg'},
             {
                 data: 'is_false_positive',

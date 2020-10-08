@@ -5,6 +5,7 @@ from apis import views
 router = routers.DefaultRouter()
 router.register('repositories', views.RepositoriesViewSet, basename='repositories')
 router.register('fixing-commits', views.FixingCommitsViewSet, basename='fixing-commits')
+router.register('fixing-files', views.FixingFilesViewSet, basename='fixing-files')
 #router.register('models', views.ModelsViewSet, basename='models')
 
 # Wire up our API using automatic URL routing.

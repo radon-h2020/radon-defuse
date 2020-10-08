@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apis.models import FixingCommit, Repositories
+from apis.models import FixingCommit, FixingFile, Repositories
 
 
 class RepositorySerializer(serializers.ModelSerializer):
@@ -29,3 +29,12 @@ class FixingCommitSerializer(serializers.ModelSerializer):
                   'is_false_positive',
                   'repository')
 
+
+class FixingFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FixingFile
+        fields = ('auto_id',
+                  'is_false_positive',
+                  'filepath',
+                  'bug_inducing_commit',
+                  'fixing_commit')

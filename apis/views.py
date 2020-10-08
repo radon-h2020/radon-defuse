@@ -3,8 +3,8 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import FixingCommit, Repositories
-from .serializers import FixingCommitSerializer, RepositorySerializer
+from .models import FixingCommit, FixingFile, Repositories
+from .serializers import FixingCommitSerializer, FixingFileSerializer, RepositorySerializer
 
 
 class RepositoriesViewSet(viewsets.ViewSet):
@@ -130,6 +130,70 @@ class FixingCommitsViewSet(viewsets.ViewSet):
         fixing_commit.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+# ===================================== FIXING FILES ===============================================================#
+
+class FixingFilesViewSet(viewsets.ViewSet):
+    """
+    API endpoint that allows fixing-files to be viewed or edited.
+
+    list:
+    Retrieve all the fixing-files.
+
+    retrieve:
+    Retrieve a fixing-file.
+
+    create:
+    Create a fixing-file.
+
+    partial_update: Set up the is_false_positive field of a fixing-file. If is_false_positive equals False,
+    then it switches to True, and vice-versa.
+
+    destroy:
+    Delete a fixing-file.
+    """
+
+    def list(self, request):
+        fixing_files = FixingFile.objects.all()
+        serializer = FixingFileSerializer(fixing_files, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk):
+        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+        #fixing_commit = get_object_or_404(FixingCommit, sha=pk)
+        #serializer = FixingCommitSerializer(fixing_commit)
+        #return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def create(self, request):
+        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+        """
+        try:  # to get the fixing-commit, if exists
+            FixingCommit.objects.get(sha=request.data.get('sha', None))
+            return Response(status=status.HTTP_409_CONFLICT)
+        except FixingCommit.DoesNotExist:
+            if not request.data.get('sha'):
+                return Response('Primary key \'sha\' is missing.', status=status.HTTP_400_BAD_REQUEST)
+
+            serializer = FixingCommitSerializer(data=request.data)
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                serializer.save()
+                return Response(status=status.HTTP_201_CREATED)
+        """
+
+    def partial_update(self, request, pk):
+        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+        #fixing_commit = get_object_or_404(FixingCommit, sha=pk)
+        #fixing_commit.is_false_positive = not fixing_commit.is_false_positive
+        #fixing_commit.save()
+        #return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def destroy(self, request, pk=None):
+        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+        #fixing_commit = get_object_or_404(FixingCommit, sha=pk)
+        #fixing_commit.delete()
+        #return Response(status=status.HTTP_204_NO_CONTENT)
 
 # ===================================================================================================================#
 

@@ -3,8 +3,8 @@ from django.urls import reverse
 
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
-from .models import FixingCommit, Repositories
-from .serializers import FixingCommitSerializer, RepositorySerializer
+from .models import FixingCommit, FixingFile, Repositories
+from .serializers import FixingCommitSerializer, FixingFileSerializer, RepositorySerializer
 
 
 class BaseViewTest(APITestCase):
@@ -26,11 +26,21 @@ class BaseViewTest(APITestCase):
 
     @staticmethod
     def create_fixing_commit(sha: str, msg: str, date: str, is_false_positive: bool, repository: Repositories):
-        FixingCommit.objects.create(sha=sha, msg=msg, date=date, is_false_positive=is_false_positive,
-                                    repository=repository)
+        fixing_commit = FixingCommit(sha=sha, msg=msg, date=date, is_false_positive=is_false_positive,
+                                     repository=repository)
+        fixing_commit.save()
+        return fixing_commit
+
+    @staticmethod
+    def create_fixing_file(filepath: str, is_false_positive: bool, bug_inducing_commit: str,
+                           fixing_commit: FixingCommit):
+        fixing_file = FixingFile(filepath=filepath, is_false_positive=is_false_positive,
+                                 bug_inducing_commit=bug_inducing_commit, fixing_commit=fixing_commit)
+        fixing_file.save()
+        return fixing_file
 
     def setUp(self):
-        # add test data
+        # add test repositories
         self.repo1 = self.create_repository(id='MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ==', owner='jnv',
                                             name='ansible-role-unattended-upgrades',
                                             url='https://github.com/jnv/ansible-role-unattended-upgrades',
@@ -49,11 +59,20 @@ class BaseViewTest(APITestCase):
                                             primary_language='shell',
                                             created_at='2014-01-15T16:46:51Z', pushed_at='2020-08-09T12:22:24Z')
 
-        self.create_fixing_commit('123456789', 'Fixed issue #1', '06/10/2020 17:26', False, self.repo1)
-        self.create_fixing_commit('23456789', 'Fixed issue #2', '06/10/2020 17:27', False, self.repo1)
-        self.create_fixing_commit('3456789', 'Fixed issue #3', '06/10/2020 17:28', False, self.repo2)
-        self.create_fixing_commit('456789', 'Fixed issue #4', '06/10/2020 17:29', False, self.repo2)
-        self.create_fixing_commit('56789', 'Fixed issue #5', '06/10/2020 17:30', False, self.repo2)
+        # add test fixing-commits
+        self.fic1 = self.create_fixing_commit('123456789', 'Fixed issue #1', '06/10/2020 17:26', False, self.repo1)
+        self.fic2 = self.create_fixing_commit('23456789', 'Fixed issue #2', '06/10/2020 17:27', False, self.repo1)
+        self.fic3 = self.create_fixing_commit('3456789', 'Fixed issue #3', '06/10/2020 17:28', False, self.repo2)
+        self.fic4 = self.create_fixing_commit('456789', 'Fixed issue #4', '06/10/2020 17:29', False, self.repo2)
+        self.fic5 = self.create_fixing_commit('56789', 'Fixed issue #5', '06/10/2020 17:30', False, self.repo2)
+
+        # add test fixing-files
+        self.file1 = self.create_fixing_file('filename1.yaml', False, 'bic_123456789', self.fic1)
+        self.file2 = self.create_fixing_file('filename2.yaml', False, 'bic_23456789', self.fic1)
+        self.file3 = self.create_fixing_file('filename3.yaml', False, 'bic_3456789', self.fic1)
+        self.file4 = self.create_fixing_file('filename1.yaml', False, 'bic_456789', self.fic2)
+        self.file5 = self.create_fixing_file('filename4.yaml', False, 'bic_56789', self.fic2)
+        self.file6 = self.create_fixing_file('filename5.yaml', False, 'bic_6789', self.fic3)
 
     def _post_teardown(self):
         Repositories.objects.all().delete()
@@ -77,7 +96,8 @@ class RepositoriesTest(BaseViewTest):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_valid_single_repository(self):
-        response = self.client.get(reverse('api:repositories-detail', kwargs={'pk': 'MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ=='}))
+        response = self.client.get(
+            reverse('api:repositories-detail', kwargs={'pk': 'MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ=='}))
         repository = Repositories.objects.get(pk='MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ==')
         serializer = RepositorySerializer(repository)
         self.assertEqual(response.data, serializer.data)
@@ -227,7 +247,6 @@ class FixingCommitsTest(BaseViewTest):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_valid_fixing_commits(self):
-
         repository = Repositories.objects.get(pk='MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ==')
         valid_payload = {
             'sha': '987654321',
@@ -286,7 +305,7 @@ class FixingCommitsTest(BaseViewTest):
         Try to create a fixing-commit with the same SHA of one already present in the database.
         :except: status.HTTP_409_CONFLICT
         """
-        existing_payload = { 'sha': '123456789' }
+        existing_payload = {'sha': '123456789'}
         fixing_commits_before_conflict = FixingCommitSerializer(FixingCommit.objects.all(), many=True).data
 
         # here the conflict
@@ -360,3 +379,22 @@ class FixingCommitsTest(BaseViewTest):
         )
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+# ================================== FIXING-FILES ==============================================================#
+class FixingFilesTest(BaseViewTest):
+
+    def test_get_all_fixing_files(self):
+        """
+        This test ensures that all fixing-files added in the setUp method exist when we make a GET request to the \
+        fixing-files/ endpoint
+        """
+        # get API response
+        response = self.client.get(reverse('api:fixing-files-list'))
+
+        # get data from db
+        fixing_files = FixingFile.objects.all()
+        serializer = FixingFileSerializer(fixing_files, many=True)
+
+        self.assertEqual(response.data, serializer.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -33,7 +33,7 @@ class FixingCommitSerializer(serializers.ModelSerializer):
 class FixingFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = FixingFile
-        fields = ('auto_id',
+        fields = ('id',
                   'is_false_positive',
                   'filepath',
                   'bug_inducing_commit',

@@ -60,12 +60,11 @@ class FixingCommit(models.Model):
 
 
 class FixingFile(models.Model):
-    auto_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True, blank=False)
     is_false_positive = models.BooleanField(blank=True, default=False)
     filepath = models.CharField(max_length=300, blank=False, editable=False)
     bug_inducing_commit = models.CharField(max_length=50, blank=False, editable=False)
     fixing_commit = models.ForeignKey(FixingCommit, on_delete=models.CASCADE)
-    # repository = models.ForeignKey(Repositories, on_delete=models.CASCADE)
 
     def __hash__(self):
         return super().__hash__()
@@ -74,7 +73,7 @@ class FixingFile(models.Model):
         if not isinstance(other, FixingFile):
             return False
 
-        if self.auto_id == other.auto_id:
+        if self.id == other.id:
             return True
 
         return self.filepath == other.filepath \

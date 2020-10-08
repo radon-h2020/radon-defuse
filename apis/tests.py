@@ -247,7 +247,6 @@ class FixingCommitsTest(BaseViewTest):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_valid_fixing_commits(self):
-        repository = Repositories.objects.get(pk='MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ==')
         valid_payload = {
             'sha': '987654321',
             'msg': 'This is a new fixing-commit for testing!',
@@ -395,7 +394,6 @@ class FixingFilesTest(BaseViewTest):
         # get data from db
         fixing_files = FixingFile.objects.all()
         serializer = FixingFileSerializer(fixing_files, many=True)
-
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -431,7 +429,6 @@ class FixingFilesTest(BaseViewTest):
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(len(response.data), 5)
 
-
     def test_get_fixing_files_invalid(self):
         """
         This test ensures that the passing both query parameters (fixing_commit and repository) to the GET request
@@ -441,3 +438,87 @@ class FixingFilesTest(BaseViewTest):
         response = self.client.get('%s?fixing_commit=%s&repository=%s'
                                    % (reverse('api:fixing-files-list'), self.fic1.sha, self.repo1.id))
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_valid_fixing_file(self):
+        """
+        Create an valid fixing-file (i.e., with either filepath, bug_inducing_commit and fixing_commit).
+        :except: status.HTTP_201_CREATED
+        """
+
+        valid_payload = {
+            'filepath': 'tasks/create_valid.yml',
+            'fixing_commit': str(self.fic1.sha),
+            'bug_inducing_commit': 'someShA123456789'
+        }
+
+        fixing_files_before_create = FixingFileSerializer(FixingFile.objects.all(), many=True).data
+
+        response = self.client.post(
+            reverse('api:fixing-files-list'),
+            data=json.dumps(valid_payload),
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        fixing_files_after_create = FixingFileSerializer(FixingFile.objects.all(), many=True).data
+        self.assertGreater(len(fixing_files_after_create), len(fixing_files_before_create))
+
+    def test_create_invalid_fixing_file(self):
+        """
+        Try to create an invalid fixing-file (i.e., with no filepath, bug_inducing_commit, or fixing_commit, or unexisting fixing commit).
+        :except: status.HTTP_400_BAD_REQUEST
+        """
+
+        invalid_payloads = [{
+            # missing filepath
+            'fixing_commit': self.fic1.sha,
+            'bug_inducing_commit': 'someShA123456789'
+        }, {
+            'filepath': 'tasks/create_valid.yml',
+            # missing fixing_commit
+            'bug_inducing_commit': 'someShA123456789'
+        }, {
+            'filepath': 'tasks/create_valid.yml',
+            'fixing_commit': self.fic1.sha
+            # missing bug_inducing_commit
+        }, {
+            'filepath': 'tasks/create_valid.yml',
+            'fixing_commit': 'Unexisting fixing-commit',
+            'bug_inducing_commit': 'someShA123456789'
+        }]
+
+        fixing_files_before_create = FixingFileSerializer(FixingFile.objects.all(), many=True).data
+
+        for payload in invalid_payloads:
+            response = self.client.post(
+                reverse('api:fixing-files-list'),
+                data=json.dumps(payload),
+                content_type='application/json'
+            )
+
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        fixing_files_after_create = FixingFileSerializer(FixingFile.objects.all(), many=True).data
+        self.assertEqual(fixing_files_after_create, fixing_files_before_create)
+
+    def test_create_fixing_file_conflict(self):
+        """
+        Try to create a fixing-file with the same filepath and fixing-commit of one already present in the database.
+        :except: status.HTTP_409_CONFLICT
+        """
+        serializer = FixingFileSerializer(self.file1)
+        existing_payload = json.dumps(serializer.data)
+        fixing_files_before_conflict = FixingFileSerializer(FixingFile.objects.all(), many=True).data
+
+        # here the conflict
+        response = self.client.post(
+            reverse('api:fixing-files-list'),
+            data=existing_payload,
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+
+        fixing_files_after_conflict = FixingFileSerializer(FixingFile.objects.all(), many=True).data
+        self.assertEqual(fixing_files_after_conflict, fixing_files_before_conflict)

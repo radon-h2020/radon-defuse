@@ -176,22 +176,22 @@ class FixingFilesViewSet(viewsets.ViewSet):
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
     def create(self, request):
-        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
-        """
-        try:  # to get the fixing-commit, if exists
-            FixingCommit.objects.get(sha=request.data.get('sha', None))
+        try:  # to get the fixing-file, if exists
+            FixingFile.objects.get(filepath=request.data.get('filepath', None),
+                                   bug_inducing_commit=request.data.get('bug_inducing_commit', None),
+                                   fixing_commit=request.data.get('fixing_commit', None))
             return Response(status=status.HTTP_409_CONFLICT)
-        except FixingCommit.DoesNotExist:
-            if not request.data.get('sha'):
-                return Response('Primary key \'sha\' is missing.', status=status.HTTP_400_BAD_REQUEST)
+        except FixingFile.DoesNotExist:
+            if not (request.data.get('filepath') and request.data.get('bug_inducing_commit') and request.data.get('fixing_commit')):
+                return Response('One or more among (filepath, bug_inducing_commit, fixing_commit) is missing.',
+                                status=status.HTTP_400_BAD_REQUEST)
 
-            serializer = FixingCommitSerializer(data=request.data)
+            serializer = FixingFileSerializer(data=request.data)
             if not serializer.is_valid():
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             else:
                 serializer.save()
                 return Response(status=status.HTTP_201_CREATED)
-        """
 
     def partial_update(self, request, pk):
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)

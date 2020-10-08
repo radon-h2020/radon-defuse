@@ -247,6 +247,56 @@ paths:
       tags:
         - fixing-commits
 
+  /api/fixing-files/:
+    get:
+      operationId: listFixingFilesViewSets
+      description: Retrieve all the fixing-files.
+      parameters:
+        - name: fixing_commit
+          in: path
+          required: false
+          description: 'The fixing-commit hash. It allows to retrieve all fixing-files for a given fixing-commit'
+          schema:
+            type: string
+
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  - id: "61"
+                    filepath: "tasks/main.yml"
+                    is_false_positive: false
+                    bug_inducing_commit: "d1f923c66126a1af0e2515ffc2643d9c7585e9de"
+                    fixing_commit: "f9ec5c62381014e6370fafe705dbd70d9391b315"
+          description: ''
+      tags:
+        - fixing-files
+
+    post:
+      operationId: createFixingFilesViewSet
+      description: Create a fixing-file.
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+          application/x-www-form-urlencoded:
+            schema: {}
+          multipart/form-data:
+            schema: {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+      tags:
+      - fixing-files
+
+
 components:
   requestBodies:
     RepositoriesBody:
@@ -322,6 +372,10 @@ components:
           type: string
           description: The commit date
           example: "06/10/2020 19:30"
+        is_false_positive:
+          type: boolean
+          description: Whether the identified fixing-commit is a false positive (i.e., it is not)
+          default: false
         repository:
           type: string
           description: The id of the repository the commit belong to
@@ -329,6 +383,33 @@ components:
       required:
         - sha
         - repository
+
+    FixingFile:
+      type: object
+      properties:
+        id:
+          type: int
+          description: Auto-increment id
+        filepath:
+          type: string
+          description: The file path within the repository
+          example: "tasks/main.yml"
+        is_false_positive:
+          type: boolean
+          description: Whether the identified fixing-commit is a false positive (i.e., it is not)
+          default: false
+        bug_inducing_commit:
+          type: string
+          description: The hash of the oldest commit (in the commit histort) to induce the bug in this file
+          example: d1f923c66126a1af0e2515ffc2643d9c7585e9de
+        fixing_commit:
+          type: string
+          description: The hash of the fixing-commit
+          example: f9ec5c62381014e6370fafe705dbd70d9391b315
+      required:
+        - filepath
+        - bug_inducing_commit
+        - fixing_commit
 
   parameters:
     Repository:
@@ -338,4 +419,5 @@ components:
         id: MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ==
       required:
         - id
+
 

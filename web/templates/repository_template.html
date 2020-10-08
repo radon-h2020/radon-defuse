@@ -26,9 +26,9 @@
     <!-- Sidebar -->
     <div class="bg-dark border-right" id="sidebar-wrapper">
       <div class="sidebar-heading">
-        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-white">
-              <span>Repository name</span>
-        </h6>
+        <p class="text-white">
+              <span>{{ repository.owner }}/{{ repository.name }}</span>
+        </p>
       </div>
       <div class="list-group list-group-flush">
         <a href="{% url 'web:repository_home' repository.id %}" class="list-group-item list-group-item-action bg-dark text-white">Dashboard</a>
@@ -57,9 +57,8 @@
         </div>
       </nav>
 
-      <div class="container-fluid mt-4" style="padding: 0px;">
-        {% block body %}
-        {% endblock %}
+      <div class="container mt-4" >
+        {% block body %} {% endblock %}
       </div>
     </div>
     <!-- /#page-content-wrapper -->

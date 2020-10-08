@@ -39,7 +39,7 @@ def get_file_content(path: str) -> str:
 
 class BackendRepositoryMiner:
 
-    def __init__(self, access_token: str, path_to_repo: str, repo_id: str, labels=None, regex: str = None):
+    def __init__(self, access_token: str, path_to_repo: str, repo_id: str, labels:list=None, regex: str = None):
         """
         :param access_token:
         :param path_to_repo:
@@ -51,8 +51,8 @@ class BackendRepositoryMiner:
         self.path_to_repo = str(Path(path_to_repo))
         self.repository = Repositories.objects.get(pk=repo_id)
         self.repository_data = RepositorySerializer(self.repository).data
-        self.labels = labels
-        self.regex = regex
+        self.labels = labels if labels else None
+        self.regex = regex if regex else None
 
     def get_files(self) -> set:
         """
@@ -85,9 +85,7 @@ class BackendRepositoryMiner:
         )
 
         # miner.get_fixing_commits_from_closed_issues(self.labels) (currently only supported for Github)
-        print(f'Mining fixing commits with regex {self.regex}')
         miner.get_fixing_commits_from_commit_messages(self.regex)
-        # miner.get_fixing_files()
 
         # Save fixing-commits that are not false-positive
         for commit in RepositoryMining(path_to_repo=self.path_to_repo,
@@ -97,7 +95,10 @@ class BackendRepositoryMiner:
             # Filter-out false positive previously discarded by the user
             if commit.hash in miner.fixing_commits:
                 try:
-                    FixingCommit.objects.get(sha=commit.hash)
+                    fixing_commit = FixingCommit.objects.get(sha=commit.hash)
+                    if fixing_commit.is_false_positive:
+                        miner.fixing_commits.remove(commit.hash)
+
                 except FixingCommit.DoesNotExist:
                     # Save fixing-commits in DB
                     FixingCommit.objects.create(sha=commit.hash,
@@ -105,5 +106,13 @@ class BackendRepositoryMiner:
                                                 date=commit.committer_date.strftime("%d/%m/%Y %H:%M"),
                                                 is_false_positive=False,
                                                 repository=self.repository)
+
+        # fixing_files = miner.get_fixing_files()
+        # Filter-out false positive fixing-files previously discarded by the user
+
+        # Get all fixing files from the db about this repository: MOVE in training.data_extraction/preparation
+        # miner.fixing_files = [FixingFile for file in db.fixing_files]
+        # miner.label()
+
 
         return len(miner.fixing_commits)

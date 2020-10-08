@@ -1,25 +1,22 @@
 {% extends "repository_template.html" %}
 
 {% block body %}
-<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 border-bottom">
-    <p class="text-uppercase">Fixing-commits</p>
-  </div>
-  <small>These are the commits identified as fixing defects based on the provided list of bug-related issues labels and regex.</small>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 border-bottom">
+<p class="text-uppercase">Fixing-commits</p>
+</div>
+<small>These are the commits identified as fixing defects based on the provided list of bug-related issues labels and regex.</small>
 
-  <table id="table-fixing-commits" class="display table table-striped table-bordered" style="font-size: 13px; font-family: Verdana, Geneva, Tahoma, sans-serif;">
-        <thead>
-            <tr>
-                <th><span class="badge badge-pill badge-success">Sha</span></th>
-                <th><span class="badge badge-pill badge-info">Description</span></th>
-                <th><span class="badge badge-pill badge-info">True Positive</span></th>
-            </tr>
-        </thead>
-        <tbody>
-  </table>
+<table id="table-fixing-commits" class="display table table-striped table-bordered" style="font-size: 13px; font-family: Verdana, Geneva, Tahoma, sans-serif;">
+    <thead>
+        <tr>
+            <th><span class="badge badge-pill badge-success">Sha</span></th>
+            <th><span class="badge badge-pill badge-info">Description</span></th>
+            <th><span class="badge badge-pill badge-warning">True Positive</span></th>
+        </tr>
+    </thead>
+    <tbody>
+</table>
 
-
-</main>
 
 
 {% endblock %}

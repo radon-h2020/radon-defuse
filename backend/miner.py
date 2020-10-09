@@ -84,51 +84,47 @@ class BackendRepositoryMiner:
             branch=self.repository_data['default_branch']
         )
 
-        exclude_commits = [commit.sha for commit in FixingCommit.objects.all() if commit.is_false_positive]
-        miner.exclude_commits = set(exclude_commits)
+        false_positives = [commit.sha for commit in FixingCommit.objects.all() if commit.is_false_positive]
+        true_positives = [commit.sha for commit in FixingCommit.objects.all() if not commit.is_false_positive]
+
+        miner.exclude_commits = set(false_positives)
+        miner.fixing_commits = list(true_positives)
 
         # miner.get_fixing_commits_from_closed_issues(self.labels) (currently only supported for Github)
         miner.get_fixing_commits_from_commit_messages(self.regex)
+        new_fixing_commits = list(set(miner.fixing_commits).difference(true_positives))
 
         # Save fixing-commits that are not false-positive
         for commit in RepositoryMining(path_to_repo=self.path_to_repo,
-                                       only_commits=list(miner.fixing_commits),
+                                       only_commits=new_fixing_commits,
                                        order='reverse').traverse_commits():
 
-            # Filter-out false positive previously discarded by the user
-            if commit.hash in miner.fixing_commits:
+            FixingCommit.objects.create(sha=commit.hash,
+                                        msg=commit.msg,
+                                        date=commit.committer_date.strftime("%d/%m/%Y %H:%M"),
+                                        is_false_positive=False,
+                                        repository=self.repository)
+
+        if new_fixing_commits:
+            # Filter-out false positive fixing-files previously discarded by the user
+            for file in miner.get_fixing_files():
                 try:
-                    fixing_commit = FixingCommit.objects.get(sha=commit.hash)
-                    if fixing_commit.is_false_positive:
-                        miner.fixing_commits.remove(commit.hash)
+                    fixing_file = FixingFile.objects.get(filepath=file.filepath,
+                                                         bug_inducing_commit=file.bic,
+                                                         fixing_commit=file.fic)
 
-                except FixingCommit.DoesNotExist:
-                    # Save fixing-commits in DB
-                    FixingCommit.objects.create(sha=commit.hash,
-                                                msg=commit.msg,
-                                                date=commit.committer_date.strftime("%d/%m/%Y %H:%M"),
-                                                is_false_positive=False,
-                                                repository=self.repository)
+                    if fixing_file.is_false_positive:
+                        miner.fixing_files.remove(file)
 
-        # Filter-out false positive fixing-files previously discarded by the user
-        for file in miner.get_fixing_files():
-            try:
-                fixing_file = FixingFile.objects.get(filepath=file.filepath,
-                                                     bug_inducing_commit=file.bic,
-                                                     fixing_commit=file.fic)
+                except FixingFile.DoesNotExist:
+                    fixing_commit = FixingCommit.objects.get(sha=file.fic)
+                    # Save fixing-file in DB
+                    FixingFile.objects.create(filepath=file.filepath,
+                                              is_false_positive=False,
+                                              bug_inducing_commit=file.bic,
+                                              fixing_commit=fixing_commit)
+            # Get all fixing files from the db about this repository: MOVE in training.data_extraction/preparation
+            # miner.fixing_files = [FixingFile for file in db.fixing_files]
+            # miner.label()
 
-                if fixing_file.is_false_positive:
-                    miner.fixing_files.remove(file)
-
-            except FixingFile.DoesNotExist:
-                fixing_commit = FixingCommit.objects.get(sha=file.fic)
-                # Save fixing-file in DB
-                FixingFile.objects.create(filepath=file.filepath,
-                                          is_false_positive=False,
-                                          bug_inducing_commit=file.bic,
-                                          fixing_commit=fixing_commit)
-        # Get all fixing files from the db about this repository: MOVE in training.data_extraction/preparation
-        # miner.fixing_files = [FixingFile for file in db.fixing_files]
-        # miner.label()
-
-        return len(miner.fixing_commits), len(miner.fixing_files)
+        return len(new_fixing_commits), len(miner.fixing_files)

@@ -84,6 +84,9 @@ class BackendRepositoryMiner:
             branch=self.repository_data['default_branch']
         )
 
+        exclude_commits = [commit.sha for commit in FixingCommit.objects.all() if commit.is_false_positive]
+        miner.exclude_commits = set(exclude_commits)
+
         # miner.get_fixing_commits_from_closed_issues(self.labels) (currently only supported for Github)
         miner.get_fixing_commits_from_commit_messages(self.regex)
 

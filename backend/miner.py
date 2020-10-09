@@ -106,23 +106,30 @@ class BackendRepositoryMiner:
                                         repository=self.repository)
 
         if new_fixing_commits:
+            # replace all fixing-files from db with the new files
+            all_fixing_files = FixingFile.objects.all()
+            for file in all_fixing_files:
+                # keep the false positive as such and delete the others
+                if not file.is_false_positive:
+                    file.delete()
+
             # Filter-out false positive fixing-files previously discarded by the user
             for file in miner.get_fixing_files():
                 try:
-                    fixing_file = FixingFile.objects.get(filepath=file.filepath,
-                                                         bug_inducing_commit=file.bic,
-                                                         fixing_commit=file.fic)
+                    fixing_file = FixingFile.objects.get(filepath=file.filepath, fixing_commit=file.fic)
 
                     if fixing_file.is_false_positive:
                         miner.fixing_files.remove(file)
 
                 except FixingFile.DoesNotExist:
                     fixing_commit = FixingCommit.objects.get(sha=file.fic)
+
                     # Save fixing-file in DB
                     FixingFile.objects.create(filepath=file.filepath,
                                               is_false_positive=False,
                                               bug_inducing_commit=file.bic,
                                               fixing_commit=fixing_commit)
+
             # Get all fixing files from the db about this repository: MOVE in training.data_extraction/preparation
             # miner.fixing_files = [FixingFile for file in db.fixing_files]
             # miner.label()

@@ -4,6 +4,7 @@ from pathlib import Path
 
 # from ansiblemetrics import metrics_extractor
 from pydriller.repository_mining import RepositoryMining, GitRepository
+from repositoryminer import file as miner_objects
 from repositoryminer.repository import RepositoryMiner
 
 from apis.models import FixingCommit, FixingFile, Repositories
@@ -79,6 +80,7 @@ class BackendRepositoryMiner:
         miner = RepositoryMiner(
             access_token=self.access_token,
             path_to_repo=self.path_to_repo,
+            host='github' if 'github.com' in self.repository_data['url'] else 'gitlab',
             repo_owner=self.repository_data['owner'],
             repo_name=self.repository_data['name'],
             branch=self.repository_data['default_branch']
@@ -90,7 +92,9 @@ class BackendRepositoryMiner:
         miner.exclude_commits = set(false_positives)
         miner.fixing_commits = list(true_positives)
 
-        # miner.get_fixing_commits_from_closed_issues(self.labels) (currently only supported for Github)
+        miner.get_fixing_commits_from_closed_issues(set(self.labels))
+        print('mined from issues')
+
         miner.get_fixing_commits_from_commit_messages(self.regex)
         new_fixing_commits = list(set(miner.fixing_commits).difference(true_positives))
 
@@ -108,10 +112,18 @@ class BackendRepositoryMiner:
         if new_fixing_commits:
             # replace all fixing-files from db with the new files
             all_fixing_files = FixingFile.objects.all()
+
             for file in all_fixing_files:
                 # keep the false positive as such and delete the others
                 if not file.is_false_positive:
                     file.delete()
+                else:
+                    miner.exclude_fixing_files.append(
+                         miner_objects.FixingFile(filepath=file.filepath,
+                                                  fic=file.fixing_commit,
+                                                  bic=file.bug_inducing_commit)
+                    )
+
 
             # Filter-out false positive fixing-files previously discarded by the user
             for file in miner.get_fixing_files():

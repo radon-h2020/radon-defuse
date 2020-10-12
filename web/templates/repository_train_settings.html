@@ -6,114 +6,163 @@
 {% endblock %}
 
 {% block body %}
-<!-- Card deck -->
+
+<div class="row">
+    <div class="col">
+        <ul class="list-group list-group-flush" >
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title">Data balancing</h5>
+                    </div>
+                    <div class="col">
+                        <div class="pull-right">
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-data-balancing"><i class="fa fa-cogs"></i> Setup </button>
+                            <input id="data-balancing-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="small">
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="list-group-item" >
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title">Feature normalization</h5>
+                    </div>
+                    <div class="col">
+                        <div class="pull-right">
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-feature-normalization"><i class="fa fa-cogs"></i> Setup </button>
+                            <input id="feature-normalization-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="small">
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="list-group-item" >
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title">Feature selection</h5>
+                    </div>
+                    <div class="col">
+                        <div class="pull-right">
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-feature-selection"><i class="fa fa-cogs"></i> Setup </button>
+                            <input id="feature-selection-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="small">
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title">Classifiers</h5>
+                    </div>
+                    <div class="col">
+                        <div class="pull-right">
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-classifiers"><i class="fa fa-cogs"></i> Setup </button>
+                            <input class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="small">
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <button type="button" class="btn btn-success btn-sm pull-right" >Train </button>
+            </li>
+        </ul>
+    </div>
+    <div class="col text-center">
+        <ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link " href="#">Settings</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" href="#">Link</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">Link</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link disabled" href="#">Disabled</a>
+  </li>
+</ul>
+        <span><i class="fa fa-spinner fa-pulse"></i></span>
+
+    </div>
+</div>
+
+
+<!--
 <div class="card-deck">
-
-  <div class="col-md-4">
-    <!-- Card -->
-    <div class="card mb-4 box-shadow shadow p-3 mb-5 rounded">
-
-      <!--<div class="view overlay text-center">
-        <i class="fa fa-balance-scale fa-5x"></i>
-      </div>-->
-
-      <!--Card content-->
-      <div class="card-body">
-
-        <h4 class="card-title">Data balancing</h4>
-        <p class="card-text">Training data are balanced so that the number of failure-prone instances equals the number of clean instances.</p>
-        <!-- Provides extra visual weight and identifies the primary action in a set of buttons -->
-
-        <div class="row">
-            <div class="col">
-              <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#modal-data-balancing"><i class="fa fa-cogs"></i> Setup </button>
-            </div>
-            <div class="col">
-                <div class="pull-right">
-                    <input id="data-balancing-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+  <ul class="list-group list-group-flush" >
+    <li class="list-group-item" style="border: none">
+        <div class="card mb-4 box-shadow shadow p-3 mb-5 rounded">
+          <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    <h4 class="card-title">Data balancing</h4>
+                </div>
+                <div class="col">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#modal-data-balancing"><i class="fa fa-cogs"></i> Setup </button>
+                        <input id="data-balancing-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+                    </div>
                 </div>
             </div>
+          </div>
         </div>
-      </div>
-
-    </div>
-    <!-- Card -->
-  </div>
-
-  <div class=" col-md-4">
-    <!-- Card -->
-    <div class="card mb-4 box-shadow shadow p-3 mb-5 rounded">
-
-      <!--Card content-->
-      <div class="card-body">
-
-        <h4 class="card-title">Data normalization</h4>
-        <p class="card-text">The training data are normalized by scaling the numeric attributes.</p>
-
-        <div class="row">
-            <div class="col">
-              <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#modal-feature-normalization"><i class="fa fa-cogs"></i> Setup </button>
-            </div>
-            <div class="col">
-                <div class="pull-right">
-                    <input id="feature-normalization-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+    </li>
+    <li class="list-group-item" style="border: none">
+        <div class="card mb-4 box-shadow shadow p-3 mb-5 rounded">
+          <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    <h4 class="card-title">Data normalization</h4>
+                </div>
+                <div class="col">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#modal-feature-normalization"><i class="fa fa-cogs"></i> Setup </button>
+                        <input id="feature-normalization-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+                    </div>
                 </div>
             </div>
+          </div>
         </div>
-      </div>
-
-    </div>
-    <!-- Card -->
-  </div>
-
-  <div class=" col-md-4">
-    <!-- Card -->
-    <div class="card mb-4 box-shadow shadow p-3 mb-5 rounded">
-
-      <!--Card content-->
-      <div class="card-body">
-        <h4 class="card-title">Features selection</h4>
-        <p class="card-text">Features whose value is constant across observations are removed because not helpful for training.</p>
-        <div class="row">
-            <div class="col">
-              <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#modal-feature-selection"><i class="fa fa-cogs"></i> Setup </button>
-            </div>
-            <div class="col">
-                <div class="pull-right">
-                    <input class="pull-right" type="checkbox" checked disabled data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+    </li>
+    <li class="list-group-item" style="border: none">
+        <div class="card mb-4 box-shadow shadow p-3 mb-5 rounded">
+          <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    <h4 class="card-title">Feature selection</h4>
+                </div>
+                <div class="col">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#modal-feature-selection"><i class="fa fa-cogs"></i> Setup </button>
+                        <input class="pull-right" type="checkbox" checked disabled data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+                    </div>
                 </div>
             </div>
+          </div>
         </div>
-      </div>
-    <!-- Card -->
-    </div>
-  </div>
-
-  <div class=" col-md-4">
-    <!-- Card -->
-    <div class="card mb-4 box-shadow shadow p-3 mb-5 rounded">
-
-      <!--Card content-->
-      <div class="card-body">
-        <h4 class="card-title">Classifiers</h4>
-        <p class="card-text">...</p>
-        <div class="row">
-            <div class="col">
-              <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#modal-classifiers"><i class="fa fa-cogs"></i> Setup </button>
-            </div>
-            <div class="col">
-                <div class="pull-right">
-                    <input class="pull-right" type="checkbox" checked disabled data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+    </li>
+    <li class="list-group-item" style="border: none">
+        <div class="card mb-4 box-shadow shadow p-3 mb-5 rounded">
+          <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    <h4 class="card-title">Classifiers</h4>
+                </div>
+                <div class="col">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#modal-classifiers"><i class="fa fa-cogs"></i> Setup </button>
+                        <input class="pull-right" type="checkbox" checked disabled data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+                    </div>
                 </div>
             </div>
+          </div>
         </div>
-      </div>
-    <!-- Card -->
-    </div>
-  </div>
+    </li>
+  </ul>
 
 </div>
-<!-- Card deck -->
+ -->
 
 {% include 'modal_data_balancing.html' %}
 {% include 'modal_feature_normalization.html' %}

@@ -14,8 +14,10 @@ function toggleOff(checkbox_id) {
 
 $("#data-balancing-checkbox").change(function(){
   if(is_on('#data-balancing-checkbox')){
-    toggleOn('#rus-checkbox')
-    toggleOn('#ros-checkbox')
+    if(!(is_on('#rus-checkbox') || is_on('#ros-checkbox'))){
+        toggleOn('#rus-checkbox')
+        toggleOn('#ros-checkbox')
+    }
   }
 })
 

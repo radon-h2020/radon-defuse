@@ -9,4 +9,5 @@ urlpatterns = [
     path('repositories/<str:pk>/fixing-commits', views.repository_fixing_commits, name='repository_fixing_commits'),
     path('repositories/<str:pk>/fixing-files', views.repository_fixing_files, name='repository_fixing_files'),
     path('repositories/<str:pk>/mine', views.repository_mine, name='repository_mine'),
+    path('repositories/<str:pk>/train', views.repository_train_settings, name='repository_train_settings'),
 ]

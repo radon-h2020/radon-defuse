@@ -1,10 +1,130 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "repository_template.html" %}
 
-</body>
-</html>
+{% block head %}
+<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+{% endblock %}
+
+{% block body %}
+<!-- Card deck -->
+<div class="card-deck">
+
+  <div class="col-md-4">
+    <!-- Card -->
+    <div class="card mb-4 box-shadow shadow p-3 mb-5 rounded">
+
+      <!--<div class="view overlay text-center">
+        <i class="fa fa-balance-scale fa-5x"></i>
+      </div>-->
+
+      <!--Card content-->
+      <div class="card-body">
+
+        <h4 class="card-title">Data balancing</h4>
+        <p class="card-text">Training data are balanced so that the number of failure-prone instances equals the number of clean instances.</p>
+        <!-- Provides extra visual weight and identifies the primary action in a set of buttons -->
+
+        <div class="row">
+            <div class="col">
+              <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#modal-data-balancing"><i class="fa fa-cogs"></i> Setup </button>
+            </div>
+            <div class="col">
+                <div class="pull-right">
+                    <input id="data-balancing-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+                </div>
+            </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- Card -->
+  </div>
+
+  <div class=" col-md-4">
+    <!-- Card -->
+    <div class="card mb-4 box-shadow shadow p-3 mb-5 rounded">
+
+      <!--Card content-->
+      <div class="card-body">
+
+        <h4 class="card-title">Data normalization</h4>
+        <p class="card-text">The training data are normalized by scaling the numeric attributes.</p>
+
+        <div class="row">
+            <div class="col">
+              <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#modal-feature-normalization"><i class="fa fa-cogs"></i> Setup </button>
+            </div>
+            <div class="col">
+                <div class="pull-right">
+                    <input id="feature-normalization-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+                </div>
+            </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- Card -->
+  </div>
+
+  <div class=" col-md-4">
+    <!-- Card -->
+    <div class="card mb-4 box-shadow shadow p-3 mb-5 rounded">
+
+      <!--Card content-->
+      <div class="card-body">
+        <h4 class="card-title">Features selection</h4>
+        <p class="card-text">Features whose value is constant across observations are removed because not helpful for training.</p>
+        <div class="row">
+            <div class="col">
+              <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#modal-feature-selection"><i class="fa fa-cogs"></i> Setup </button>
+            </div>
+            <div class="col">
+                <div class="pull-right">
+                    <input class="pull-right" type="checkbox" checked disabled data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+                </div>
+            </div>
+        </div>
+      </div>
+    <!-- Card -->
+    </div>
+  </div>
+
+  <div class=" col-md-4">
+    <!-- Card -->
+    <div class="card mb-4 box-shadow shadow p-3 mb-5 rounded">
+
+      <!--Card content-->
+      <div class="card-body">
+        <h4 class="card-title">Classifiers</h4>
+        <p class="card-text">...</p>
+        <div class="row">
+            <div class="col">
+              <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#modal-classifiers"><i class="fa fa-cogs"></i> Setup </button>
+            </div>
+            <div class="col">
+                <div class="pull-right">
+                    <input class="pull-right" type="checkbox" checked disabled data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
+                </div>
+            </div>
+        </div>
+      </div>
+    <!-- Card -->
+    </div>
+  </div>
+
+</div>
+<!-- Card deck -->
+
+{% include 'modal_data_balancing.html' %}
+{% include 'modal_feature_normalization.html' %}
+{% include 'modal_feature_selection.html' %}
+{% include 'modal_classifiers.html' %}
+
+{% endblock %}
+
+{% block javascript %}
+{% load static %}
+<script src="{% static 'web/js/modal-data-balancing.js' %}"> </script>
+<script src="{% static 'web/js/modal-feature-normalization.js' %}"> </script>
+<script src="{% static 'web/js/modal-classifiers.js' %}"> </script>
+{% endblock %}

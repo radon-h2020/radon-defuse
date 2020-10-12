@@ -53,3 +53,9 @@ def repository_mine(request, pk):
     response = HttpResponse(results, content_type='application/json', status=200)
     response["Content-Length"] = len(results)
     return response
+
+
+def repository_train_settings(request, pk):
+    repository = get_object_or_404(Repositories, pk=pk)
+    return render(request=request, context={'repository': repository}, template_name='repository_train_settings.html',
+                  status=200)

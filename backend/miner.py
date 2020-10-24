@@ -4,8 +4,9 @@ from pathlib import Path
 
 # from ansiblemetrics import metrics_extractor
 from pydriller.repository_mining import RepositoryMining, GitRepository
-from repositoryminer import file as miner_objects
-from repositoryminer.repository import RepositoryMiner
+from radonminer import files as miner_objects
+from radonminer.mining.ansible import AnsibleMiner
+from radonminer.mining.tosca import ToscaMiner
 
 from apis.models import FixingCommit, FixingFile, Repositories
 from apis.serializers import RepositorySerializer
@@ -77,12 +78,11 @@ class BackendRepositoryMiner:
         return files
 
     def mine(self):
-        miner = RepositoryMiner(
+        miner = AnsibleMiner(
             access_token=self.access_token,
             path_to_repo=self.path_to_repo,
             host='github' if 'github.com' in self.repository_data['url'] else 'gitlab',
-            repo_owner=self.repository_data['owner'],
-            repo_name=self.repository_data['name'],
+            full_name_or_id= f'{self.repository_data["owner"]}/{self.repository_data["name"]}',
             branch=self.repository_data['default_branch']
         )
 

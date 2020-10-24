@@ -14,7 +14,7 @@ function toggleOff(checkbox_id) {
 
 $("#classifiers-save-btn").click(function(){
   if(!(is_on('#dt-classifier-checkbox')  ||
-       is_on('#dlr-classifier-checkbox') ||
+       is_on('#lr-classifier-checkbox') ||
        is_on('#nb-classifier-checkbox')  ||
        is_on('#rf-classifier-checkbox')  ||
        is_on('#svm-classifier-checkbox'))){

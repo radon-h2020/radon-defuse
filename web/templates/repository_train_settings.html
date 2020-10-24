@@ -63,7 +63,7 @@
                 </div>
             </li>
             <li class="list-group-item">
-                <button type="button" class="btn btn-success btn-sm pull-right" >Train </button>
+                <button id="btn-train" type="button" class="btn btn-success btn-sm pull-right" >Train </button>
             </li>
         </ul>
     </div>
@@ -87,83 +87,6 @@
     </div>
 </div>
 
-
-<!--
-<div class="card-deck">
-  <ul class="list-group list-group-flush" >
-    <li class="list-group-item" style="border: none">
-        <div class="card mb-4 box-shadow shadow p-3 mb-5 rounded">
-          <div class="card-body">
-            <div class="row">
-                <div class="col">
-                    <h4 class="card-title">Data balancing</h4>
-                </div>
-                <div class="col">
-                    <div class="pull-right">
-                        <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#modal-data-balancing"><i class="fa fa-cogs"></i> Setup </button>
-                        <input id="data-balancing-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-                    </div>
-                </div>
-            </div>
-          </div>
-        </div>
-    </li>
-    <li class="list-group-item" style="border: none">
-        <div class="card mb-4 box-shadow shadow p-3 mb-5 rounded">
-          <div class="card-body">
-            <div class="row">
-                <div class="col">
-                    <h4 class="card-title">Data normalization</h4>
-                </div>
-                <div class="col">
-                    <div class="pull-right">
-                        <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#modal-feature-normalization"><i class="fa fa-cogs"></i> Setup </button>
-                        <input id="feature-normalization-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-                    </div>
-                </div>
-            </div>
-          </div>
-        </div>
-    </li>
-    <li class="list-group-item" style="border: none">
-        <div class="card mb-4 box-shadow shadow p-3 mb-5 rounded">
-          <div class="card-body">
-            <div class="row">
-                <div class="col">
-                    <h4 class="card-title">Feature selection</h4>
-                </div>
-                <div class="col">
-                    <div class="pull-right">
-                        <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#modal-feature-selection"><i class="fa fa-cogs"></i> Setup </button>
-                        <input class="pull-right" type="checkbox" checked disabled data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-                    </div>
-                </div>
-            </div>
-          </div>
-        </div>
-    </li>
-    <li class="list-group-item" style="border: none">
-        <div class="card mb-4 box-shadow shadow p-3 mb-5 rounded">
-          <div class="card-body">
-            <div class="row">
-                <div class="col">
-                    <h4 class="card-title">Classifiers</h4>
-                </div>
-                <div class="col">
-                    <div class="pull-right">
-                        <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#modal-classifiers"><i class="fa fa-cogs"></i> Setup </button>
-                        <input class="pull-right" type="checkbox" checked disabled data-toggle="toggle" data-onstyle="success" data-offstyle="danger">
-                    </div>
-                </div>
-            </div>
-          </div>
-        </div>
-    </li>
-  </ul>
-
-</div>
- -->
-
 {% include 'modal_data_balancing.html' %}
 {% include 'modal_feature_normalization.html' %}
 {% include 'modal_feature_selection.html' %}
@@ -176,4 +99,57 @@
 <script src="{% static 'web/js/modal-data-balancing.js' %}"> </script>
 <script src="{% static 'web/js/modal-feature-normalization.js' %}"> </script>
 <script src="{% static 'web/js/modal-classifiers.js' %}"> </script>
+
+<script>
+$("#btn-train").click(function(){
+
+    balancers = []
+    if($('#rus-checkbox').prop('checked'))
+        balancers.push('rus')
+    if($('#ros-checkbox').prop('checked'))
+        balancers.push('ros')
+
+    normalizers = []
+    if($('#minmax-scaler-checkbox').prop('checked'))
+        normalizers.push('minmax')
+    if($('#std-scaler-checkbox').prop('checked'))
+        normalizers.push('std')
+
+    classifiers = []
+    if($('#dt-classifier-checkbox').prop('checked'))
+        classifiers.push('dt')
+    if($('#lr-classifier-checkbox').prop('checked'))
+        classifiers.push('logit')
+    if($('#nb-classifier-checkbox').prop('checked'))
+        classifiers.push('nb')
+    if($('#rf-classifier-checkbox').prop('checked'))
+        classifiers.push('rf')
+    if($('#svm-classifier-checkbox').prop('checked'))
+        classifiers.push('svm')
+
+    payload = JSON.stringify({
+        "balancers": balancers,
+        "normalizers": normalizers,
+        "feature_selectors": [],
+        "classifiers": classifiers
+    })
+
+    $.ajax({
+         url: '{% url "web:repository_train_start" pk=repository.id %}',
+         type: "POST",
+         headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+         },
+         data: payload,
+         statusCode: {
+            202: function(){
+                toastr['success']('The request has been added to the queue for processing.' , 'Accepted.')
+            },
+            501: function(){
+                toastr['warning']('Not Implemented yet.' , 'Warning.')
+            },
+         }
+    })
+})
+</script>
 {% endblock %}

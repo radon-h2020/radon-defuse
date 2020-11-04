@@ -154,6 +154,7 @@ class Task(models.Model):
     status = models.CharField(max_length=10, blank=False, editable=False, choices=STATUS_CHOICES, default=PENDING)
     name = models.CharField(max_length=50, blank=False, choices=NAME_CHOICES, default=NONE)
     data = JSONField(blank=True, null=True)
+    repository = models.ForeignKey(Repositories, on_delete=models.CASCADE)
 
     def __hash__(self):
         return super().__hash__()

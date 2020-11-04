@@ -42,8 +42,8 @@ class BaseViewTest(APITestCase):
         return fixing_file
 
     @staticmethod
-    def create_task(status: str, name: str, data: Union[dict, list]):
-        task = Task(status=status, name=name, data=data)
+    def create_task(status: str, name: str, data: Union[dict, list], repository: Repositories):
+        task = Task(status=status, name=name, data=data, repository=repository)
         task.save()
         return task
 
@@ -83,7 +83,9 @@ class BaseViewTest(APITestCase):
         self.file6 = self.create_fixing_file('filename5.yaml', False, 'bic_6789', self.fic3)
 
         # add test tasks
-        self.task1 = self.create_task(Task.COMPLETED, Task.MINE_FIXING_COMMITS, ['1234', '5678'])
+        self.task1 = self.create_task(Task.COMPLETED, Task.MINE_FIXING_COMMITS, ['1234', '5678'], self.repo1)
+        self.task2 = self.create_task(Task.ERROR, Task.EXTRACT_METRICS, None, self.repo1)
+        self.task3 = self.create_task(Task.ACCEPTED, Task.TRAIN, None, self.repo2)
 
     def _post_teardown(self):
         Repositories.objects.all().delete()
@@ -621,13 +623,46 @@ class FixingFilesTest(BaseViewTest):
 class TasksTest(BaseViewTest):
 
     def test_get_task(self):
-        response = self.client.get(reverse('api:get-task', kwargs={'pk': self.task1.pk}))
+        response = self.client.get(reverse('api:tasks-detail', kwargs={'pk': self.task1.pk}))
         task = Task.objects.get(pk=self.task1.pk)
         serializer = TaskSerializer(task)
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_task_not_found(self):
-        response = self.client.get(reverse('api:get-task', kwargs={'pk': 0}))
+        response = self.client.get(reverse('api:tasks-detail', kwargs={'pk': 0}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_get_repository_tasks(self):
+        """
+        This test ensures that all the tasks of a given repository added in the setUp method exist when we \
+        make a GET request to the tasks/ endpoint
+        """
+        # get API response
+        response = self.client.get('%s?repository=%s' % (reverse('api:tasks-list'), self.repo1.id))
+
+        # get data from db
+        tasks = Task.objects.filter(repository=self.repo1.id)
+        serializer = TaskSerializer(tasks, many=True)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, serializer.data)
+        self.assertEqual(len(response.data), 2)
+
+    def test_get_repository_tasks_not_found(self):
+        """
+        This test ensures that all the tasks of a given repository added in the setUp method exist when we \
+        make a GET request to the tasks/ endpoint
+        """
+        # get API response
+        response = self.client.get('%s?repository=%s' % (reverse('api:tasks-list'), 'un-existingID'))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_repository_tasks_invalid(self):
+        """
+        This test ensures that all the tasks of a given repository added in the setUp method exist when we \
+        make a GET request to the tasks/ endpoint
+        """
+        # get API response
+        response = self.client.get('%s?' % (reverse('api:tasks-list')))
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

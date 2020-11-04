@@ -212,13 +212,30 @@ class FixingFilesViewSet(viewsets.ViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class TaskView(APIView):
+class TaskViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    get:
-    Get a task
-    """
+    API endpoint to list and retrieve tasks.
 
-    def get(self, request, pk):
+    list:
+    Retrieve all the tasks of a repository.
+
+    retrieve:
+    Retrieve a given task
+
+    """
+    def list(self, request, **kwargs):
+        repository = self.request.query_params.get('repository', None)
+
+        if not repository:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        repository = get_object_or_404(Repositories, id=repository)
+        tasks = Task.objects.filter(repository=repository)
+        serializer = TaskSerializer(tasks, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, pk):
         task = get_object_or_404(Task, id=pk)
         serializer = TaskSerializer(task)
         return Response(serializer.data, status=status.HTTP_200_OK)

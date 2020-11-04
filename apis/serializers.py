@@ -46,4 +46,5 @@ class TaskSerializer(serializers.ModelSerializer):
         fields = ('id',
                   'status',
                   'name',
-                  'data')
+                  'data',
+                  'repository')

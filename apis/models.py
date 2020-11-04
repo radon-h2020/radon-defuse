@@ -1,4 +1,42 @@
 from djongo import models
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+
+
+class JSONField(models.TextField):
+    """
+    JSONField specialize a TextField to (de)serialize JSON objects.
+
+    Example:
+        class Page(models.Model):
+            data = JSONField(blank=True, null=True)
+
+        page = Page.objects.get(pk=5)
+        page.data = {'title': 'test', 'type': 3}
+        page.save()
+    """
+
+    def to_python(self, value):
+        if value == "":
+            return None
+
+        try:
+            if isinstance(value, str):
+                return json.loads(value)
+        except ValueError:
+            pass
+        return value
+
+    def from_db_value(self, value, *args):
+        return self.to_python(value)
+
+    def get_db_prep_save(self, value, *args, **kwargs):
+        if value == "":
+            return None
+        if isinstance(value, dict):
+            value = json.dumps(value, cls=DjangoJSONEncoder)
+        return value
+
 
 """
 class Metric(models.Model):
@@ -79,3 +117,49 @@ class FixingFile(models.Model):
         return self.filepath == other.filepath \
                and self.fixing_commit == other.fixing_commit \
                and self.bug_inducing_commit == other.bug_inducing_commit
+
+
+class Task(models.Model):
+    PENDING = 'pending'
+    ACCEPTED = 'accepted'
+    RUNNING = 'running'
+    COMPLETED = 'completed'
+    ERROR = 'error'
+
+    STATUS_CHOICES = [
+        (PENDING, 'pending'),
+        (ACCEPTED, 'accepted'),
+        (RUNNING, 'running'),
+        (COMPLETED, 'completed'),
+        (ERROR, 'error')
+    ]
+
+    NONE = 'none'
+    MINE_FIXING_COMMITS = 'mine-fixing-commits'
+    MINE_FIXED_FILES = 'mine-fixed-files'
+    MINE_FAILURE_PRONE_FILES = 'mine-failure-prone-files'
+    EXTRACT_METRICS = 'extract-metrics'
+    TRAIN = 'train'
+
+    NAME_CHOICES = [
+        (NONE, 'none'),
+        (MINE_FIXING_COMMITS, 'mine-fixing-commits'),
+        (MINE_FIXED_FILES, 'mine-fixed-files'),
+        (MINE_FAILURE_PRONE_FILES, 'mine-failure-prone-files'),
+        (EXTRACT_METRICS, 'extract-metrics'),
+        (TRAIN, 'train')
+    ]
+
+    id = models.AutoField(primary_key=True, blank=False)
+    status = models.CharField(max_length=10, blank=False, editable=False, choices=STATUS_CHOICES, default=PENDING)
+    name = models.CharField(max_length=50, blank=False, choices=NAME_CHOICES, default=NONE)
+    data = JSONField(blank=True, null=True)
+
+    def __hash__(self):
+        return super().__hash__()
+
+    def __eq__(self, other):
+        if not isinstance(other, Task):
+            return False
+
+        return self.id == other.id

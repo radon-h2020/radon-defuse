@@ -1,10 +1,12 @@
 import json
+from typing import Union
+
 from django.urls import reverse
 
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
-from .models import FixingCommit, FixingFile, Repositories
-from .serializers import FixingCommitSerializer, FixingFileSerializer, RepositorySerializer
+from .models import FixingCommit, FixingFile, Repositories, Task
+from .serializers import FixingCommitSerializer, FixingFileSerializer, RepositorySerializer, TaskSerializer
 
 
 class BaseViewTest(APITestCase):
@@ -38,6 +40,12 @@ class BaseViewTest(APITestCase):
                                  bug_inducing_commit=bug_inducing_commit, fixing_commit=fixing_commit)
         fixing_file.save()
         return fixing_file
+
+    @staticmethod
+    def create_task(status: str, name: str, data: Union[dict, list]):
+        task = Task(status=status, name=name, data=data)
+        task.save()
+        return task
 
     def setUp(self):
         # add test repositories
@@ -73,6 +81,9 @@ class BaseViewTest(APITestCase):
         self.file4 = self.create_fixing_file('filename1.yaml', False, 'bic_456789', self.fic2)
         self.file5 = self.create_fixing_file('filename4.yaml', False, 'bic_56789', self.fic2)
         self.file6 = self.create_fixing_file('filename5.yaml', False, 'bic_6789', self.fic3)
+
+        # add test tasks
+        self.task1 = self.create_task(Task.COMPLETED, Task.MINE_FIXING_COMMITS, ['1234', '5678'])
 
     def _post_teardown(self):
         Repositories.objects.all().delete()
@@ -604,3 +615,19 @@ class FixingFilesTest(BaseViewTest):
         )
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+# ================================== TASKS ==============================================================#
+class TasksTest(BaseViewTest):
+
+    def test_get_task(self):
+        response = self.client.get(reverse('api:get-task', kwargs={'pk': self.task1.pk}))
+        task = Task.objects.get(pk=self.task1.pk)
+        serializer = TaskSerializer(task)
+        self.assertEqual(response.data, serializer.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_task_not_found(self):
+        response = self.client.get(reverse('api:get-task', kwargs={'pk': 0}))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+

@@ -3,8 +3,8 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import FixingCommit, FixingFile, Repositories
-from .serializers import FixingCommitSerializer, FixingFileSerializer, RepositorySerializer
+from .models import FixingCommit, FixingFile, Repositories, Task
+from .serializers import FixingCommitSerializer, FixingFileSerializer, RepositorySerializer, TaskSerializer
 
 
 class RepositoriesViewSet(viewsets.ViewSet):
@@ -210,6 +210,18 @@ class FixingFilesViewSet(viewsets.ViewSet):
         fixing_file = get_object_or_404(FixingFile, id=pk)
         fixing_file.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TaskView(APIView):
+    """
+    get:
+    Get a task
+    """
+
+    def get(self, request, pk):
+        task = get_object_or_404(Task, id=pk)
+        serializer = TaskSerializer(task)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 # ===================================================================================================================#

@@ -1,149 +1,160 @@
+import json
 import os
-from io import StringIO
-from pathlib import Path
+import shutil
+import threading
 
-# from ansiblemetrics import metrics_extractor
-from pydriller.repository_mining import RepositoryMining, GitRepository
-from radonminer import files as miner_objects
-from radonminer.mining.ansible import AnsibleMiner
-from radonminer.mining.tosca import ToscaMiner
+import docker
+from pydriller.repository_mining import RepositoryMining
 
-from apis.models import FixingCommit, FixingFile, Repositories
-from apis.serializers import RepositorySerializer
-
-from django.core import serializers
-
-
-def is_ansible_file(path: str) -> bool:
-    """
-    Check whether the path is an Ansible file
-    :param path: a path
-    :return: True if the path link to an Ansible file. False, otherwise
-    """
-    return path and ('test' not in path) \
-           and (
-                   'ansible' in path or 'playbooks' in path or 'meta' in path or 'tasks' in path or 'handlers' in path or 'roles' in path) \
-           and path.endswith('.yml')
-
-
-def get_file_content(path: str) -> str:
-    """
-    Return the content of a file
-    :param path: the path to the file
-    :return: the content of the file, if exists; None, otherwise.
-    """
-    if not os.path.isfile(path):
-        return ''
-
-    with open(path, 'r') as f:
-        return f.read()
+from apis.models import FixingCommit, FixingFile, Repositories, Task
 
 
 class BackendRepositoryMiner:
 
-    def __init__(self, access_token: str, path_to_repo: str, repo_id: str, labels: list = None, regex: str = None):
+    EXCLUDED_COMMITS_FILENAME = 'excluded_commits.json'
+    INCLUDED_COMMITS_FILENAME = 'included_commits.json'
+    EXCLUDED_FILES_FILENAME = 'excluded_files.json'
+
+    def __init__(self, repo_id: str, language: str, labels: list = None, regex: str = None):
         """
-        :param access_token:
-        :param path_to_repo:
         :param repo_id:
         :param labels:
         :param regex:
         """
-        self.access_token = access_token
-        self.path_to_repo = str(Path(path_to_repo))
+
+        if language not in ('ansible', 'tosca'):
+            raise ValueError(f'Language {language} not supported.')
+
         self.repository = Repositories.objects.get(pk=repo_id)
-        self.repository_data = RepositorySerializer(self.repository).data
+        self.language = language
         self.labels = labels if labels else None
         self.regex = regex if regex else None
 
-    def get_files(self) -> set:
-        """
-        Return all the files in the repository
-        :return: a set of strings representing the path of the files in the repository
-        """
-
-        files = set()
-
-        for root, _, filenames in os.walk(self.path_to_repo):
-            if '.git' in root:
-                continue
-            for filename in filenames:
-                path = os.path.join(root, filename)
-                path = path.replace(self.path_to_repo, '')
-                if path.startswith('/'):
-                    path = path[1:]
-
-                files.add(path)
-
-        return files
-
     def mine(self):
-        miner = AnsibleMiner(
-            access_token=self.access_token,
-            path_to_repo=self.path_to_repo,
-            host='github' if 'github.com' in self.repository_data['url'] else 'gitlab',
-            full_name_or_id= f'{self.repository_data["owner"]}/{self.repository_data["name"]}',
-            branch=self.repository_data['default_branch']
-        )
 
-        false_positives = [commit.sha for commit in FixingCommit.objects.all() if commit.is_false_positive]
-        true_positives = [commit.sha for commit in FixingCommit.objects.all() if not commit.is_false_positive]
+        task = Task(state=Task.ACCEPTED, name=Task.MINE_FIXED_FILES, repository=self.repository)
+        task.save()
 
-        miner.exclude_commits = set(false_positives)
-        miner.fixing_commits = list(true_positives)
+        mine_fixing_commits_thread = threading.Thread(target=self.run_task, name="miner", args=(task,))
+        mine_fixing_commits_thread.start()
 
-        miner.get_fixing_commits_from_closed_issues(set(self.labels))
-        print('mined from issues')
+        return task.id, task.state
 
-        miner.get_fixing_commits_from_commit_messages(self.regex)
-        new_fixing_commits = list(set(miner.fixing_commits).difference(true_positives))
+    def run_task(self, task: Task):
 
-        # Save fixing-commits that are not false-positive
-        for commit in RepositoryMining(path_to_repo=self.path_to_repo,
-                                       only_commits=new_fixing_commits,
-                                       order='reverse').traverse_commits():
+        path_to_task = os.path.join('/tmp', 'radondp_tasks', str(task.id))
+        path_to_excluded_commits = os.path.join(path_to_task, self.EXCLUDED_COMMITS_FILENAME)
+        path_to_included_commits = os.path.join(path_to_task, self.INCLUDED_COMMITS_FILENAME)
+        path_to_excluded_files = os.path.join(path_to_task, self.EXCLUDED_FILES_FILENAME)
 
-            FixingCommit.objects.create(sha=commit.hash,
-                                        msg=commit.msg,
-                                        date=commit.committer_date.strftime("%d/%m/%Y %H:%M"),
-                                        is_false_positive=False,
-                                        repository=self.repository)
+        try:
+            os.makedirs(path_to_task)
 
-        if new_fixing_commits:
-            # replace all fixing-files from db with the new files
-            all_fixing_files = FixingFile.objects.all()
+            false_positive_commits = [commit.sha for commit in FixingCommit.objects.all() if commit.is_false_positive]
+            true_positive_commits = [commit.sha for commit in FixingCommit.objects.all() if
+                                     not commit.is_false_positive]
 
-            for file in all_fixing_files:
-                # keep the false positive as such and delete the others
-                if not file.is_false_positive:
-                    file.delete()
-                else:
-                    miner.exclude_fixing_files.append(
-                         miner_objects.FixingFile(filepath=file.filepath,
-                                                  fic=file.fixing_commit,
-                                                  bic=file.bug_inducing_commit)
-                    )
+            false_positive_files = [dict(
+                filepath=file.filepath,
+                bic=file.bug_inducing_commit,
+                fic=file.fixing_commit.sha) for file in FixingFile.objects.all() if file.is_false_positive]
+
+            with open(path_to_excluded_commits, 'w') as f:
+                json.dump(false_positive_commits, f)
+
+            with open(path_to_included_commits, 'w') as f:
+                json.dump(true_positive_commits, f)
+
+            with open(path_to_excluded_files, 'w') as f:
+                json.dump(false_positive_files, f)
+
+        except Exception as e:
+            print(e)
 
 
-            # Filter-out false positive fixing-files previously discarded by the user
-            for file in miner.get_fixing_files():
-                try:
-                    fixing_file = FixingFile.objects.get(filepath=file.filepath, fixing_commit=file.fic)
+        volumes = {
+            path_to_task: {
+                'bind': '/app',
+                'mode': 'rw'
+            }
+        }
 
-                    if fixing_file.is_false_positive:
-                        miner.fixing_files.remove(file)
+        task.state = Task.RUNNING
+        task.save()
 
-                except FixingFile.DoesNotExist:
-                    fixing_commit = FixingCommit.objects.get(sha=file.fic)
+        host = 'github' if 'github.com' in self.repository.url else 'gitlab'
+        full_name = f'{self.repository.owner}/{self.repository.name}'
+        branch = self.repository.default_branch
+        command = 'repo-miner mine fixed-files {0} {1} {2} . -b {3} --exclude-commits {4} --include-commits {5} --exclude-files {6}'.format(
+            host,
+            self.language,
+            full_name,
+            branch,
+            self.EXCLUDED_COMMITS_FILENAME,
+            self.INCLUDED_COMMITS_FILENAME,
+            self.EXCLUDED_FILES_FILENAME)
+        
+        print(command)
 
-                    # Save fixing-file in DB
-                    FixingFile.objects.create(filepath=file.filepath,
-                                              is_false_positive=False,
-                                              bug_inducing_commit=file.bic,
-                                              fixing_commit=fixing_commit)
+        docker_client = docker.from_env()
+        container = docker_client.containers.run(image='radonconsortium/repo-miner:latest',
+                                                 command=command,
+                                                 detach=True,
+                                                 volumes=volumes,
+                                                 environment={
+                                                     'GITHUB_ACCESS_TOKEN': os.getenv('GITHUB_ACCESS_TOKEN'),
+                                                     'GITLAB_ACCESS_TOKEN': os.getenv('GITLAB_ACCESS_TOKEN')
+                                                 })
 
-            # Get all fixing files from the db about this repository: MOVE in training.data_extraction/preparation
-            # miner.fixing_files = [FixingFile for file in db.fixing_files]
-            # miner.label()
+        result = container.wait()
+        container.remove()
 
-        return len(new_fixing_commits), len(miner.fixing_files)
+        # For debug
+        print(result)
+
+        task.state = Task.COMPLETED
+
+        if result['StatusCode'] != 0:
+            task.state = Task.ERROR
+        else:
+            with open(os.path.join(path_to_task, 'fixing-commits.json')) as f:
+                fixing_commits = json.load(f)
+
+                # Save fixing-commits
+                for commit in RepositoryMining(path_to_repo=self.repository.url,
+                                               only_commits=fixing_commits,
+                                               order='reverse').traverse_commits():
+                    FixingCommit.objects.get_or_create(sha=commit.hash,
+                                                       defaults=dict(
+                                                           msg=commit.msg,
+                                                           date=commit.committer_date.strftime("%d/%m/%Y %H:%M"),
+                                                           is_false_positive=False,
+                                                           repository=self.repository
+                                                       ))
+
+            with open(os.path.join(path_to_task, 'fixed-files.json')) as f:
+                fixed_files = json.load(f)
+
+                # Remove existing true positives (they might be replaced by new files given new fixing-commits)
+                existing_files = FixingFile.objects.all()
+                for file in existing_files:
+                    if not file.is_false_positive:
+                        file.delete()
+
+                # Insert new fixed files
+                for file in fixed_files:
+                    fixing_commit = FixingCommit.objects.get(sha=file['fic'])
+
+                    FixingFile.objects.get_or_create(filepath=file['filepath'],
+                                                     fixing_commit=fixing_commit,
+                                                     defaults=dict(
+                                                         bug_inducing_commit=file['bic'],
+                                                         is_false_positive=False,
+                                                     ))
+
+        task.save()
+
+        try:
+            shutil.rmtree(path_to_task)
+        except Exception as e:
+            print(e)

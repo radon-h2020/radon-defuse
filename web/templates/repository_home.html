@@ -26,93 +26,102 @@
 </div>
 
 <!-- MODAL MINE -->
-<div class="modal" id="modal-mine" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-
-      <div class="modal-content">
-        <div class="modal-header">
-          <p class="modal-title text-uppercase">Mining settings</p>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-
-        <div class="modal-body">
-          <form method="POST" id="mine-form" enctype="multipart/form-data">
-            {% csrf_token %}
-
-            <div class="form-group">
-              <label>Bug-related labels</label><br/>
-              <input id="input-labels" type="text" class="form-control" placeholder="Separate labels by comma (e.g., bug, type: bug, bugfix)">
-              <small  class="form-text text-muted">These are the issue labels that will be used to identify bug-related issues.</small>
-            </div>
-
-            <div class="form-group">
-              <label>Regex</label><br/>
-              <input id="input-regex" type="text" class="form-control" placeholder="e.g., (bug|fix|error|crash|problem|fail|defect|patch)">
-              <small class="form-text text-muted">This is the regular expression that will be used to match fixing-commit messages.</small>
-            </div>
-
-            <div class="form-group">
-              <label>Path to the cloned repository</label><br/>
-              <input id="input-path-to-repo" type="text" class="form-control" placeholder="Path to the cloned repository">
-              <small id="path_to_clones_help" class="form-text text-muted">This is the folder of the cloned repository.</small>
-            </div>
-
-            <div class="form-group">
-              <label>Github access token</label>
-              <input id="input-svc-api-token" type="password" class="form-control" placeholder="Personal access token">
-            </div>
-            <button id="btn-mine" type="submit" class="btn btn-primary btn-md btn-block">Mine</button>
-          </form>
-        </div>
-
-      </div>
-  </div>
-</div>
+{% include 'modal_mine.html' %}
 
 
 {% endblock %}
 
 {% block javascript %}
+{% load static %}
+<script src="{% static 'web/js/modal-mine.js' %}"> </script>
 
 <script>
+function longPollingMining(taskID){
+  var url = '{% url "api:tasks-detail" pk=0 %}'.replace('0', taskID)
+  $.ajax({
+    url: url,
+    type: "GET",
+    statusCode: {
+      200: function(response) {
+
+        if(response.state == 'completed'){
+          fixing_commits_url = "{% url 'web:repository_fixing_commits' repository.id %}"
+
+          var msg = 'Task completed'
+
+          if(response.name == 'mine-fixed-files'){
+            msg = 'Mining completed'
+          }else if(response.name == 'train'){
+            msg = 'Training completed'
+          }
+
+          toastr['success'](msg, 'Hooray!')
+
+        }else if(response.state == 'error'){
+          toastr['error']('The server failed to fulfill task ' + taskID, 'Error')
+
+        }else if(response.state == 'accepted' || response.state == 'running') {
+          console.log(response)
+          setTimeout(function() { longPollingMining(taskID); }, 10000);
+        }
+      }
+    }
+  })
+}
+
+function handleRunningTasks(){
+  $.ajax({
+    url: '{% url "api:tasks-list" %}?state=running&repository=' + {{ repository.id }},
+    type: "GET",
+    statusCode: {
+      200: function(response) {
+        for(const task of response){
+          longPollingMining(task.id)
+        }
+      }
+    }
+  })
+}
+
 $(document).ready(function(){
+  toastr.options = {
+      "closeButton": true,
+      "positionClass": "toast-bottom-right",
+      "timeOut": 0,
+      "extendedTimeOut": 0,
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+  }
+
+  handleRunningTasks()
 
   $("#mine-form").on('submit', function(event){
     event.preventDefault();
-
-    // Check the mandatory fields are not empty
-    if(!$("#input-path-to-repo").val() || !$("#input-svc-api-token").val()){
-        toastr.options.preventDuplicates = true
-        toastr.options.positionClass = "toast-bottom-right"
-        toastr.warning('The path to clone and the personal access token are mandatory!')
-        return
-    }
 
     var labels = undefined
     if($("#input-labels").val()){
       labels = $("#input-labels").val().split(',')
     }
 
+    var language = $("#dropdown-mine-language-btn").text().trim().toLowerCase()
+
     payload = JSON.stringify({
-                'labels': labels,
-                'regex': $("#input-regex").val(),
-                'path_to_repo': $("#input-path-to-repo").val(),
-              })
+      'language': language,
+      'labels': labels,
+      'regex': $("#input-regex").val(),
+    })
 
     // Call { url repository_mine }
     $.ajax({
          url: '{% url "web:repository_mine" pk=repository.id %}',
          type: "POST",
          headers: {
-            'ACCESS-TOKEN': $("#input-svc-api-token").val(),
             'X-CSRFToken': '{{ csrf_token }}'
          },
          data: payload,
          dataType: 'json',
          statusCode: {
-            200: function(response) {
+            202: function(response) {
                 toastr.clear()
                 toastr.options = {
                     "closeButton": true,
@@ -122,11 +131,8 @@ $(document).ready(function(){
                     "hideMethod": "fadeOut"
                 }
 
-                msg = `<ul>
-                        <li>${response.fixing_commits_count} new fixing-commits;</li>
-                        <li>${response.fixing_files_count} fixing-files.</li>
-                       </ul>`
-                toastr['success']('Mining ended: ' + msg, 'Hooray!')
+                toastr['info']('The mining is started. You will get notified when completed... <span><i class="fa fa-spinner fa-pulse"></i></span>', 'Started!')
+                longPollingMining(response)
             },
             500: function(response) {
               toastr.remove()
@@ -146,21 +152,11 @@ $(document).ready(function(){
     $('#modal-mine').modal('hide');
     $('body').removeClass('modal-open');
     $('.modal-backdrop').remove();
-
-    // Notify
-    toastr.options = {
-        "closeButton": true,
-        "positionClass": "toast-bottom-right",
-        "timeOut": 0,
-        "extendedTimeOut": 0,
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
-    }
-    toastr['info']('I am mining... <span><i class="fa fa-spinner fa-pulse"></i></span>', 'Please wait')
   });
 
 });
 </script>
+
 {% endblock %}
 
 

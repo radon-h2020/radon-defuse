@@ -1,5 +1,5 @@
 import json
-from apis.models import Repositories
+from apis.models import Repositories, Task
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
@@ -26,32 +26,18 @@ def repository_fixing_files(request, pk):
 
 @require_POST
 def repository_mine(request, pk):
-    access_token = request.headers.get('ACCESS-TOKEN')
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
-
-    labels = body.get('labels')
-    regex = body.get('regex')
-    path_to_repo = body.get('path_to_repo')
-
-    if not (access_token and path_to_repo):
-        return HttpResponse(status=400)  # Bad request
-
-    fixing_commits_count, fixing_files_count = BackendRepositoryMiner(
-        access_token=access_token,
-        path_to_repo=str(body.get('path_to_repo')),
+    task_id, task_state = BackendRepositoryMiner(
         repo_id=pk,
-        labels=labels,
-        regex=regex).mine()
+        language=body.get('language'),
+        labels=body.get('labels'),
+        regex=body.get('regex')).mine()
 
-    results = json.dumps({
-        'fixing_commits_count': fixing_commits_count,
-        'fixing_files_count': fixing_files_count
-    })
-
-    response = HttpResponse(results, content_type='application/json', status=200)
-    response["Content-Length"] = len(results)
-    return response
+    if task_state == Task.ACCEPTED:
+        return HttpResponse(status=202, content=task_id)
+    else:
+        return HttpResponse(status=500)
 
 
 def repository_train_settings(request, pk):

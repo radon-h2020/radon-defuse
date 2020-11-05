@@ -126,7 +126,7 @@ class Task(models.Model):
     COMPLETED = 'completed'
     ERROR = 'error'
 
-    STATUS_CHOICES = [
+    STATE_CHOICES = [
         (PENDING, 'pending'),
         (ACCEPTED, 'accepted'),
         (RUNNING, 'running'),
@@ -151,9 +151,8 @@ class Task(models.Model):
     ]
 
     id = models.AutoField(primary_key=True, blank=False)
-    status = models.CharField(max_length=10, blank=False, editable=False, choices=STATUS_CHOICES, default=PENDING)
+    state = models.CharField(max_length=10, blank=False, editable=False, choices=STATE_CHOICES, default=PENDING)
     name = models.CharField(max_length=50, blank=False, choices=NAME_CHOICES, default=NONE)
-    data = JSONField(blank=True, null=True)
     repository = models.ForeignKey(Repositories, on_delete=models.CASCADE)
 
     def __hash__(self):

@@ -44,7 +44,6 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = ('id',
-                  'status',
+                  'state',
                   'name',
-                  'data',
                   'repository')

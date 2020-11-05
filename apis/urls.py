@@ -13,7 +13,6 @@ router.register('tasks', views.TaskViewSet, basename='tasks')
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
    path('', include(router.urls)),
-   #path('tasks/<int:pk>', views.TaskView.as_view(), name='get-task'),
    #path('predictions/<int:id>', views.GetPredictionView.as_view(), name='get-prediction'),
    #path('predictions/<int:id>/', views.UpdatePredictionView.as_view(), name='update-prediction')
 ]

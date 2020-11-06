@@ -207,13 +207,10 @@
       // ====================== ADD/confirm button ====================== //
       $("#confirm-add-repository").click(function(){
         if($("#input-svc-identifier").val().length == 0){
-            toastr['warning']('Url/id is mandatory!' , 'Warning.')
-        }
-        if($("#input-svc-api-token").val().length == 0){
-            toastr['warning']('Token is mandatory!' , 'Warning.')
+            toastr['warning']('Full name or id is mandatory!' , 'Warning.')
         }
 
-        if($("#input-svc-identifier").val() && $("#input-svc-api-token").val()){
+        if($("#input-svc-identifier").val()){
             svc_item = $("#dropdown-svc-button").text().trim().toLowerCase()
             var token = $("#input-svc-api-token").val()
 
@@ -258,31 +255,39 @@
                 full_name = $("#input-svc-identifier").val()
 
                 url = '{% url "web:get_github_repo" %}?full_name_or_id=' + full_name
-                console.log(url)
                 $.ajax({
                      url: url,
                      type: "GET",
-                     headers: {'token': token },
-                     success: function(response) {
-                        $.ajax({
-                             url: '{% url "api:repositories-list" %}',
-                             type: "POST",
-                             data: response,
-                             dataType: 'json',
-                             statusCode: {
-                                201: function(){
-                                    toastr['success']('Repository added successfully' , 'Success.')
-                                    table.ajax.reload(null, false)
-                                },
-                                409: function(){
-                                    toastr['warning']('There already exists a repository like this.' , 'Warning.')
-                                },
-                             }
-                        })
+                     headers: {'token': token ? token : undefined},
+                     statusCode: {
+                        200: function(response){
+                            $.ajax({
+                                url: '{% url "api:repositories-list" %}',
+                                type: "POST",
+                                data: response,
+                                dataType: 'json',
+                                statusCode: {
+                                    201: function(){
+                                        toastr['success']('Repository added successfully' , 'Success.')
+                                        table.ajax.reload(null, false)
+                                    },
+                                    409: function(){
+                                        toastr['warning']('Repository already in the db.' , 'Warning.')
+                                    }
+                                }
+                            })
+                        },
+                        401: function(){
+                             toastr['error']('Please, make sure the provided token can access the repository' , 'Bad credentials.')
+                        },
+                        404: function(){
+                             toastr['error']('The repository does not exist or is private' , 'Repository not found.')
+                        },
+                        500: function(){
+                             toastr['error']('Internal server error' , 'Error.')
+                        },
                      }
-                }).fail(function (msg) {
-                    toastr['error']('Repository not found. Make sure you inserted the right id/url or token.' , 'Error.')
-                });
+                })
             }
 
             // finally, dismiss modal

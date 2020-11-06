@@ -21,20 +21,24 @@ def get_github_repository(request):
     try:
         g = Github(login_or_token=access_token)
         repo = g.get_repo(full_name_or_id)
-
-        content = {
-            'id': repo.id,
-            'full_name': repo.full_name,
-            'url': repo.html_url,
-            'default_branch': repo.default_branch,
-            'description': repo.description,
-            'created_at': repo.created_at.strftime("%Y-%d-%m %H:%M:%S"),
-            'star_count': repo.stargazers_count,
-        }
-        return HttpResponse(content=json.dumps(content), content_type='application/json', status=200)
     except GithubException as e:
-        print(e)
-        return HttpResponse(status=400)
+
+        if access_token and e.status == 401:
+            return HttpResponse(status=401)
+
+        return HttpResponse(status=404)
+
+    content = {
+        'id': repo.id,
+        'full_name': repo.full_name,
+        'url': repo.html_url,
+        'default_branch': repo.default_branch,
+        'description': repo.description,
+        'created_at': repo.created_at.strftime("%Y-%d-%m %H:%M:%S"),
+        'star_count': repo.stargazers_count,
+    }
+
+    return HttpResponse(content=json.dumps(content), content_type='application/json', status=200)
 
 
 @require_GET

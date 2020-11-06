@@ -3,7 +3,7 @@
 {% block body %}
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 border-bottom">
 <p class="text-uppercase">Fixed-files</p>
-<a class="btn btn-primary btn-sm  fa fa-download" href="" download="{{ repository.full_name }}_fixing_commits.json"  style="float:right;"> </a>
+<a class="btn btn-primary btn-sm  fa fa-download" href="{% url 'web:repository_dump_fixed_files' repository.id %}"  style="float:right;"> </a>
 </div>
 <small class="mb-4">These are the files involved in the identified fixing-commits.</small>
 

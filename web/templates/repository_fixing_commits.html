@@ -3,7 +3,7 @@
 {% block body %}
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 border-bottom">
 <p class="text-uppercase">Fixing-commits</p>
-<a class="btn btn-primary btn-sm  fa fa-download" href="" download="{{ repository.full_name }}_fixing_commits.json"  style="float:right;"> </a>
+<a class="btn btn-primary btn-sm  fa fa-download" href="{% url 'web:repository_dump_fixing_commits' repository.id %}" style="float:right;"> </a>
 </div>
 <small class="mb-4">These are the commits identified as fixing defects based on the provided list of bug-related issues labels and regex.</small>
 

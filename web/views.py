@@ -1,12 +1,14 @@
 import io
 import json
 import pandas as pd
-from apis.models import MetricsFile, PredictiveModel, Repository, Task
+
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.views.decorators.http import require_GET, require_POST
 from github import Github, GithubException
 
+from apis.models import FixingCommit, FixedFile, MetricsFile, PredictiveModel, Repository, Task
+from apis.serializers import FixingCommitSerializer, FixedFileSerializer, RepositorySerializer
 from backend.miner import BackendRepositoryMiner
 from backend.predictor import BackendTrainer
 
@@ -35,6 +37,37 @@ def get_github_repository(request):
         return HttpResponse(status=400)
 
 
+@require_GET
+def repository_dump_fixing_commits(request, pk: str):
+    repository = get_object_or_404(Repository, pk=pk)
+    commits = FixingCommit.objects.filter(repository=repository)
+    serialized_commits = FixingCommitSerializer(commits, many=True)
+    content = json.dumps(serialized_commits.data)
+
+    filename = f'{repository.full_name}_fixing_commits.json'
+    size = len(content)
+    response = HttpResponse(content, content_type='application/json')
+    response['Content-Length'] = size
+    response['Content-Disposition'] = 'attachment; filename=%s' % filename
+    return response
+
+
+@require_GET
+def repository_dump_fixed_files(request, pk: str):
+    repository = get_object_or_404(Repository, pk=pk)
+    fixed_files = FixedFile.objects.filter(fixing_commit__repository=repository)
+    serialized_files = FixedFileSerializer(fixed_files, many=True)
+    content = json.dumps(serialized_files.data)
+
+    filename = f'{repository.full_name}_fixed_files.json'
+    size = len(content)
+    response = HttpResponse(content, content_type='application/json')
+    response['Content-Length'] = size
+    response['Content-Disposition'] = 'attachment; filename=%s' % filename
+    return response
+
+
+@require_GET
 def repository_dump_metrics(request, pk: str):
     repository = get_object_or_404(Repository, pk=pk)
     metrics = MetricsFile.objects.get(repository=repository, language='ansible')
@@ -48,6 +81,7 @@ def repository_dump_metrics(request, pk: str):
     return response
 
 
+@require_GET
 def repository_dump_model(request, pk: str):
     repository = get_object_or_404(Repository, pk=pk)
     model = PredictiveModel.objects.get(repository=repository, language='ansible')
@@ -57,6 +91,24 @@ def repository_dump_model(request, pk: str):
     response = HttpResponse(b_model, content_type='application/octet-streamapplication/octet-stream')
     response['Content-Disposition'] = 'attachment; filename=' + filename
 
+    return response
+
+
+@require_GET
+def repositories_dump(request):
+    """
+    Dump all repositories in the db to a json file
+    :param request:
+    :return: HttpResponse
+    """
+    repos = Repository.objects.all()
+    serialized_repos = RepositorySerializer(repos, many=True)
+    content = json.dumps(serialized_repos.data)
+
+    size = len(content)
+    response = HttpResponse(content, content_type='application/json')
+    response['Content-Length'] = size
+    response['Content-Disposition'] = 'attachment; filename=repositories.json'
     return response
 
 

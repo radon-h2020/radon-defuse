@@ -4,7 +4,7 @@ from django.urls import reverse
 
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
-from .models import FixingCommit, FixingFile, Repositories, Task
+from .models import FixingCommit, FixingFile, Repository, Task
 from .serializers import FixingCommitSerializer, FixingFileSerializer, RepositorySerializer, TaskSerializer
 
 
@@ -17,16 +17,16 @@ class BaseViewTest(APITestCase):
                           releases_count: int, stars_count: int, watcher_count: int, primary_language: str,
                           created_at: str,
                           pushed_at: str):
-        repository = Repositories(id=id, full_name=full_name, url=url, default_branch=default_branch,
-                                  description=description, issue_count=issue_count, release_count=releases_count,
-                                  star_count=stars_count, watcher_count=watcher_count,
-                                  primary_language=primary_language,
-                                  created_at=created_at, pushed_at=pushed_at)
+        repository = Repository(id=id, full_name=full_name, url=url, default_branch=default_branch,
+                                description=description, issue_count=issue_count, release_count=releases_count,
+                                star_count=stars_count, watcher_count=watcher_count,
+                                primary_language=primary_language,
+                                created_at=created_at, pushed_at=pushed_at)
         repository.save()
         return repository
 
     @staticmethod
-    def create_fixing_commit(sha: str, msg: str, date: str, is_false_positive: bool, repository: Repositories):
+    def create_fixing_commit(sha: str, msg: str, date: str, is_false_positive: bool, repository: Repository):
         fixing_commit = FixingCommit(sha=sha, msg=msg, date=date, is_false_positive=is_false_positive,
                                      repository=repository)
         fixing_commit.save()
@@ -41,7 +41,7 @@ class BaseViewTest(APITestCase):
         return fixing_file
 
     @staticmethod
-    def create_task(state: str, name: str, repository: Repositories):
+    def create_task(state: str, name: str, repository: Repository):
         task = Task(state=state, name=name, repository=repository)
         task.save()
         return task
@@ -87,7 +87,7 @@ class BaseViewTest(APITestCase):
         self.task3 = self.create_task(Task.ACCEPTED, Task.TRAIN, self.repo2)
 
     def _post_teardown(self):
-        Repositories.objects.all().delete()
+        Repository.objects.all().delete()
 
 
 class RepositoriesTest(BaseViewTest):
@@ -101,7 +101,7 @@ class RepositoriesTest(BaseViewTest):
         response = self.client.get(reverse('api:repositories-list'))
 
         # get data from db
-        repositories = Repositories.objects.all()
+        repositories = Repository.objects.all()
         serializer = RepositorySerializer(repositories, many=True)
 
         self.assertEqual(response.data, serializer.data)
@@ -110,7 +110,7 @@ class RepositoriesTest(BaseViewTest):
     def test_get_valid_single_repository(self):
         response = self.client.get(
             reverse('api:repositories-detail', kwargs={'pk': 'MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ=='}))
-        repository = Repositories.objects.get(pk='MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ==')
+        repository = Repository.objects.get(pk='MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ==')
         serializer = RepositorySerializer(repository)
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -126,7 +126,7 @@ class RepositoriesTest(BaseViewTest):
             'url': 'https://github.com/Juniper/ansible-junos-stdlib'
         }
 
-        repositories_before_create = RepositorySerializer(Repositories.objects.all(), many=True).data
+        repositories_before_create = RepositorySerializer(Repository.objects.all(), many=True).data
 
         response = self.client.post(
             reverse('api:repositories-list'),
@@ -136,7 +136,7 @@ class RepositoriesTest(BaseViewTest):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        repositories_after_create = RepositorySerializer(Repositories.objects.all(), many=True).data
+        repositories_after_create = RepositorySerializer(Repository.objects.all(), many=True).data
 
         self.assertGreater(len(repositories_after_create), len(repositories_before_create))
 
@@ -155,7 +155,7 @@ class RepositoriesTest(BaseViewTest):
             # no url passed
         }]
 
-        repositories_before_create = RepositorySerializer(Repositories.objects.all(), many=True).data
+        repositories_before_create = RepositorySerializer(Repository.objects.all(), many=True).data
 
         for payload in invalid_payloads:
             response = self.client.post(
@@ -166,7 +166,7 @@ class RepositoriesTest(BaseViewTest):
 
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-        repositories_after_create = RepositorySerializer(Repositories.objects.all(), many=True).data
+        repositories_after_create = RepositorySerializer(Repository.objects.all(), many=True).data
         self.assertEqual(repositories_after_create, repositories_before_create)
 
     def test_create_repository_conflict(self):
@@ -175,7 +175,7 @@ class RepositoriesTest(BaseViewTest):
         :except: status.HTTP_409_CONFLICT
         """
         existing_payload = RepositorySerializer(self.repo1).data
-        repositories_before_conflict = RepositorySerializer(Repositories.objects.all(), many=True).data
+        repositories_before_conflict = RepositorySerializer(Repository.objects.all(), many=True).data
 
         # here the conflict
         response = self.client.post(
@@ -186,7 +186,7 @@ class RepositoriesTest(BaseViewTest):
 
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
 
-        repositories_after_conflict = RepositorySerializer(Repositories.objects.all(), many=True).data
+        repositories_after_conflict = RepositorySerializer(Repository.objects.all(), many=True).data
         self.assertEqual(repositories_after_conflict, repositories_before_conflict)
 
     def test_delete_existing_repository(self):
@@ -194,7 +194,7 @@ class RepositoriesTest(BaseViewTest):
         Delete a repository from the database and compare the database before and after deleting.
         If the database differs, than the repository has been deleted
         """
-        repositories_before_delete = Repositories.objects.all()
+        repositories_before_delete = Repository.objects.all()
         serializer_before_delete = RepositorySerializer(repositories_before_delete, many=True).data
 
         response = self.client.delete(
@@ -203,7 +203,7 @@ class RepositoriesTest(BaseViewTest):
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-        repositories_after_delete = Repositories.objects.all()
+        repositories_after_delete = Repository.objects.all()
         serializer_after_delete = RepositorySerializer(repositories_after_delete, many=True).data
 
         self.assertLess(len(serializer_after_delete), len(serializer_before_delete))

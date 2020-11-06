@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import FixingCommit, FixingFile, Repositories, Task
+from .models import FixingCommit, FixingFile, Repository, Task
 from .serializers import FixingCommitSerializer, FixingFileSerializer, RepositorySerializer, TaskSerializer
 
 
@@ -28,21 +28,21 @@ class RepositoriesViewSet(viewsets.ViewSet):
     """
 
     def list(self, request):
-        repositories = Repositories.objects.all()
+        repositories = Repository.objects.all()
         serializer = RepositorySerializer(repositories, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        repository = get_object_or_404(Repositories, id=pk)
+        repository = get_object_or_404(Repository, id=pk)
         serializer = RepositorySerializer(repository)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request):
 
         try:  # to get the repository, if exists
-            repository = Repositories.objects.get(id=request.data.get('id', None))
+            repository = Repository.objects.get(id=request.data.get('id', None))
             return Response(status=status.HTTP_409_CONFLICT)
-        except Repositories.DoesNotExist:
+        except Repository.DoesNotExist:
             serializer = RepositorySerializer(data=request.data)
 
             if not request.data.get('id'):
@@ -62,10 +62,10 @@ class RepositoriesViewSet(viewsets.ViewSet):
 
     def destroy(self, request, pk=None):
         try:  # to get the repository, if exists
-            repository = Repositories.objects.get(id=pk)
+            repository = Repository.objects.get(id=pk)
             repository.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        except Repositories.DoesNotExist:
+        except Repository.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
@@ -228,7 +228,7 @@ class TaskViewSet(viewsets.ReadOnlyModelViewSet):
         if not repository:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        repository = get_object_or_404(Repositories, id=repository)
+        repository = get_object_or_404(Repository, id=repository)
 
         if state:
             tasks = Task.objects.filter(repository=repository, state=state)

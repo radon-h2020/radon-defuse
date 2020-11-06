@@ -1,7 +1,7 @@
 import io
 import json
 import pandas as pd
-from apis.models import MetricsFile, PredictiveModel, Repositories, Task
+from apis.models import MetricsFile, PredictiveModel, Repository, Task
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.views.decorators.http import require_GET, require_POST
@@ -36,7 +36,7 @@ def get_github_repository(request):
 
 
 def repository_dump_metrics(request, pk: str):
-    repository = get_object_or_404(Repositories, pk=pk)
+    repository = get_object_or_404(Repository, pk=pk)
     metrics = MetricsFile.objects.get(repository=repository, language='ansible')
     df = pd.read_csv(io.BytesIO(metrics.file))
 
@@ -49,30 +49,30 @@ def repository_dump_metrics(request, pk: str):
 
 
 def repository_dump_model(request, pk: str):
-    repository = get_object_or_404(Repositories, pk=pk)
+    repository = get_object_or_404(Repository, pk=pk)
     model = PredictiveModel.objects.get(repository=repository, language='ansible')
     b_model = model.file
 
-    filename = f'{repository.full_name}_ansible_model.csv'
-    response = HttpResponse(b_model, content_type='text/csv')
+    filename = f'{repository.full_name}_ansible_model.joblib'
+    response = HttpResponse(b_model, content_type='application/octet-streamapplication/octet-stream')
     response['Content-Disposition'] = 'attachment; filename=' + filename
 
     return response
 
 
 def repository_home(request, pk):
-    repository = get_object_or_404(Repositories, pk=pk)
+    repository = get_object_or_404(Repository, pk=pk)
     return render(request=request, context={'repository': repository}, template_name='repository_home.html', status=200)
 
 
 def repository_fixing_commits(request, pk):
-    repository = get_object_or_404(Repositories, pk=pk)
+    repository = get_object_or_404(Repository, pk=pk)
     return render(request=request, context={'repository': repository}, template_name='repository_fixing_commits.html',
                   status=200)
 
 
 def repository_fixing_files(request, pk):
-    repository = get_object_or_404(Repositories, pk=pk)
+    repository = get_object_or_404(Repository, pk=pk)
     return render(request=request, context={'repository': repository}, template_name='repository_fixing_files.html',
                   status=200)
 
@@ -94,7 +94,7 @@ def repository_mine(request, pk):
 
 
 def repository_train_settings(request, pk):
-    repository = get_object_or_404(Repositories, pk=pk)
+    repository = get_object_or_404(Repository, pk=pk)
     return render(request=request, context={'repository': repository}, template_name='repository_train_settings.html',
                   status=200)
 

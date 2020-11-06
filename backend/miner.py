@@ -6,7 +6,7 @@ import threading
 import docker
 from pydriller.repository_mining import RepositoryMining
 
-from apis.models import FailureProneFile, FixingCommit, FixingFile, Repositories, Task
+from apis.models import FailureProneFile, FixingCommit, FixingFile, Repository, Task
 
 
 class BackendRepositoryMiner:
@@ -29,7 +29,7 @@ class BackendRepositoryMiner:
         if language not in ('ansible', 'tosca'):
             raise ValueError(f'Language {language} not supported.')
 
-        self.repository = Repositories.objects.get(pk=repo_id)
+        self.repository = Repository.objects.get(pk=repo_id)
         self.language = language
         self.labels = labels if labels else None
         self.regex = regex if regex else None

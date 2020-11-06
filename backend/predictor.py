@@ -8,7 +8,7 @@ import threading
 from radondp.predictors import DefectPredictor
 from typing import List
 
-from apis.models import PredictiveModel, FailureProneFile, MetricsFile, Repositories, Task
+from apis.models import PredictiveModel, FailureProneFile, MetricsFile, Repository, Task
 
 
 class BackendTrainer:
@@ -26,7 +26,7 @@ class BackendTrainer:
         self.normalizers = normalizers
         self.selectors = selectors
 
-        self.repository = Repositories.objects.get(pk=repo_id)
+        self.repository = Repository.objects.get(pk=repo_id)
         self.language = language
 
     def train(self):

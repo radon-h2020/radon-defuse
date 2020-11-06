@@ -1,7 +1,7 @@
 from djongo import models
 
 
-class Repositories(models.Model):
+class Repository(models.Model):
     id = models.CharField(max_length=40, blank=False, unique=True, primary_key=True)
     full_name = models.CharField(max_length=200, blank=False)
     url = models.CharField(max_length=200, blank=False)
@@ -19,7 +19,7 @@ class Repositories(models.Model):
         return super().__hash__()
 
     def __eq__(self, other):
-        if not isinstance(other, Repositories):
+        if not isinstance(other, Repository):
             return False
 
         return self.id == other.id
@@ -30,7 +30,7 @@ class FixingCommit(models.Model):
     msg = models.TextField(blank=True, default='')
     date = models.CharField(max_length=30, blank=True, default='')
     is_false_positive = models.BooleanField(blank=True, default=False)
-    repository = models.ForeignKey(Repositories, on_delete=models.CASCADE)
+    repository = models.ForeignKey(Repository, on_delete=models.CASCADE)
 
     def __hash__(self):
         return super().__hash__()
@@ -119,7 +119,7 @@ class Task(models.Model):
     id = models.AutoField(primary_key=True, blank=False)
     state = models.CharField(max_length=10, blank=False, editable=False, choices=STATE_CHOICES, default=PENDING)
     name = models.CharField(max_length=50, blank=False, choices=NAME_CHOICES, default=NONE)
-    repository = models.ForeignKey(Repositories, on_delete=models.CASCADE)
+    repository = models.ForeignKey(Repository, on_delete=models.CASCADE)
 
     def __hash__(self):
         return super().__hash__()
@@ -135,7 +135,7 @@ class MetricsFile(models.Model):
     id = models.AutoField(primary_key=True, blank=False)
     file = models.BinaryField()
     language = models.CharField(max_length=50, blank=False)
-    repository = models.ForeignKey(Repositories, on_delete=models.CASCADE)
+    repository = models.ForeignKey(Repository, on_delete=models.CASCADE)
 
     def __eq__(self, other):
         if not isinstance(other, MetricsFile):
@@ -148,7 +148,7 @@ class PredictiveModel(models.Model):
     id = models.AutoField(primary_key=True, blank=False)
     file = models.BinaryField()
     language = models.CharField(max_length=50, blank=False)
-    repository = models.ForeignKey(Repositories, on_delete=models.CASCADE)
+    repository = models.ForeignKey(Repository, on_delete=models.CASCADE)
 
     def __eq__(self, other):
         if not isinstance(other, PredictiveModel):

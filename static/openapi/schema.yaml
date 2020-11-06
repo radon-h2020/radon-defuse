@@ -40,7 +40,7 @@ paths:
           example: 'MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ=='
 
       requestBody:
-        $ref: '#/components/requestBodies/RepositoriesBody'
+        $ref: '#/components/requestBodies/RepositoryBody'
       responses:
         '201':
           description: 'The request has been fulfilled, resulting in the creation of a new repository.'
@@ -424,7 +424,7 @@ paths:
 
 components:
   requestBodies:
-    RepositoriesBody:
+    RepositoryBody:
       description: A JSON object containing repository information
       required: true
       content:

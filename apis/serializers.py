@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from apis.models import FailureProneFile, FixingCommit, FixingFile, Repositories, Task
+from apis.models import FailureProneFile, FixingCommit, FixingFile, Repository, Task
 
 
 class RepositorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Repositories
+        model = Repository
         fields = ('id',
                   'full_name',
                   'url',

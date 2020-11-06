@@ -9,7 +9,7 @@
 {% block sidebar_content %}
 <a href="{% url 'web:repository_home' repository.id %}" class="list-group-item list-group-item-action bg-dark text-white">Dashboard</a>
 <a href="{% url 'web:repository_fixing_commits' repository.id %}" class="list-group-item list-group-item-action bg-dark text-white">Fixing commits</a>
-<a href="{% url 'web:repository_fixing_files' repository.id %}" class="list-group-item list-group-item-action bg-dark text-white">Fixing files</a>
+<a href="{% url 'web:repository_fixed_files' repository.id %}" class="list-group-item list-group-item-action bg-dark text-white">Fixed files</a>
 
 <div class="mt-4" style="text-align:center;">
   <a href="{% url 'web:repository_dump_metrics' repository.id %}" download="{{ repository.full_name }}.csv" class="btn btn-outline-secondary btn-sm">

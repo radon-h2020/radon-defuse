@@ -71,9 +71,9 @@ def repository_fixing_commits(request, pk):
                   status=200)
 
 
-def repository_fixing_files(request, pk):
+def repository_fixed_files(request, pk):
     repository = get_object_or_404(Repository, pk=pk)
-    return render(request=request, context={'repository': repository}, template_name='repository_fixing_files.html',
+    return render(request=request, context={'repository': repository}, template_name='repository_fixed_files.html',
                   status=200)
 
 

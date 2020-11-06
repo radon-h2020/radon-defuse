@@ -42,7 +42,7 @@ class FixingCommit(models.Model):
         return self.sha == other.sha
 
 
-class FixingFile(models.Model):
+class FixedFile(models.Model):
     id = models.AutoField(primary_key=True, blank=False)
     is_false_positive = models.BooleanField(blank=True, default=False)
     filepath = models.CharField(max_length=300, blank=False, editable=False)
@@ -53,7 +53,7 @@ class FixingFile(models.Model):
         return super().__hash__()
 
     def __eq__(self, other):
-        if not isinstance(other, FixingFile):
+        if not isinstance(other, FixedFile):
             return False
 
         if self.id == other.id:
@@ -74,7 +74,7 @@ class FailureProneFile(models.Model):
         return super().__hash__()
 
     def __eq__(self, other):
-        if not isinstance(other, FixingFile):
+        if not isinstance(other, FixedFile):
             return False
 
         if self.id == other.id:

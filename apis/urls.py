@@ -5,7 +5,7 @@ from apis import views
 router = routers.DefaultRouter()
 router.register('repositories', views.RepositoriesViewSet, basename='repositories')
 router.register('fixing-commits', views.FixingCommitsViewSet, basename='fixing-commits')
-router.register('fixing-files', views.FixingFilesViewSet, basename='fixing-files')
+router.register('fixed-files', views.FixedFilesViewSet, basename='fixed-files')
 router.register('tasks', views.TaskViewSet, basename='tasks')
 #router.register('models', views.ModelsViewSet, basename='models')
 

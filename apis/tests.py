@@ -4,8 +4,8 @@ from django.urls import reverse
 
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
-from .models import FixingCommit, FixingFile, Repository, Task
-from .serializers import FixingCommitSerializer, FixingFileSerializer, RepositorySerializer, TaskSerializer
+from .models import FixingCommit, FixedFile, Repository, Task
+from .serializers import FixingCommitSerializer, FixedFileSerializer, RepositorySerializer, TaskSerializer
 
 
 class BaseViewTest(APITestCase):
@@ -35,8 +35,8 @@ class BaseViewTest(APITestCase):
     @staticmethod
     def create_fixing_file(filepath: str, is_false_positive: bool, bug_inducing_commit: str,
                            fixing_commit: FixingCommit):
-        fixing_file = FixingFile(filepath=filepath, is_false_positive=is_false_positive,
-                                 bug_inducing_commit=bug_inducing_commit, fixing_commit=fixing_commit)
+        fixing_file = FixedFile(filepath=filepath, is_false_positive=is_false_positive,
+                                bug_inducing_commit=bug_inducing_commit, fixing_commit=fixing_commit)
         fixing_file.save()
         return fixing_file
 
@@ -73,7 +73,7 @@ class BaseViewTest(APITestCase):
         self.fic4 = self.create_fixing_commit('456789', 'Fixed issue #4', '06/10/2020 17:29', False, self.repo2)
         self.fic5 = self.create_fixing_commit('56789', 'Fixed issue #5', '06/10/2020 17:30', False, self.repo2)
 
-        # add test fixing-files
+        # add test fixed-files
         self.file1 = self.create_fixing_file('filename1.yaml', False, 'bic_123456789', self.fic1)
         self.file2 = self.create_fixing_file('filename2.yaml', False, 'bic_23456789', self.fic1)
         self.file3 = self.create_fixing_file('filename3.yaml', False, 'bic_3456789', self.fic1)
@@ -400,68 +400,68 @@ class FixingCommitsTest(BaseViewTest):
 
 
 # ================================== FIXING-FILES ==============================================================#
-class FixingFilesTest(BaseViewTest):
+class FixedFilesTest(BaseViewTest):
 
-    def test_get_all_fixing_files(self):
+    def test_get_all_fixed_files(self):
         """
-        This test ensures that all fixing-files added in the setUp method exist when we make a GET request to the \
-        fixing-files/ endpoint
+        This test ensures that all fixed-files added in the setUp method exist when we make a GET request to the \
+        fixed-files/ endpoint
         """
         # get API response
-        response = self.client.get(reverse('api:fixing-files-list'))
+        response = self.client.get(reverse('api:fixed-files-list'))
 
         # get data from db
-        fixing_files = FixingFile.objects.all()
-        serializer = FixingFileSerializer(fixing_files, many=True)
+        fixed_files = FixedFile.objects.all()
+        serializer = FixedFileSerializer(fixed_files, many=True)
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_get_fixing_commit_fixing_files(self):
+    def test_get_fixing_commit_fixed_files(self):
         """
-        This test ensures that the fixing-files belonging to a fixing-commit added in the setUp method exist when we \
-        make a GET request to the fixing-files/ endpoint
+        This test ensures that the fixed-files belonging to a fixing-commit added in the setUp method exist when we \
+        make a GET request to the fixed-files/ endpoint
         """
         # get API response
-        response = self.client.get('%s?fixing_commit=%s' % (reverse('api:fixing-files-list'), self.fic1.sha))
+        response = self.client.get('%s?fixing_commit=%s' % (reverse('api:fixed-files-list'), self.fic1.sha))
 
         # get data from db
-        fixing_files = FixingFile.objects.filter(fixing_commit=self.fic1.sha)
-        serializer = FixingFileSerializer(fixing_files, many=True)
+        fixed_files = FixedFile.objects.filter(fixing_commit=self.fic1.sha)
+        serializer = FixedFileSerializer(fixed_files, many=True)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(len(response.data), 3)
 
-    def test_get_repository_fixing_files(self):
+    def test_get_repository_fixed_files(self):
         """
-        This test ensures that the fixing-files belonging to a fixing-commit added in the setUp method exist when we \
-        make a GET request to the fixing-files/ endpoint
+        This test ensures that the fixed-files belonging to a fixing-commit added in the setUp method exist when we \
+        make a GET request to the fixed-files/ endpoint
         """
         # get API response
-        response = self.client.get('%s?repository=%s' % (reverse('api:fixing-files-list'), self.repo1.id))
+        response = self.client.get('%s?repository=%s' % (reverse('api:fixed-files-list'), self.repo1.id))
 
         # get data from db
-        fixing_files = FixingFile.objects.filter(fixing_commit__repository=self.repo1.id)
-        serializer = FixingFileSerializer(fixing_files, many=True)
+        fixed_files = FixedFile.objects.filter(fixing_commit__repository=self.repo1.id)
+        serializer = FixedFileSerializer(fixed_files, many=True)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(len(response.data), 5)
 
-        # Make sure only fixing-files belonging to true-positive fixing-commits are returned
+        # Make sure only fixed-files belonging to true-positive fixing-commits are returned
         self.fic1.is_false_positive = True
         self.fic1.save()
-        response = self.client.get('%s?repository=%s' % (reverse('api:fixing-files-list'), self.repo1.id))
+        response = self.client.get('%s?repository=%s' % (reverse('api:fixed-files-list'), self.repo1.id))
         self.assertEqual(len(response.data), 2)
 
-    def test_get_fixing_files_invalid(self):
+    def test_get_fixed_files_invalid(self):
         """
         This test ensures that the passing both query parameters (fixing_commit and repository) to the GET request
         result in a HTTP_400_BAD_REQUEST
         """
         # get API response
         response = self.client.get('%s?fixing_commit=%s&repository=%s'
-                                   % (reverse('api:fixing-files-list'), self.fic1.sha, self.repo1.id))
+                                   % (reverse('api:fixed-files-list'), self.fic1.sha, self.repo1.id))
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_valid_fixing_file(self):
@@ -476,18 +476,18 @@ class FixingFilesTest(BaseViewTest):
             'bug_inducing_commit': 'someShA123456789'
         }
 
-        fixing_files_before_create = FixingFileSerializer(FixingFile.objects.all(), many=True).data
+        fixed_files_before_create = FixedFileSerializer(FixedFile.objects.all(), many=True).data
 
         response = self.client.post(
-            reverse('api:fixing-files-list'),
+            reverse('api:fixed-files-list'),
             data=json.dumps(valid_payload),
             content_type='application/json'
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        fixing_files_after_create = FixingFileSerializer(FixingFile.objects.all(), many=True).data
-        self.assertGreater(len(fixing_files_after_create), len(fixing_files_before_create))
+        fixed_files_after_create = FixedFileSerializer(FixedFile.objects.all(), many=True).data
+        self.assertGreater(len(fixed_files_after_create), len(fixed_files_before_create))
 
     def test_create_invalid_fixing_file(self):
         """
@@ -513,58 +513,58 @@ class FixingFilesTest(BaseViewTest):
             'bug_inducing_commit': 'someShA123456789'
         }]
 
-        fixing_files_before_create = FixingFileSerializer(FixingFile.objects.all(), many=True).data
+        fixed_files_before_create = FixedFileSerializer(FixedFile.objects.all(), many=True).data
 
         for payload in invalid_payloads:
             response = self.client.post(
-                reverse('api:fixing-files-list'),
+                reverse('api:fixed-files-list'),
                 data=json.dumps(payload),
                 content_type='application/json'
             )
 
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-        fixing_files_after_create = FixingFileSerializer(FixingFile.objects.all(), many=True).data
-        self.assertEqual(fixing_files_after_create, fixing_files_before_create)
+        fixed_files_after_create = FixedFileSerializer(FixedFile.objects.all(), many=True).data
+        self.assertEqual(fixed_files_after_create, fixed_files_before_create)
 
     def test_create_fixing_file_conflict(self):
         """
         Try to create a fixing-file with the same filepath and fixing-commit of one already present in the database.
         :except: status.HTTP_409_CONFLICT
         """
-        serializer = FixingFileSerializer(self.file1)
+        serializer = FixedFileSerializer(self.file1)
         existing_payload = json.dumps(serializer.data)
-        fixing_files_before_conflict = FixingFileSerializer(FixingFile.objects.all(), many=True).data
+        fixed_files_before_conflict = FixedFileSerializer(FixedFile.objects.all(), many=True).data
 
         # here the conflict
         response = self.client.post(
-            reverse('api:fixing-files-list'),
+            reverse('api:fixed-files-list'),
             data=existing_payload,
             content_type='application/json'
         )
 
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
 
-        fixing_files_after_conflict = FixingFileSerializer(FixingFile.objects.all(), many=True).data
-        self.assertEqual(fixing_files_after_conflict, fixing_files_before_conflict)
+        fixed_files_after_conflict = FixedFileSerializer(FixedFile.objects.all(), many=True).data
+        self.assertEqual(fixed_files_after_conflict, fixed_files_before_conflict)
 
     def test_patch_existing_fixing_file(self):
         """
         Patch a fixing-file.
         :except: HTTP_204_NO_CONTENT
         """
-        fixing_file_before_patch = FixingFile.objects.get(id=self.file1.id)
-        serializer_before_patch = FixingFileSerializer(fixing_file_before_patch).data
+        fixing_file_before_patch = FixedFile.objects.get(id=self.file1.id)
+        serializer_before_patch = FixedFileSerializer(fixing_file_before_patch).data
         self.assertFalse(serializer_before_patch['is_false_positive'])
 
         response = self.client.patch(
-            reverse('api:fixing-files-detail', kwargs={'pk': self.file1.id})
+            reverse('api:fixed-files-detail', kwargs={'pk': self.file1.id})
         )
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-        fixing_file_after_patch = FixingFile.objects.get(id=self.file1.id)
-        serializer_after_patch = FixingFileSerializer(fixing_file_after_patch).data
+        fixing_file_after_patch = FixedFile.objects.get(id=self.file1.id)
+        serializer_after_patch = FixedFileSerializer(fixing_file_after_patch).data
         self.assertTrue(serializer_after_patch['is_false_positive'])
 
     def test_patch_unexisting_fixing_file(self):
@@ -573,7 +573,7 @@ class FixingFilesTest(BaseViewTest):
         :except: HTTP_404_NOT_FOUND
         """
         response = self.client.patch(
-            reverse('api:fixing-files-detail', kwargs={'pk': -1})
+            reverse('api:fixed-files-detail', kwargs={'pk': -1})
         )
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -583,17 +583,17 @@ class FixingFilesTest(BaseViewTest):
         Delete a fixing-file from the database and compare the collection before and after deletion.
         If the collections differ, than the fixing-file has been deleted
         """
-        fixing_files_before_delete = FixingFile.objects.all()
-        serializer_before_delete = FixingFileSerializer(fixing_files_before_delete, many=True).data
+        fixed_files_before_delete = FixedFile.objects.all()
+        serializer_before_delete = FixedFileSerializer(fixed_files_before_delete, many=True).data
 
         response = self.client.delete(
-            reverse('api:fixing-files-detail', kwargs={'pk': self.file1.id})
+            reverse('api:fixed-files-detail', kwargs={'pk': self.file1.id})
         )
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-        fixing_files_after_delete = FixingFile.objects.all()
-        serializer_after_delete = FixingFileSerializer(fixing_files_after_delete, many=True).data
+        fixed_files_after_delete = FixedFile.objects.all()
+        serializer_after_delete = FixedFileSerializer(fixed_files_after_delete, many=True).data
 
         self.assertLess(len(serializer_after_delete), len(serializer_before_delete))
 
@@ -603,7 +603,7 @@ class FixingFilesTest(BaseViewTest):
         :except: HTTP_404_NOT_FOUND
         """
         response = self.client.delete(
-            reverse('api:fixing-files-detail', kwargs={'pk': -1})
+            reverse('api:fixed-files-detail', kwargs={'pk': -1})
         )
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

@@ -3,8 +3,8 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import FixingCommit, FixingFile, Repository, Task
-from .serializers import FixingCommitSerializer, FixingFileSerializer, RepositorySerializer, TaskSerializer
+from .models import FixingCommit, FixedFile, Repository, Task
+from .serializers import FixingCommitSerializer, FixedFileSerializer, RepositorySerializer, TaskSerializer
 
 
 class RepositoriesViewSet(viewsets.ViewSet):
@@ -137,12 +137,12 @@ class FixingCommitsViewSet(viewsets.ViewSet):
 
 # ===================================== FIXING FILES ===============================================================#
 
-class FixingFilesViewSet(viewsets.ViewSet):
+class FixedFilesViewSet(viewsets.ViewSet):
     """
-    API endpoint that allows fixing-files to be viewed or edited.
+    API endpoint that allows fixed-files to be viewed or edited.
 
     list:
-    Retrieve all the fixing-files.
+    Retrieve all the fixed-files.
 
     retrieve: NOT IMPLEMENTED
 
@@ -164,17 +164,17 @@ class FixingFilesViewSet(viewsets.ViewSet):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         elif fixing_commit:
-            fixing_files = FixingFile.objects.filter(fixing_commit=fixing_commit)
+            fixed_files = FixedFile.objects.filter(fixing_commit=fixing_commit)
 
         elif repository:
             fixing_commits = FixingCommit.objects.filter(repository=repository)
             fixing_commits = [commit.sha for commit in list(fixing_commits) if not commit.is_false_positive]
-            fixing_files = FixingFile.objects.filter(fixing_commit__in=fixing_commits)
+            fixed_files = FixedFile.objects.filter(fixing_commit__in=fixing_commits)
 
         else:
-            fixing_files = FixingFile.objects.all()
+            fixed_files = FixedFile.objects.all()
 
-        serializer = FixingFileSerializer(fixing_files, many=True)
+        serializer = FixedFileSerializer(fixed_files, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, pk):
@@ -182,16 +182,16 @@ class FixingFilesViewSet(viewsets.ViewSet):
 
     def create(self, request):
         try:  # to get the fixing-file, if exists
-            FixingFile.objects.get(filepath=request.data.get('filepath', None),
-                                   bug_inducing_commit=request.data.get('bug_inducing_commit', None),
-                                   fixing_commit=request.data.get('fixing_commit', None))
+            FixedFile.objects.get(filepath=request.data.get('filepath', None),
+                                  bug_inducing_commit=request.data.get('bug_inducing_commit', None),
+                                  fixing_commit=request.data.get('fixing_commit', None))
             return Response(status=status.HTTP_409_CONFLICT)
-        except FixingFile.DoesNotExist:
+        except FixedFile.DoesNotExist:
             if not (request.data.get('filepath') and request.data.get('bug_inducing_commit') and request.data.get('fixing_commit')):
                 return Response('One or more among (filepath, bug_inducing_commit, fixing_commit) is missing.',
                                 status=status.HTTP_400_BAD_REQUEST)
 
-            serializer = FixingFileSerializer(data=request.data)
+            serializer = FixedFileSerializer(data=request.data)
             if not serializer.is_valid():
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             else:
@@ -199,13 +199,13 @@ class FixingFilesViewSet(viewsets.ViewSet):
                 return Response(status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, pk):
-        fixing_file = get_object_or_404(FixingFile, id=pk)
+        fixing_file = get_object_or_404(FixedFile, id=pk)
         fixing_file.is_false_positive = not fixing_file.is_false_positive
         fixing_file.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, pk=None):
-        fixing_file = get_object_or_404(FixingFile, id=pk)
+        fixing_file = get_object_or_404(FixedFile, id=pk)
         fixing_file.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

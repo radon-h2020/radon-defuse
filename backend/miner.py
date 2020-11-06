@@ -6,7 +6,7 @@ import threading
 import docker
 from pydriller.repository_mining import RepositoryMining
 
-from apis.models import FailureProneFile, FixingCommit, FixingFile, Repository, Task
+from apis.models import FailureProneFile, FixingCommit, FixedFile, Repository, Task
 
 
 class BackendRepositoryMiner:
@@ -61,7 +61,7 @@ class BackendRepositoryMiner:
             false_positive_files = [dict(
                 filepath=file.filepath,
                 bic=file.bug_inducing_commit,
-                fic=file.fixing_commit.sha) for file in FixingFile.objects.all() if file.is_false_positive]
+                fic=file.fixing_commit.sha) for file in FixedFile.objects.all() if file.is_false_positive]
 
             with open(path_to_excluded_commits, 'w') as f:
                 json.dump(false_positive_commits, f)
@@ -135,7 +135,7 @@ class BackendRepositoryMiner:
                 fixed_files = json.load(f)
 
                 # Remove existing true positives (they might be replaced by new files given new fixing-commits)
-                existing_files = FixingFile.objects.all()
+                existing_files = FixedFile.objects.all()
                 for file in existing_files:
                     if not file.is_false_positive:
                         file.delete()
@@ -144,9 +144,9 @@ class BackendRepositoryMiner:
                 for file in fixed_files:
                     fixing_commit = FixingCommit.objects.get(sha=file['fic'])
 
-                    FixingFile.objects.get_or_create(filepath=file['filepath'],
-                                                     fixing_commit=fixing_commit,
-                                                     defaults=dict(
+                    FixedFile.objects.get_or_create(filepath=file['filepath'],
+                                                    fixing_commit=fixing_commit,
+                                                    defaults=dict(
                                                          bug_inducing_commit=file['bic'],
                                                          is_false_positive=False,
                                                      ))

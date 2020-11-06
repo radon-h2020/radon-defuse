@@ -2,12 +2,12 @@
 
 {% block body %}
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 border-bottom">
-<p class="text-uppercase">Fixing-files</p>
+<p class="text-uppercase">Fixed-files</p>
 <a class="btn btn-primary btn-sm  fa fa-download" href="" download="{{ repository.full_name }}_fixing_commits.json"  style="float:right;"> </a>
 </div>
 <small class="mb-4">These are the files involved in the identified fixing-commits.</small>
 
-<table id="table-fixing-files" class="display table table-striped table-bordered" style="font-size: 13px; font-family: Verdana, Geneva, Tahoma, sans-serif;">
+<table id="table-fixed-files" class="display table table-striped table-bordered" style="font-size: 13px; font-family: Verdana, Geneva, Tahoma, sans-serif;">
     <thead>
         <tr>
             <th><span class="badge badge-pill badge-info">Filepath</span></th>
@@ -35,11 +35,10 @@ $(document).ready(function() {
         "timeOut": 1000
     }
 
-    var table = $( "#table-fixing-files" ).DataTable({
-        //data: {{ fixing_files|safe }},
+    var table = $( "#table-fixed-files" ).DataTable({
         processing: true,
         ajax:  {
-            url: '{% url "api:fixing-files-list" %}?repository=' + {{ repository.id }},
+            url: '{% url "api:fixed-files-list" %}?repository=' + {{ repository.id }},
             type: "GET",
             dataSrc: ''
         },
@@ -71,12 +70,12 @@ $(document).ready(function() {
         ]
     });
 
-    $('#table-fixing-files tbody').on( 'click', 'small.change-positiveness', function () {
+    $('#table-fixed-files tbody').on( 'click', 'small.change-positiveness', function () {
         var data = table.row($(this).parents('tr')).data();
 
         // patch is_false_positive
         $.ajax({
-            url: '{% url "api:fixing-files-list" %}' + data.id + '/', // Note the trailing slash. It is mandatory
+            url: '{% url "api:fixed-files-list" %}' + data.id + '/', // Note the trailing slash. It is mandatory
             method: 'PATCH',
             statusCode: {
                 204: function(){

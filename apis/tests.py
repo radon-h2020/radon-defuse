@@ -1,5 +1,4 @@
 import json
-from typing import Union
 
 from django.urls import reverse
 
@@ -648,6 +647,10 @@ class TasksTest(BaseViewTest):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
         self.assertEqual(len(response.data), 1)
+
+    def test_get_repository_tasks_404(self):
+        response = self.client.get('%s?repository=invalidID' % (reverse('api:tasks-list')))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_repository_tasks_unexisting_state(self):
         """

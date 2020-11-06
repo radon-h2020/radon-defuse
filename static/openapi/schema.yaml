@@ -134,7 +134,13 @@ paths:
     get:
       operationId: listFixingCommitsViewSets
       description: Retrieve all the fixing-commits.
-      parameters: [ ]
+      parameters:
+        - name: repository
+          in: query
+          required: false
+          description: 'The id of the repository the commits belong to'
+          schema:
+            type: string
       responses:
         '200':
           content:
@@ -253,13 +259,13 @@ paths:
       description: Retrieve all the fixing-files.
       parameters:
         - name: fixing_commit
-          in: path
+          in: query
           required: false
           description: 'The fixing-commit hash. It allows to retrieve all fixing-files for a given fixing-commit'
           schema:
             type: string
         - name: repository
-          in: path
+          in: query
           required: false
           description: 'The id of the repository the file belongs to'
           schema:
@@ -352,6 +358,70 @@ paths:
           description: 'No fixing-file found with this id.'
       tags:
       - fixing-files
+
+  /api/tasks/:
+    get:
+      operationId: listTasks
+      description: Retrieve all tasks of a repository.
+      parameters:
+        - name: repository
+          in: query
+          required: true
+          description: A unique value identifying the repository.
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: false
+          description: 'Get only tasks with this state'
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+              example:
+                - id: 1
+                  state: 'running'
+                  name: 'train'
+                  repository: 124612574
+          description: 'The list of repositories.'
+        '400':
+          description: 'Query parameter "repository" is missing.'
+        '404':
+          description: 'Repository not found'
+      tags:
+        - tasks
+
+  /api/tasks/{id}:
+    get:
+      operationId: retrieveRepositories
+      description: Retrieve a repository.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: A unique value identifying this repository.
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                - id: 1
+                  state: 'running'
+                  name: 'train'
+                  repository: 124612574
+          description: 'A task.'
+        '404':
+          description: 'Repository not found'
+      tags:
+        - tasks
 
 
 components:
@@ -480,6 +550,29 @@ components:
         - bug_inducing_commit
         - fixing_commit
 
+    Task:
+      type: object
+      properties:
+        id:
+          type: int
+          description: Auto-increment id
+        state:
+          type: string
+          description: The current task's state. Can be 'pending', 'accepted', 'running', 'completed', 'error'
+          default: 'pending'
+        name:
+          type: string
+          description: A human-readable name describind the task. Can be 'mine-fixing-commits', 'mine-fixed-files', 'mine-failure-prone-files', 'extract-metrics', 'train'
+        repository:
+          type: string
+          description: The repository id the task belongs to
+          example: 'MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ'
+      required:
+        - state
+        - name
+        - repository
+
+
   parameters:
     Repository:
       id: The repository unique identifier
@@ -488,5 +581,4 @@ components:
         id: MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ==
       required:
         - id
-
 

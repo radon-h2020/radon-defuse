@@ -68,7 +68,7 @@ class BackendTrainer:
         task.state = Task.RUNNING
         task.save()
 
-        command = 'repo-miner extract-metrics {0} {1} {2} all release . '.format(self.repository.url + '.git',  #TODO: remove + .git
+        command = 'repo-miner extract-metrics {0} {1} {2} all release . '.format(self.repository.url,
                                                                                  self.FAILURE_PRONE_FILES_FILENAME,
                                                                                  self.language)
         docker_client = docker.from_env()
@@ -102,7 +102,6 @@ class BackendTrainer:
                                                              defaults=dict(file=res))
 
             if not created and obj:
-                print('Obj exits')
                 obj.file = res
                 obj.save()
 

@@ -3,8 +3,7 @@ from djongo import models
 
 class Repositories(models.Model):
     id = models.CharField(max_length=40, blank=False, unique=True, primary_key=True)
-    owner = models.CharField(max_length=100, blank=False)
-    name = models.CharField(max_length=100, blank=False)
+    full_name = models.CharField(max_length=200, blank=False)
     url = models.CharField(max_length=200, blank=False)
     default_branch = models.CharField(max_length=100, blank=True, default='master')
     description = models.TextField(blank=True, default='')

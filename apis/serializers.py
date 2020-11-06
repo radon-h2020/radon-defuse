@@ -6,8 +6,7 @@ class RepositorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Repositories
         fields = ('id',
-                  'owner',
-                  'name',
+                  'full_name',
                   'url',
                   'default_branch',
                   'description',

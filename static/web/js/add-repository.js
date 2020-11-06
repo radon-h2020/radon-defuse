@@ -16,8 +16,8 @@ $("#dropdown-svc-item").click(function(){
   if(index == 0){ // github
     $("#dropdown-svc-button").addClass('fa-github').removeClass('fa-gitlab')
     $("#dropdown-svc-button").css("background-color", "black");
-    $("#input-svc-identifier").attr("placeholder", "https://github.com/<owner>/<name>");
-    $("#svc-identifier-description").html("This is the url to the Github repository.")
+    $("#input-svc-identifier").attr("placeholder", "owner/name");
+    $("#svc-identifier-description").html("This is the Github repository full name.")
   }else{ // gitlab
     $("#dropdown-svc-button").addClass('fa-gitlab').removeClass('fa-github')
     $("#dropdown-svc-button").css("background-color", "orange");

@@ -70,8 +70,8 @@
         </div>
 
         <div class="form-group">
-            <input id="input-svc-identifier" type="text" class="form-control" placeholder="https://github.com/<owner>/<name>" >
-            <small id="svc-identifier-description" class="form-text text-muted">This is the url to the Github repository.</small>
+            <input id="input-svc-identifier" type="text" class="form-control" placeholder="owner/name" >
+            <small id="svc-identifier-description" class="form-text text-muted">This is the Github repository full name.</small>
         </div>
         <div class="form-group">
             <input id="input-svc-api-token" type="password" class="form-control" placeholder="Personal access token">
@@ -112,8 +112,7 @@
                 {
                   data: null,
                   render: function ( data, type, row ) {
-                    // Combine the owner and name into a single table field
-                    var tag_a_name = `<a href="${data.url}" target="_blank"> ${data.owner}/${data.name}</a>`
+                    var tag_a_name = `<a href="${data.url}" target="_blank"> ${data.full_name}</a>`
 
                     // Create button to redirect to repository details
                     url_to_repository_home = '{% url "web:repositories_index" %}' + data.id
@@ -168,7 +167,6 @@
                 {
                     data: null,
                     render: function ( data, type, row ) {
-                        // Combine the owner and name into a single table field
                         return '<button class="delete-button btn btn-outline-danger btn-sm" style="float:right;">Delete</button>'
                     }
                 }
@@ -229,8 +227,7 @@
                      success: function(response) {
                         var body = {
                             'id': response.id,
-                            'owner': response.namespace.full_path,
-                            'name': response.name,
+                            'full_name': response.namespace.full_path + '/' + response.name,
                             'url': response.web_url,
                             'default_branch': response.default_branch,
                             'description': response.description,
@@ -258,9 +255,9 @@
                     toastr['error']('Repository not found. Make sure you inserted the right id/url or token.' , 'Error.')
                 });
             }else{ // github
-                ownerRepo = $("#input-svc-identifier").val()
+                full_name = $("#input-svc-identifier").val()
 
-                url = '{% url "web:get_github_repo" %}?full_name_or_id=' + ownerRepo
+                url = '{% url "web:get_github_repo" %}?full_name_or_id=' + full_name
                 console.log(url)
                 $.ajax({
                      url: url,

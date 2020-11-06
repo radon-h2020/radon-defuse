@@ -22,8 +22,7 @@ def get_github_repository(request):
 
         content = {
             'id': repo.id,
-            'owner': repo.full_name.split('/')[0],
-            'name': repo.full_name.split('/')[1],
+            'full_name': repo.full_name,
             'url': repo.html_url,
             'default_branch': repo.default_branch,
             'description': repo.description,
@@ -41,7 +40,7 @@ def repository_dump_metrics(request, pk: str):
     metrics = MetricsFile.objects.get(repository=repository, language='ansible')
     df = pd.read_csv(io.BytesIO(metrics.file))
 
-    filename = f'{repository.name}_ansible_metrics.csv'
+    filename = f'{repository.full_name}_ansible_metrics.csv'
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=' + filename
     df.to_csv(path_or_buf=response, index=False)
@@ -54,7 +53,7 @@ def repository_dump_model(request, pk: str):
     model = PredictiveModel.objects.get(repository=repository, language='ansible')
     b_model = model.file
 
-    filename = f'{repository.name}_ansible_model.csv'
+    filename = f'{repository.full_name}_ansible_model.csv'
     response = HttpResponse(b_model, content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=' + filename
 

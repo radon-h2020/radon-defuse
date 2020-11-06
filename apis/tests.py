@@ -12,12 +12,12 @@ class BaseViewTest(APITestCase):
     client = APIClient()
 
     @staticmethod
-    def create_repository(id: str, owner: str, name: str, url: str, default_branch: str, description: str,
+    def create_repository(id: str, full_name: str, url: str, default_branch: str, description: str,
                           issue_count: int,
                           releases_count: int, stars_count: int, watcher_count: int, primary_language: str,
                           created_at: str,
                           pushed_at: str):
-        repository = Repositories(id=id, owner=owner, name=name, url=url, default_branch=default_branch,
+        repository = Repositories(id=id, full_name=full_name, url=url, default_branch=default_branch,
                                   description=description, issue_count=issue_count, release_count=releases_count,
                                   star_count=stars_count, watcher_count=watcher_count,
                                   primary_language=primary_language,
@@ -48,8 +48,8 @@ class BaseViewTest(APITestCase):
 
     def setUp(self):
         # add test repositories
-        self.repo1 = self.create_repository(id='MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ==', owner='jnv',
-                                            name='ansible-role-unattended-upgrades',
+        self.repo1 = self.create_repository(id='MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ==',
+                                            full_name='jnv/ansible-role-unattended-upgrades',
                                             url='https://github.com/jnv/ansible-role-unattended-upgrades',
                                             default_branch='master',
                                             description='Setup unattended-upgrades on Debian-based systems',
@@ -57,8 +57,8 @@ class BaseViewTest(APITestCase):
                                             primary_language='shell',
                                             created_at='2014-01-18T23:56:09Z', pushed_at='2020-08-18T12:28:29Z')
 
-        self.repo2 = self.create_repository(id='MDEwOlJlcG9zaXRvcnkxNjAzNjY0Ng==', owner='jnv',
-                                            name='ansible-role-debian-backports',
+        self.repo2 = self.create_repository(id='MDEwOlJlcG9zaXRvcnkxNjAzNjY0Ng==',
+                                            full_name='jnv/ansible-role-debian-backports',
                                             url='https://github.com/jnv/ansible-role-debian-backports',
                                             default_branch='master',
                                             description='Setup backports repository for Debian and Ubuntu',
@@ -122,8 +122,7 @@ class RepositoriesTest(BaseViewTest):
     def test_create_valid_repository(self):
         valid_payload = {
             'id': 'MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ==',
-            'owner': 'Juniper',
-            'name': 'ansible-junos-stdlib',
+            'full_name': 'Juniper/ansible-junos-stdlib',
             'url': 'https://github.com/Juniper/ansible-junos-stdlib'
         }
 
@@ -144,23 +143,15 @@ class RepositoriesTest(BaseViewTest):
     def test_create_invalid_repository(self):
         invalid_payloads = [{
             # no id passed
-            'owner': 'Juniper',
-            'name': 'ansible-junos-stdlib',
+            'full_name': 'Juniper/ansible-junos-stdlib',
             'url': 'https://github.com/Juniper/ansible-junos-stdlib',
         }, {
             'id': 'MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ==',
-            # no owner passed
-            'name': 'ansible-junos-stdlib',
+            # no full_name passed
             'url': 'https://github.com/Juniper/ansible-junos-stdlib',
         }, {
             'id': 'MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ==',
-            'owner': 'Juniper',
-            # no name passed
-            'url': 'https://github.com/Juniper/ansible-junos-stdlib',
-        }, {
-            'id': 'MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ==',
-            'owner': 'Juniper',
-            'name': 'ansible-junos-stdlib'
+            'full_name': 'Juniper/ansible-junos-stdlib'
             # no url passed
         }]
 

@@ -47,10 +47,8 @@ class RepositoriesViewSet(viewsets.ViewSet):
 
             if not request.data.get('id'):
                 return Response({'message': 'id is missing'}, status=status.HTTP_400_BAD_REQUEST)
-            elif not request.data.get('owner'):
-                return Response({'message': 'owner is missing'}, status=status.HTTP_400_BAD_REQUEST)
-            elif not request.data.get('name'):
-                return Response({'message': 'name is missing'}, status=status.HTTP_400_BAD_REQUEST)
+            elif not request.data.get('full_name'):
+                return Response({'message': 'full_name is missing'}, status=status.HTTP_400_BAD_REQUEST)
             elif not request.data.get('url'):
                 return Response({'message': 'url is missing'}, status=status.HTTP_400_BAD_REQUEST)
             elif serializer.is_valid():

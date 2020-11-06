@@ -16,8 +16,7 @@ paths:
                 type: array
               example:
                 - id: MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ
-                  owner: Juniper
-                  name: ansible-junos-stdlib
+                  full_name: Juniper/ansible-junos-stdlib
                   url: https://github.com/Juniper/ansible-junos-stdlib
                   default_branch: master
                   description: Junos modules for Ansible
@@ -46,7 +45,7 @@ paths:
         '201':
           description: 'The request has been fulfilled, resulting in the creation of a new repository.'
         '400':
-          description: 'Bad request. One among (id, owner, name, url) is missing.'
+          description: 'Bad request. One among (id, full_name, url) is missing.'
         '409':
           description: 'Conflict. There already exists a fixing-commit with this id.'
       tags:
@@ -71,8 +70,7 @@ paths:
                   type: object
                 example:
                   - id: MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ==
-                    owner: Juniper
-                    name: ansible-junos-stdlib
+                    full_name: Juniper/ansible-junos-stdlib
                     url: https://github.com/Juniper/ansible-junos-stdlib
                     default_branch: master
                     description: Junos modules for Ansible
@@ -435,8 +433,7 @@ components:
             $ref: '#/components/schemas/Repository'
           example:
             id: MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ==
-            owner: jnv
-            name: ansible-role-unattended-upgrades
+            full_name: jnv/ansible-role-unattended-upgrades
             url: https://github.com/jnv/ansible-role-unattended-upgrades
     FixingCommitBody:
       description: A JSON object containing fixing-commit information
@@ -471,14 +468,10 @@ components:
           type: string
           description: The repository unique identifier
           example: MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ==
-        owner:
+        full_name:
           type: string
-          description: The repository owner
-          example: radon-h2020
-        name:
-          type: string
-          description: The repository name
-          example: radon-defect-predictor
+          description: The repository full name (owner/repository)
+          example: radon-h2020/radon-defect-prediction-api
         url:
           type: string
           description: The url to the Github repository
@@ -493,8 +486,7 @@ components:
           type: string
       required:
         - id
-        - owner
-        - name
+        - full_name
         - url
     FixingCommit:
       type: object

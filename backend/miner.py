@@ -87,12 +87,11 @@ class BackendRepositoryMiner:
         task.save()
 
         host = 'github' if 'github.com' in self.repository.url else 'gitlab'
-        full_name = f'{self.repository.owner}/{self.repository.name}'
         branch = self.repository.default_branch
         command = 'repo-miner mine failure-prone-files {0} {1} {2} . -b {3} --exclude-commits {4} --include-commits {5} --exclude-files {6}'.format(
             host,
             self.language,
-            full_name,
+            self.repository.full_name,
             branch,
             self.EXCLUDED_COMMITS_FILENAME,
             self.INCLUDED_COMMITS_FILENAME,

@@ -51,6 +51,8 @@ function longPollingMining(taskID){
 
           if(response.name == 'mine-fixed-files'){
             msg = 'Mining completed'
+          }else if(response.name == 'extract-metrics'){
+            msg = 'Metrics extraction completed'
           }else if(response.name == 'train'){
             msg = 'Training completed'
           }
@@ -82,6 +84,7 @@ function handleRunningTasks(){
     }
   })
 }
+
 
 $(document).ready(function(){
   toastr.options = {

@@ -6,7 +6,7 @@ import threading
 import docker
 from pydriller.repository_mining import RepositoryMining
 
-from apis.models import FixingCommit, FixingFile, Repositories, Task
+from apis.models import FailureProneFile, FixingCommit, FixingFile, Repositories, Task
 
 
 class BackendRepositoryMiner:
@@ -14,6 +14,10 @@ class BackendRepositoryMiner:
     EXCLUDED_COMMITS_FILENAME = 'excluded_commits.json'
     INCLUDED_COMMITS_FILENAME = 'included_commits.json'
     EXCLUDED_FILES_FILENAME = 'excluded_files.json'
+
+    FIXING_COMMITS_FILENAME = 'fixing-commits.json'
+    FIXED_FILES_FILENAME = 'fixed-files.json'
+    FAILURE_PRONE_FILES_FILENAME = 'failure-prone-files.json'
 
     def __init__(self, repo_id: str, language: str, labels: list = None, regex: str = None):
         """
@@ -32,7 +36,7 @@ class BackendRepositoryMiner:
 
     def mine(self):
 
-        task = Task(state=Task.ACCEPTED, name=Task.MINE_FIXED_FILES, repository=self.repository)
+        task = Task(state=Task.ACCEPTED, name=Task.MINE_FAILURE_PRONE_FILES, repository=self.repository)
         task.save()
 
         mine_fixing_commits_thread = threading.Thread(target=self.run_task, name="miner", args=(task,))
@@ -85,7 +89,7 @@ class BackendRepositoryMiner:
         host = 'github' if 'github.com' in self.repository.url else 'gitlab'
         full_name = f'{self.repository.owner}/{self.repository.name}'
         branch = self.repository.default_branch
-        command = 'repo-miner mine fixed-files {0} {1} {2} . -b {3} --exclude-commits {4} --include-commits {5} --exclude-files {6}'.format(
+        command = 'repo-miner mine failure-prone-files {0} {1} {2} . -b {3} --exclude-commits {4} --include-commits {5} --exclude-files {6}'.format(
             host,
             self.language,
             full_name,
@@ -94,8 +98,6 @@ class BackendRepositoryMiner:
             self.INCLUDED_COMMITS_FILENAME,
             self.EXCLUDED_FILES_FILENAME)
         
-        print(command)
-
         docker_client = docker.from_env()
         container = docker_client.containers.run(image='radonconsortium/repo-miner:latest',
                                                  command=command,
@@ -112,12 +114,10 @@ class BackendRepositoryMiner:
         # For debug
         print(result)
 
-        task.state = Task.COMPLETED
-
         if result['StatusCode'] != 0:
             task.state = Task.ERROR
         else:
-            with open(os.path.join(path_to_task, 'fixing-commits.json')) as f:
+            with open(os.path.join(path_to_task, self.FIXING_COMMITS_FILENAME)) as f:
                 fixing_commits = json.load(f)
 
                 # Save fixing-commits
@@ -132,7 +132,7 @@ class BackendRepositoryMiner:
                                                            repository=self.repository
                                                        ))
 
-            with open(os.path.join(path_to_task, 'fixed-files.json')) as f:
+            with open(os.path.join(path_to_task, self.FIXED_FILES_FILENAME)) as f:
                 fixed_files = json.load(f)
 
                 # Remove existing true positives (they might be replaced by new files given new fixing-commits)
@@ -152,6 +152,23 @@ class BackendRepositoryMiner:
                                                          is_false_positive=False,
                                                      ))
 
+            # delete all labeled files and re-label
+            labeled_files = FailureProneFile.objects.filter(fixing_commit__repository=self.repository)
+            for file in labeled_files:
+                file.delete()
+
+            with open(os.path.join(path_to_task, self.FAILURE_PRONE_FILES_FILENAME)) as f:
+                labeled_files = json.load(f)
+
+                # Insert new fixed files
+                for file in labeled_files:
+                    fixing_commit = FixingCommit.objects.get(sha=file['fixing_commit'])
+
+                    FailureProneFile.objects.get_or_create(filepath=file['filepath'],
+                                                           commit=file['commit'],
+                                                           fixing_commit=fixing_commit)
+
+        task.state = Task.COMPLETED
         task.save()
 
         try:

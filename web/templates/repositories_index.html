@@ -258,7 +258,34 @@
                     toastr['error']('Repository not found. Make sure you inserted the right id/url or token.' , 'Error.')
                 });
             }else{ // github
+                ownerRepo = $("#input-svc-identifier").val()
 
+                url = '{% url "web:get_github_repo" %}?full_name_or_id=' + ownerRepo
+                console.log(url)
+                $.ajax({
+                     url: url,
+                     type: "GET",
+                     headers: {'token': token },
+                     success: function(response) {
+                        $.ajax({
+                             url: '{% url "api:repositories-list" %}',
+                             type: "POST",
+                             data: response,
+                             dataType: 'json',
+                             statusCode: {
+                                201: function(){
+                                    toastr['success']('Repository added successfully' , 'Success.')
+                                    table.ajax.reload(null, false)
+                                },
+                                409: function(){
+                                    toastr['warning']('There already exists a repository like this.' , 'Warning.')
+                                },
+                             }
+                        })
+                     }
+                }).fail(function (msg) {
+                    toastr['error']('Repository not found. Make sure you inserted the right id/url or token.' , 'Error.')
+                });
             }
 
             // finally, dismiss modal

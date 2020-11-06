@@ -63,6 +63,14 @@
                 </div>
             </li>
             <li class="list-group-item">
+                <div class="form-group text-center mb-2" >
+                  <button id="dropdown-train-language-btn" type="button" class="btn btn-outline-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width: 100%;">
+                  &nbsp;Ansible
+                  </button>
+                  <div class="dropdown-menu" style="width: 100%;">
+                    <a id="dropdown-mine-language-item" class="dropdown-item">Tosca</a>
+                  </div>
+                </div>
                 <button id="btn-train" type="button" class="btn btn-success btn-xl pull-right" >Train</button>
             </li>
         </ul>
@@ -101,6 +109,20 @@
 <script src="{% static 'web/js/modal-classifiers.js' %}"> </script>
 
 <script>
+const LANGUAGES = ['ansible', 'tosca']
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+$("#dropdown-train-language-item").click(function(){
+  item = $("#dropdown-train-language-item").text().trim().toLowerCase()
+  index = LANGUAGES.indexOf(item)
+
+  $("#dropdown-train-language-btn").html('&nbsp;' + capitalizeFirstLetter(LANGUAGES[index]))
+  $("#dropdown-train-language-item").html(capitalizeFirstLetter(LANGUAGES[(index+1) % 2]))
+});
+
 $("#btn-train").click(function(){
 
     balancers = []
@@ -127,7 +149,10 @@ $("#btn-train").click(function(){
     if($('#svm-classifier-checkbox').prop('checked'))
         classifiers.push('svm')
 
+    var language = $("#dropdown-train-language-btn").text().trim().toLowerCase()
+
     payload = JSON.stringify({
+        "language": language,
         "balancers": balancers,
         "normalizers": normalizers,
         "feature_selectors": [],
@@ -143,10 +168,10 @@ $("#btn-train").click(function(){
          data: payload,
          statusCode: {
             202: function(){
-                toastr['success']('The request has been added to the queue for processing.' , 'Accepted.')
+                toastr['info']('The training is started. You will get notified when completed... <span><i class="fa fa-spinner fa-pulse"></i></span>', 'Started!')
             },
-            501: function(){
-                toastr['warning']('Not Implemented yet.' , 'Warning.')
+            500: function(){
+                toastr['error']('Some error occurred.' , 'Error.')
             },
          }
     })

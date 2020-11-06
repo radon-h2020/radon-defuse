@@ -658,7 +658,6 @@ class TasksTest(BaseViewTest):
 
         # get data from db
         tasks = Task.objects.filter(repository=self.repo1.id)
-        serializer = TaskSerializer(tasks, many=True)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 0)

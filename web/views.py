@@ -1,10 +1,38 @@
 import json
+
 from apis.models import Repositories, Task
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
+from github import Github, GithubException
 
 from backend.miner import BackendRepositoryMiner
+from backend.predictor import BackendTrainer
+
+
+@require_GET
+def get_github_repository(request):
+    access_token = request.headers.get('token')
+    full_name_or_id = request.GET['full_name_or_id']
+
+    try:
+        g = Github(login_or_token=access_token)
+        repo = g.get_repo(full_name_or_id)
+
+        content = {
+            'id': repo.id,
+            'owner': repo.full_name.split('/')[0],
+            'name': repo.full_name.split('/')[1],
+            'url': repo.html_url,
+            'default_branch': repo.default_branch,
+            'description': repo.description,
+            'created_at': repo.created_at.strftime("%Y-%d-%m %H:%M:%S"),
+            'star_count': repo.stargazers_count,
+        }
+        return HttpResponse(content=json.dumps(content), content_type='application/json', status=200)
+    except GithubException as e:
+        print(e)
+        return HttpResponse(status=400)
 
 
 def repository_home(request, pk):
@@ -50,5 +78,15 @@ def repository_train_start(request, pk):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
 
-    # TODO: call radondp.predictors.DefectPredictor
-    return HttpResponse(status=501)
+    task_id, task_state = BackendTrainer(
+        repo_id=pk,
+        language=body.get('language'),
+        classifiers=body.get('classifiers'),
+        balancers=body.get('balancers'),
+        normalizers=body.get('normalizers'),
+        selectors=body.get('selectors')).train()
+
+    if task_state == Task.ACCEPTED:
+        return HttpResponse(status=202, content=task_id)
+    else:
+        return HttpResponse(status=500)

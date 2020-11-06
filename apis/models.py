@@ -132,11 +132,27 @@ class Task(models.Model):
         return self.id == other.id
 
 
-class Metrics(models.Model):
+class MetricsFile(models.Model):
+    id = models.AutoField(primary_key=True, blank=False)
     file = models.BinaryField()
+    language = models.CharField(max_length=50, blank=False)
     repository = models.ForeignKey(Repositories, on_delete=models.CASCADE)
 
+    def __eq__(self, other):
+        if not isinstance(other, MetricsFile):
+            return False
 
-class DefectPredictionModel(models.Model):
+        return self.id == other.id or (self.repository == other.repository and self.language == other.language)
+
+
+class PredictiveModel(models.Model):
+    id = models.AutoField(primary_key=True, blank=False)
     file = models.BinaryField()
+    language = models.CharField(max_length=50, blank=False)
     repository = models.ForeignKey(Repositories, on_delete=models.CASCADE)
+
+    def __eq__(self, other):
+        if not isinstance(other, PredictiveModel):
+            return False
+
+        return self.id == other.id or (self.repository == other.repository and self.language == other.language)

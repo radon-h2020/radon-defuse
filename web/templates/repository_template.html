@@ -10,6 +10,15 @@
 <a href="{% url 'web:repository_home' repository.id %}" class="list-group-item list-group-item-action bg-dark text-white">Dashboard</a>
 <a href="{% url 'web:repository_fixing_commits' repository.id %}" class="list-group-item list-group-item-action bg-dark text-white">Fixing commits</a>
 <a href="{% url 'web:repository_fixing_files' repository.id %}" class="list-group-item list-group-item-action bg-dark text-white">Fixing files</a>
+
+<div class="mt-4" style="text-align:center;">
+  <a href="{% url 'web:repository_dump_metrics' repository.id %}" download="{{ repository.name }}.csv" class="btn btn-outline-secondary btn-sm">
+      <span data-feather="download"> </span> Export metrics
+  </a>
+  <a href="{% url 'web:repository_dump_model' repository.id %}" download="{{ repository.name }}.csv" class="btn btn-outline-secondary btn-sm">
+      <span data-feather="download"> </span> Export model
+  </a>
+</div>
 {% endblock %}
 
 {% block body %} {% endblock %}

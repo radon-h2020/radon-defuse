@@ -7,92 +7,72 @@
 
 {% block body %}
 
-<div class="row">
-    <div class="col">
-        <ul class="list-group list-group-flush" >
-            <li class="list-group-item">
-                <div class="row">
-                    <div class="col">
-                        <h5 class="card-title">Data balancing</h5>
-                    </div>
-                    <div class="col">
-                        <div class="pull-right">
-                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-data-balancing"><i class="fa fa-cogs"></i> Setup </button>
-                            <input id="data-balancing-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="small">
-                        </div>
+<div class="col">
+    <ul class="list-group list-group-flush" >
+        <li class="list-group-item">
+            <div class="row">
+                <div class="col">
+                    <h5 class="card-title">Data balancing</h5>
+                </div>
+                <div class="col">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-data-balancing"><i class="fa fa-cogs"></i> Setup </button>
+                        <input id="data-balancing-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="small">
                     </div>
                 </div>
-            </li>
-            <li class="list-group-item" >
-                <div class="row">
-                    <div class="col">
-                        <h5 class="card-title">Feature normalization</h5>
-                    </div>
-                    <div class="col">
-                        <div class="pull-right">
-                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-feature-normalization"><i class="fa fa-cogs"></i> Setup </button>
-                            <input id="feature-normalization-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="small">
-                        </div>
+            </div>
+        </li>
+        <li class="list-group-item" >
+            <div class="row">
+                <div class="col">
+                    <h5 class="card-title">Feature normalization</h5>
+                </div>
+                <div class="col">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-feature-normalization"><i class="fa fa-cogs"></i> Setup </button>
+                        <input id="feature-normalization-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="small">
                     </div>
                 </div>
-            </li>
-            <li class="list-group-item" >
-                <div class="row">
-                    <div class="col">
-                        <h5 class="card-title">Feature selection</h5>
-                    </div>
-                    <div class="col">
-                        <div class="pull-right">
-                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-feature-selection"><i class="fa fa-cogs"></i> Setup </button>
-                            <input id="feature-selection-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="small">
-                        </div>
+            </div>
+        </li>
+        <li class="list-group-item" >
+            <div class="row">
+                <div class="col">
+                    <h5 class="card-title">Feature selection</h5>
+                </div>
+                <div class="col">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-feature-selection"><i class="fa fa-cogs"></i> Setup </button>
+                        <input id="feature-selection-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="small">
                     </div>
                 </div>
-            </li>
-            <li class="list-group-item">
-                <div class="row">
-                    <div class="col">
-                        <h5 class="card-title">Classifiers</h5>
-                    </div>
-                    <div class="col">
-                        <div class="pull-right">
-                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-classifiers"><i class="fa fa-cogs"></i> Setup </button>
-                            <input class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="small">
-                        </div>
+            </div>
+        </li>
+        <li class="list-group-item">
+            <div class="row">
+                <div class="col">
+                    <h5 class="card-title">Classifiers</h5>
+                </div>
+                <div class="col">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-classifiers"><i class="fa fa-cogs"></i> Setup </button>
+                        <input class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="small">
                     </div>
                 </div>
-            </li>
-            <li class="list-group-item">
-                <div class="form-group text-center mb-2" >
-                  <button id="dropdown-train-language-btn" type="button" class="btn btn-outline-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width: 100%;">
-                  &nbsp;Ansible
-                  </button>
-                  <div class="dropdown-menu" style="width: 100%;">
-                    <a id="dropdown-mine-language-item" class="dropdown-item">Tosca</a>
-                  </div>
-                </div>
-                <button id="btn-train" type="button" class="btn btn-success btn-xl pull-right" >Train</button>
-            </li>
-        </ul>
-    </div>
-    <div class="col text-center">
-        <ul class="nav nav-tabs">
-  <li class="nav-item">
-    <a class="nav-link " href="#">Settings</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link active" href="#">Link</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="#">Link</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link disabled" href="#">Disabled</a>
-  </li>
-</ul>
-        <span><i class="fa fa-spinner fa-pulse"></i></span>
-
-    </div>
+            </div>
+        </li>
+        <li class="list-group-item">
+            <div class="form-group text-center mb-2" >
+              <button id="dropdown-train-language-btn" type="button" class="btn btn-outline-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width: 100%;">
+              &nbsp;Ansible
+              </button>
+              <div class="dropdown-menu" style="width: 100%;">
+                <a id="dropdown-mine-language-item" class="dropdown-item">Tosca</a>
+              </div>
+            </div>
+            <button id="btn-train" type="button" class="btn btn-success btn-xl pull-right mt-4" >Train</button>
+        </li>
+    </ul>
 </div>
 
 {% include 'modal_data_balancing.html' %}

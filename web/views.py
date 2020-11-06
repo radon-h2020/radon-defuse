@@ -1,6 +1,7 @@
+import io
 import json
-
-from apis.models import Repositories, Task
+import pandas as pd
+from apis.models import MetricsFile, PredictiveModel, Repositories, Task
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.views.decorators.http import require_GET, require_POST
@@ -33,6 +34,31 @@ def get_github_repository(request):
     except GithubException as e:
         print(e)
         return HttpResponse(status=400)
+
+
+def repository_dump_metrics(request, pk: str):
+    repository = get_object_or_404(Repositories, pk=pk)
+    metrics = MetricsFile.objects.get(repository=repository, language='ansible')
+    df = pd.read_csv(io.BytesIO(metrics.file))
+
+    filename = f'{repository.name}_ansible_metrics.csv'
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=' + filename
+    df.to_csv(path_or_buf=response, index=False)
+
+    return response
+
+
+def repository_dump_model(request, pk: str):
+    repository = get_object_or_404(Repositories, pk=pk)
+    model = PredictiveModel.objects.get(repository=repository, language='ansible')
+    b_model = model.file
+
+    filename = f'{repository.name}_ansible_model.csv'
+    response = HttpResponse(b_model, content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=' + filename
+
+    return response
 
 
 def repository_home(request, pk):

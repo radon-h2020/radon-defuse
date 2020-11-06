@@ -8,7 +8,7 @@ import threading
 from radondp.predictors import DefectPredictor
 from typing import List
 
-from apis.models import DefectPredictionModel, FailureProneFile, Metrics, Repositories, Task
+from apis.models import PredictiveModel, FailureProneFile, MetricsFile, Repositories, Task
 
 
 class BackendTrainer:
@@ -71,7 +71,6 @@ class BackendTrainer:
         command = 'repo-miner extract-metrics {0} {1} {2} all release . '.format(self.repository.url + '.git',  #TODO: remove + .git
                                                                                  self.FAILURE_PRONE_FILES_FILENAME,
                                                                                  self.language)
-        print(command)
         docker_client = docker.from_env()
         container = docker_client.containers.run(image='radonconsortium/repo-miner:latest',
                                                  command=command,
@@ -98,7 +97,14 @@ class BackendTrainer:
             path_to_csv = os.path.join(path_to_task, 'metrics.csv')
             with(open(path_to_csv, 'rb')) as f:
                 res = f.read()
-                Metrics.objects.create(file=res, repository=self.repository)
+
+            obj, created = MetricsFile.objects.get_or_create(repository=self.repository, language=self.language,
+                                                             defaults=dict(file=res))
+
+            if not created and obj:
+                print('Obj exits')
+                obj.file = res
+                obj.save()
 
             # Train
             dp = DefectPredictor()
@@ -117,7 +123,14 @@ class BackendTrainer:
 
             dp.train(data)
             b_model = dp.dumps_model()
-            DefectPredictionModel.objects.create(file=b_model, repository=self.repository)
+
+            obj, created = PredictiveModel.objects.get_or_create(repository=self.repository, language=self.language,
+                                                                 defaults=dict(file=b_model))
+
+            if not created:
+                obj.file = b_model
+                obj.save()
+
             task.state = Task.COMPLETED
             task.save()
 

@@ -63,7 +63,6 @@ function longPollingMining(taskID){
           toastr['error']('The server failed to fulfill task ' + taskID, 'Error')
 
         }else if(response.state == 'accepted' || response.state == 'running') {
-          console.log(response)
           setTimeout(function() { longPollingMining(taskID); }, 10000);
         }
       }

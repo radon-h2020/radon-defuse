@@ -3,6 +3,9 @@ from apis.models import FailureProneFile, FixingCommit, FixedFile, Repository, T
 
 
 class RepositorySerializer(serializers.ModelSerializer):
+
+    indicators = serializers.SerializerMethodField()
+
     class Meta:
         model = Repository
         fields = ('id',
@@ -18,14 +21,9 @@ class RepositorySerializer(serializers.ModelSerializer):
                   'created_at',
                   'pushed_at',
                   'indicators')
-                  #'commit_frequency',
-                  #'issue_frequency',
-                  #'core_contributors',
-                  #'comments_ratio',
-                  #'iac_ratio',
-                  #'sloc',
-                  #'has_ci',
-                  #'has_license')
+
+    def get_indicators(self, obj):
+        return dict(obj.indicators)
 
 
 class FixingCommitSerializer(serializers.ModelSerializer):

@@ -554,7 +554,7 @@ components:
           default: 'pending'
         name:
           type: string
-          description: A human-readable name describind the task. Can be 'mine-fixing-commits', 'mine-fixed-files', 'mine-failure-prone-files', 'extract-metrics', 'train'
+          description: A human-readable name describind the task. Can be 'extract-metrics', 'mine-fixing-commits', 'mine-fixed-files', 'mine-failure-prone-files', 'scoring', 'train'
         repository:
           type: string
           description: The repository id the task belongs to

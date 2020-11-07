@@ -1,14 +1,10 @@
 import docker
 import json
 import os
-import shutil
+import re
 import threading
 
-import docker
-from pydriller.repository_mining import RepositoryMining
-import time
-import random
-from apis.models import FailureProneFile, FixingCommit, FixedFile, Repository, Task
+from apis.models import Repository, Task
 
 
 class BackendScorer:
@@ -18,7 +14,20 @@ class BackendScorer:
 
     def score(self):
 
+        task = Task(state=Task.ACCEPTED, name=Task.SCORING, repository=self.repository)
+        task.save()
+
+        scorer_thread = threading.Thread(target=self.run_task, name="scorer", args=(task,))
+        scorer_thread.start()
+
+        return task.id, task.state
+
+    def run_task(self, task: Task):
+
         host = 'github' if 'github' in self.repository.url else 'gitlab'
+
+        task.state = Task.RUNNING
+        task.save()
 
         docker_client = docker.from_env()
         container = docker_client.containers.run(image='radonconsortium/repo-scorer:latest',
@@ -30,16 +39,26 @@ class BackendScorer:
                                                  })
 
         result = container.wait()
-        print(result)
-        indicators = dict()
-        if result['StatusCode'] == 0:
-            output = container.logs(stdout=True, stderr=True)
-            print(output)
-            indicators = json.loads(output.decode())
-            print(indicators)
-            # TODO: save scores in repository
-        else:
-            print(container.logs(stdout=True, stderr=True))
-
+        output = container.logs(stdout=True, stderr=True)
         container.remove()
-        return indicators
+
+        if result['StatusCode'] == 0:
+            try:
+                match = re.search(r'(\{\".*}$)', output.decode())
+                indicators = json.loads(match.groups()[0])
+
+                self.repository.indicators = indicators
+                self.repository.save()
+
+                task.state = Task.COMPLETED
+                task.save()
+            except json.decoder.JSONDecodeError:
+                task.state = Task.ERROR
+                task.save()
+                # for debug
+                print('Scoring: JSONDecodeError')
+        else:
+            task.state = Task.ERROR
+            task.save()
+            # for debug
+            print('ERROR:', output)

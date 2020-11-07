@@ -1,39 +1,4 @@
 from djongo import models
-from django.core.serializers.json import DjangoJSONEncoder
-import json
-
-
-class JSONField(models.TextField):
-    """
-    JSONField specialize a TextField to (de)serialize JSON objects.
-    Example:
-        class Page(models.Model):
-            data = JSONField(blank=True, null=True)
-        page = Page.objects.get(pk=5)
-        page.data = {'title': 'test', 'type': 3}
-        page.save()
-    """
-
-    def to_python(self, value):
-        if value == "":
-            return None
-
-        try:
-            if isinstance(value, str):
-                return json.loads(value)
-        except ValueError:
-            pass
-        return value
-
-    def from_db_value(self, value, *args):
-        return self.to_python(value)
-
-    def get_db_prep_save(self, value, *args, **kwargs):
-        if value == "":
-            return None
-        if isinstance(value, dict):
-            value = json.dumps(value, cls=DjangoJSONEncoder)
-        return value
 
 
 class Repository(models.Model):
@@ -50,16 +15,18 @@ class Repository(models.Model):
     created_at = models.CharField(max_length=30, blank=True, default='')
     pushed_at = models.CharField(max_length=30, blank=True, default='')
 
-    # Scores
-    indicators = JSONField(blank=True, null=True)
-    #commit_frequency = models.FloatField(default=0, blank=True)
-    #issue_frequency = models.FloatField(default=0, blank=True)
-    #core_contributors = models.IntegerField(default=0, blank=True)
-    #comments_ratio = models.FloatField(default=0, blank=True)
-    #iac_ratio = models.FloatField(default=0, blank=True)
-    #sloc = models.IntegerField(default=0, blank=True)
-    #has_ci = models.BooleanField(blank=True, default=False)
-    #has_license = models.BooleanField(blank=True, default=False)
+    default_indicators = {
+        "comments_ratio": 0,
+        "commit_frequency": 0,
+        "core_contributors": 0,
+        "has_ci": False,
+        "has_license": False,
+        "iac_ratio": 0,
+        "issue_frequency":0,
+        "repository_size": 0,
+    }
+
+    indicators = models.JSONField(default={})
 
     def __hash__(self):
         return super().__hash__()
@@ -151,14 +118,16 @@ class Task(models.Model):
     MINE_FIXED_FILES = 'mine-fixed-files'
     MINE_FAILURE_PRONE_FILES = 'mine-failure-prone-files'
     EXTRACT_METRICS = 'extract-metrics'
+    SCORING = 'scoring'
     TRAIN = 'train'
 
     NAME_CHOICES = [
         (NONE, 'none'),
+        (EXTRACT_METRICS, 'extract-metrics'),
         (MINE_FIXING_COMMITS, 'mine-fixing-commits'),
         (MINE_FIXED_FILES, 'mine-fixed-files'),
         (MINE_FAILURE_PRONE_FILES, 'mine-failure-prone-files'),
-        (EXTRACT_METRICS, 'extract-metrics'),
+        (SCORING, 'scoring'),
         (TRAIN, 'train')
     ]
 

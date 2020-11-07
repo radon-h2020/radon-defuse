@@ -75,7 +75,7 @@ def repository_dump_fixed_files(request, pk: str):
 @require_GET
 def repository_dump_metrics(request, pk: str):
     repository = get_object_or_404(Repository, pk=pk)
-    metrics = MetricsFile.objects.get(repository=repository, language='ansible')
+    metrics = get_object_or_404(MetricsFile, repository=repository, language='ansible')
     df = pd.read_csv(io.BytesIO(metrics.file))
 
     filename = f'{repository.full_name}_ansible_metrics.csv'
@@ -89,7 +89,7 @@ def repository_dump_metrics(request, pk: str):
 @require_GET
 def repository_dump_model(request, pk: str):
     repository = get_object_or_404(Repository, pk=pk)
-    model = PredictiveModel.objects.get(repository=repository, language='ansible')
+    model = get_object_or_404(PredictiveModel, repository=repository, language='ansible')
     b_model = model.file
 
     filename = f'{repository.full_name}_ansible_model.joblib'
@@ -144,7 +144,7 @@ def repository_mine(request, pk):
         labels=body.get('labels'),
         regex=body.get('regex')).mine()
 
-    if task_state == Task.ACCEPTED:
+    if task_state == Task.ACCEPTED or task_state == Task.RUNNING:
         return HttpResponse(status=202, content=task_id)
     else:
         return HttpResponse(status=500)
@@ -153,8 +153,12 @@ def repository_mine(request, pk):
 @require_GET
 def repository_score(request, pk):
     repository = get_object_or_404(Repository, pk=pk)
-    indicators = BackendScorer(repository).score()
-    return HttpResponse(json.dumps(indicators), status=200, content_type="application/json")
+    task_id, task_state = BackendScorer(repository).score()
+
+    if task_state == Task.ACCEPTED or task_state == Task.RUNNING:
+        return HttpResponse(status=202, content=task_id)
+    else:
+        return HttpResponse(status=500)
 
 
 def repository_train_settings(request, pk):
@@ -175,7 +179,7 @@ def repository_train_start(request, pk):
         normalizers=body.get('normalizers'),
         selectors=body.get('selectors')).train()
 
-    if task_state == Task.ACCEPTED:
+    if task_state == Task.ACCEPTED or task_state == Task.RUNNING:
         return HttpResponse(status=202, content=task_id)
     else:
         return HttpResponse(status=500)

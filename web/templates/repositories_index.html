@@ -92,263 +92,316 @@
 
 <script>
 
-    function scoreRepo(repo_id, table, row){
-        // patch repo
-        const url = '{% url "web:repository_score" pk=0 %}'.replace('0', repo_id)
-        $.ajax({
-            url: url,
-            method: 'GET',
-            statusCode: {
-                200: function(response){
-                    var d = table.row(row).data();
-                    console.log(response)
-                    if(!jQuery.isEmptyObject(response)){
-                        d['commit_frequency'] = response.commit_frequency;
-                        d['issue_frequency'] = response.issue_frequency;
-                        d['core_contributors'] = response.core_contributors;
-                        d['percent_comments'] = parseFloat(response.comments_ratio * 100).toFixed(2);
-                        d['percent_iac'] = parseFloat(response.iac_ratio * 100).toFixed(2);
-                        d['sloc'] = response.repository_size;
-                        d['has_ci'] = response.has_ci;
-                        d['has_license'] = response.has_license;
+var inProgress = [] // list of repositories (id) currently scoring
 
-                        table.row(row).data(d).draw()
-                        toastr['success']('Resource updated successfully' , 'Success.')
-                    }
+function longPollingScoring(taskID, table){
+  $.ajax({
+    url: '{% url "api:tasks-detail" pk=0 %}'.replace('0', taskID),
+    type: "GET",
+    statusCode: {
+      200: function(response) {
 
-                    $('#score-spinner-'+repo_id).hide()
-                    $('#score-button-'+repo_id).show()
-                },
-                404: function(){
-                     toastr['error']('Resource not found.' , 'Ops.')
+        table.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+            var data = this.data();
+
+            if(data.id == response.repository){
+
+                if(response.state == 'completed'){
+
+                    $.ajax({
+                        url: '{% url "api:repositories-detail" pk=0 %}'.replace('0', data.id),
+                        type: "GET",
+                        success: function(response) {
+                            const index = inProgress.indexOf(data.id);
+                            if (index !== -1) {
+                              inProgress.splice(index, 1);
+                            }
+
+                            table.ajax.reload(null, false)
+                        },
+                        fail: function(response) {
+                           console.log(response)
+                        }
+                    })
+
+                    $('#score-spinner-'+data.id).hide()
+                    $('#score-button-'+data.id).show()
+                    toastr['success']('End scoring for repository ' + data.full_name, 'Success')
+
+                }else if(response.state == 'error'){
+                    $('#score-spinner-'+data.id).hide()
+                    $('#score-button-'+data.id).show()
+                    toastr['error']('The server failed to score ' + data.full_name, 'Error')
+
+                }else if(response.state == 'accepted' || response.state == 'running') {
+                  setTimeout(function() { longPollingScoring(taskID, table); }, 2000);
+                }
+                // Call GET repository and update row
+                if(data['indicators'] == undefined) {
+                    data['indicators'] = {}
                 }
             }
-        }).fail(function(msg){
-            console.log(msg)
-        })
+        });
+      }
+    }
+  })
+}
+
+function scoreRepo(repo_id, table, row){
+    $.ajax({
+        url: '{% url "web:repository_score" pk=0 %}'.replace('0', repo_id),
+        method: 'GET',
+        statusCode: {
+            202: function(taskID){
+                toastr['info']('Scoring repository' , 'Accepted.')
+                longPollingScoring(taskID, table)
+            },
+            404: function(){
+                 toastr['error']('Resource not found.' , 'Ops.')
+            }
+        }
+    }).fail(function(msg){
+        console.log(msg)
+    })
+}
+
+
+// ====================== Populate repositories DataTable ====================== //
+$(document).ready(function() {
+  toastr.options = {
+    "closeButton": true,
+    "positionClass": "toast-bottom-right",
+    "preventDuplicates": true,
+    "showMethod": "fadeIn",
+    "hideMethod": "fadeOut",
+  }
+
+  var table = $('#table-repositories').DataTable({
+        processing: true,
+        ajax:  {
+            url: '{% url "api:repositories-list" %}',
+            type: "GET",
+            dataSrc: function (json){
+               for(obj of json) {
+                   if(obj.indicators.comments_ratio != undefined){
+                      percent_comments = parseFloat(obj.indicators.comments_ratio * 100).toFixed(2);
+                      percent_iac = parseFloat(obj.indicators.iac_ratio *100).toFixed(2);
+                   }
+                   if(obj.indicators.comments_ratio != undefined){
+                       obj.indicators.comments_ratio = percent_comments;
+                       obj.indicators.iac_ratio = percent_iac;
+                   }
+               }
+
+               return json;
+            }
+        },
+        columns: [
+            {
+              data: null,
+              render: function ( data, type, row ) {
+                var tag_a_name = `<a href="${data.url}" target="_blank"> ${data.full_name}</a>`
+
+                // Create button to redirect to repository details
+                url_to_repository_home = '{% url "web:repositories_index" %}' + data.id
+                var tag_a_button = `<a href="${url_to_repository_home}" class="btn btn-outline-primary btn-sm"  style="float: right;"> <small>See more</small> </a>`
+                return tag_a_name + tag_a_button
+              }
+            },
+            {
+                defaultContent: '-',
+                data: 'indicators.commit_frequency'
+            },
+            {
+                defaultContent: '-',
+                data: 'indicators.issue_frequency'
+            },
+            {
+                defaultContent: '-',
+                data: 'indicators.core_contributors'
+            },
+            {
+                defaultContent: '-',
+                data: 'indicators.comments_ratio'
+            },
+            {
+                defaultContent: '-',
+                data: 'indicators.iac_ratio'
+            },
+            {
+                defaultContent: '-',
+                data: 'indicators.repository_size'
+            },
+            {
+                defaultContent: 'NA',
+                data: 'indicators.has_ci',
+                render: function ( data, type, row ) {
+                    if(data && data)
+                        return '<span class="fa fa-check" style="color: green;"></span>'
+                    else
+                        return '<span class="fa fa-times" style="color: red;"></span>'
+                }
+            },
+            {
+                defaultContent: 'NA',
+                data: 'indicators.has_license',
+                render: function ( data, type, row ) {
+                    if(data && data)
+                        return '<span class="fa fa-check" style="color: green;"></span>'
+                    else
+                        return '<span class="fa fa-times" style="color: red;"></span>'
+                }
+            },
+            {
+                data: null,
+                render: function ( data, type, row ) {
+
+                    const display_spinner = inProgress.includes(data.id) ? 'inline' : 'none'
+                    const display_btn_score = inProgress.includes(data.id) ? 'none' : 'inline'
+
+                    const spinner_score = `<span id="score-spinner-${data.id}" class="mt-2" style="float:right; display:${display_spinner};"><i class="score-spinner fa fa-spinner fa-pulse" ></i></span>`
+                    const btn_score = `<button id="score-button-${data.id}" class="score-button btn btn-outline-success btn-sm" style="float:right; display:${display_btn_score};">Score</button>`
+                    const btn_delete = '<button class="delete-button btn btn-outline-danger btn-sm ml-2" style="float:right;">Delete</button>'
+                    return btn_delete + btn_score + spinner_score
+                }
+            }
+        ]
+  });
+
+  // SCORE BUTTON
+  $('#table-repositories tbody').on( 'click', 'button.score-button', function () {
+       const data = table.row( $(this).parents('tr') ).data();
+       row = $(this).parents('tr');
+       $('#score-button-'+data.id).hide()
+       $('#score-spinner-'+data.id).show()
+
+       inProgress.push(data.id)
+       scoreRepo(data.id, table, row)
+  });
+
+  // DELETE BUTTON
+  $('#table-repositories tbody').on( 'click', 'button.delete-button', function () {
+
+    var data = table.row( $(this).parents('tr') ).data();
+
+    userWantsToDeleteRow = confirm("Do you really want to delete this repository? All data related to this " +
+                                   "repository (e.g., fixing-commits) will be erased.");
+
+    if(userWantsToDeleteRow){
+        // Remove row from DataTable
+        table.row($(this).parents('tr'))
+             .remove()
+             .draw();
+
+        // Delete from db
+        $.ajax({
+            url: '{% url "api:repositories-list" %}' + data.id,
+            method: 'DELETE',
+            //data: {pk: data.id},
+            statusCode: {
+                204: function(){
+                    table.ajax.reload(null, false)
+                    toastr['success']('Repository deleted successfully' , 'Success.')
+                },
+                404: function(){
+                    toastr['warning']('Repository not found.' , 'Warning.')
+                },
+            }
+        });
+    }
+  });
+
+  // ====================== ADD/confirm button ====================== //
+  $("#confirm-add-repository").click(function(){
+    if($("#input-svc-identifier").val().length == 0){
+        toastr['warning']('Full name or id is mandatory!' , 'Warning.')
     }
 
-   // ====================== Populate repositories DataTable ====================== //
-   $(document).ready(function() {
-      toastr.options = {
-        "closeButton": true,
-        "positionClass": "toast-bottom-right",
-        "preventDuplicates": true,
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut",
-      }
+    if($("#input-svc-identifier").val()){
+        svc_item = $("#dropdown-svc-button").text().trim().toLowerCase()
+        var token = $("#input-svc-api-token").val()
 
-      var table = $('#table-repositories').DataTable({
-            processing: true,
-            ajax:  {
-                url: '{% url "api:repositories-list" %}',
-                type: "GET",
-                dataSrc: ''
-            },
-            columns: [
-                {
-                  data: null,
-                  render: function ( data, type, row ) {
-                    var tag_a_name = `<a href="${data.url}" target="_blank"> ${data.full_name}</a>`
+        if(svc_item == 'gitlab'){
+            var project_id = $("#input-svc-identifier").val()
 
-                    // Create button to redirect to repository details
-                    url_to_repository_home = '{% url "web:repositories_index" %}' + data.id
-                    var tag_a_button = `<a href="${url_to_repository_home}" class="btn btn-outline-primary btn-sm"  style="float: right;"> <small>See more</small> </a>`
-                    return tag_a_name + tag_a_button
-                  }
-                },
-                {
-                    defaultContent: '-',
-                    data: 'commit_frequency'
-                },
-                {
-                    defaultContent: '-',
-                    data: 'issue_frequency'
-                },
-                {
-                    defaultContent: '-',
-                    data: 'core_contributors'
-                },
-                {
-                    defaultContent: '-',
-                    data: 'percent_comments'
-                },
-                {
-                    defaultContent: '-',
-                    data: 'percent_iac'
-                },
-                {
-                    defaultContent: '-',
-                    data: 'sloc'
-                },
-                {
-                    defaultContent: 'NA',
-                    data: 'has_ci',
-                    render: function ( data, type, row ) {
-                        if(data && data)
-                            return '<span class="fa fa-check" style="color: green;"></span>'
-                        else
-                            return '<span class="fa fa-times" style="color: red;"></span>'
-                    }
-                },
-                {
-                    defaultContent: 'NA',
-                    data: 'has_license',
-                    render: function ( data, type, row ) {
-                        if(data && data)
-                            return '<span class="fa fa-check" style="color: green;"></span>'
-                        else
-                            return '<span class="fa fa-times" style="color: red;"></span>'
-                    }
-                },
-                {
-                    data: null,
-                    render: function ( data, type, row ) {
-                        const spinner_score = `<span id="score-spinner-${data.id}" class="mt-2" style="float:right; display:none;"><i class="score-spinner fa fa-spinner fa-pulse" ></i></span>`
-                        const btn_score = `<button id="score-button-${data.id}" class="score-button btn btn-outline-success btn-sm" style="float:right;">Score</button>`
-                        const btn_delete = '<button class="delete-button btn btn-outline-danger btn-sm ml-2" style="float:right;">Delete</button>'
-                        return btn_delete + btn_score + spinner_score
-                    }
-                }
-            ]
-      });
-
-      // SCORE BUTTON
-      $('#table-repositories tbody').on( 'click', 'button.score-button', function () {
-           const data = table.row( $(this).parents('tr') ).data();
-           //row_index = table.row( $(this).parents('tr')).index();
-           //row = table.row($(this).parents('tr'));
-           row = $(this).parents('tr');
-           $('#score-button-'+data.id).hide()
-           $('#score-spinner-'+data.id).show()
-
-           // TODO: call a function to run RepositoryScorer (async). Pass the id to, and when finished update row
-           scoreRepo(data.id, table, row)
-      });
-
-      // DELETE BUTTON
-      $('#table-repositories tbody').on( 'click', 'button.delete-button', function () {
-
-        var data = table.row( $(this).parents('tr') ).data();
-
-        userWantsToDeleteRow = confirm("Do you really want to delete this repository? All data related to this " +
-                                       "repository (e.g., fixing-commits) will be erased.");
-
-        if(userWantsToDeleteRow){
-            // Remove row from DataTable
-            table.row($(this).parents('tr'))
-                 .remove()
-                 .draw();
-
-            // Delete from db
             $.ajax({
-                url: '{% url "api:repositories-list" %}' + data.id,
-                method: 'DELETE',
-                //data: {pk: data.id},
-                statusCode: {
-                    204: function(){
-                        table.ajax.reload(null, false)
-                        toastr['success']('Repository deleted successfully' , 'Success.')
-                    },
-                    404: function(){
-                        toastr['warning']('Repository not found.' , 'Warning.')
-                    },
-                }
+                 url: "https://gitlab.com/api/v4/projects/" + project_id,
+                 type: "GET",
+                 headers: {'PRIVATE-TOKEN': token },
+                 success: function(response) {
+                    var body = {
+                        'id': response.id,
+                        'full_name': response.namespace.full_path + '/' + response.name,
+                        'url': response.web_url,
+                        'default_branch': response.default_branch,
+                        'description': response.description,
+                        'created_at': response.created_at,
+                        'star_count': response.star_count
+                    }
+
+                    $.ajax({
+                         url: '{% url "api:repositories-list" %}',
+                         type: "POST",
+                         data: body,
+                         dataType: 'json',
+                         statusCode: {
+                            201: function(){
+                                toastr['success']('Repository added successfully' , 'Success.')
+                                table.ajax.reload(null, false)
+                            },
+                            409: function(){
+                                toastr['warning']('There already exists a repository like this.' , 'Warning.')
+                            },
+                         }
+                    })
+                 }
+            }).fail(function (msg) {
+                toastr['error']('Repository not found. Make sure you inserted the right id/url or token.' , 'Error.')
             });
-        }
-      });
+        }else{ // github
+            full_name = $("#input-svc-identifier").val()
 
-      // ====================== ADD/confirm button ====================== //
-      $("#confirm-add-repository").click(function(){
-        if($("#input-svc-identifier").val().length == 0){
-            toastr['warning']('Full name or id is mandatory!' , 'Warning.')
-        }
-
-        if($("#input-svc-identifier").val()){
-            svc_item = $("#dropdown-svc-button").text().trim().toLowerCase()
-            var token = $("#input-svc-api-token").val()
-
-            if(svc_item == 'gitlab'){
-                var project_id = $("#input-svc-identifier").val()
-
-                $.ajax({
-                     url: "https://gitlab.com/api/v4/projects/" + project_id,
-                     type: "GET",
-                     headers: {'PRIVATE-TOKEN': token },
-                     success: function(response) {
-                        var body = {
-                            'id': response.id,
-                            'full_name': response.namespace.full_path + '/' + response.name,
-                            'url': response.web_url,
-                            'default_branch': response.default_branch,
-                            'description': response.description,
-                            'created_at': response.created_at,
-                            'star_count': response.star_count,
-                        }
-
+            url = '{% url "web:get_github_repo" %}?full_name_or_id=' + full_name
+            $.ajax({
+                 url: url,
+                 type: "GET",
+                 headers: {'token': token ? token : undefined},
+                 statusCode: {
+                    200: function(response){
                         $.ajax({
-                             url: '{% url "api:repositories-list" %}',
-                             type: "POST",
-                             data: body,
-                             dataType: 'json',
-                             statusCode: {
+                            url: '{% url "api:repositories-list" %}',
+                            type: "POST",
+                            data: response,
+                            dataType: 'json',
+                            statusCode: {
                                 201: function(){
                                     toastr['success']('Repository added successfully' , 'Success.')
                                     table.ajax.reload(null, false)
                                 },
                                 409: function(){
-                                    toastr['warning']('There already exists a repository like this.' , 'Warning.')
-                                },
-                             }
-                        })
-                     }
-                }).fail(function (msg) {
-                    toastr['error']('Repository not found. Make sure you inserted the right id/url or token.' , 'Error.')
-                });
-            }else{ // github
-                full_name = $("#input-svc-identifier").val()
-
-                url = '{% url "web:get_github_repo" %}?full_name_or_id=' + full_name
-                $.ajax({
-                     url: url,
-                     type: "GET",
-                     headers: {'token': token ? token : undefined},
-                     statusCode: {
-                        200: function(response){
-                            $.ajax({
-                                url: '{% url "api:repositories-list" %}',
-                                type: "POST",
-                                data: response,
-                                dataType: 'json',
-                                statusCode: {
-                                    201: function(){
-                                        toastr['success']('Repository added successfully' , 'Success.')
-                                        table.ajax.reload(null, false)
-                                    },
-                                    409: function(){
-                                        toastr['warning']('Repository already in the db.' , 'Warning.')
-                                    }
+                                    toastr['warning']('Repository already in the db.' , 'Warning.')
                                 }
-                            })
-                        },
-                        401: function(){
-                             toastr['error']('Please, make sure the provided token can access the repository' , 'Bad credentials.')
-                        },
-                        404: function(){
-                             toastr['error']('The repository does not exist or is private' , 'Repository not found.')
-                        },
-                        500: function(){
-                             toastr['error']('Internal server error' , 'Error.')
-                        },
-                     }
-                })
-            }
-
-            // finally, dismiss modal
-            $('#id_modal_add_repository').modal('hide');
+                            }
+                        })
+                    },
+                    401: function(){
+                         toastr['error']('Please, make sure the provided token can access the repository' , 'Bad credentials.')
+                    },
+                    404: function(){
+                         toastr['error']('The repository does not exist or is private' , 'Repository not found.')
+                    },
+                    500: function(){
+                         toastr['error']('Internal server error' , 'Error.')
+                    },
+                 }
+            })
         }
-      });
-   });
+
+        // finally, dismiss modal
+        $('#id_modal_add_repository').modal('hide');
+    }
+  });
+});
 </script>
 
 {% endblock %}

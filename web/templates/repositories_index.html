@@ -91,6 +91,43 @@
 <script src="{% static 'web/js/add-repository.js' %}"> </script>
 
 <script>
+
+    function scoreRepo(repo_id, table, row){
+        // patch repo
+        const url = '{% url "web:repository_score" pk=0 %}'.replace('0', repo_id)
+        $.ajax({
+            url: url,
+            method: 'GET',
+            statusCode: {
+                200: function(response){
+                    var d = table.row(row).data();
+                    console.log(response)
+                    if(!jQuery.isEmptyObject(response)){
+                        d['commit_frequency'] = response.commit_frequency;
+                        d['issue_frequency'] = response.issue_frequency;
+                        d['core_contributors'] = response.core_contributors;
+                        d['percent_comments'] = parseFloat(response.comments_ratio * 100).toFixed(2);
+                        d['percent_iac'] = parseFloat(response.iac_ratio * 100).toFixed(2);
+                        d['sloc'] = response.repository_size;
+                        d['has_ci'] = response.has_ci;
+                        d['has_license'] = response.has_license;
+
+                        table.row(row).data(d).draw()
+                        toastr['success']('Resource updated successfully' , 'Success.')
+                    }
+
+                    $('#score-spinner-'+repo_id).hide()
+                    $('#score-button-'+repo_id).show()
+                },
+                404: function(){
+                     toastr['error']('Resource not found.' , 'Ops.')
+                }
+            }
+        }).fail(function(msg){
+            console.log(msg)
+        })
+    }
+
    // ====================== Populate repositories DataTable ====================== //
    $(document).ready(function() {
       toastr.options = {
@@ -146,7 +183,7 @@
                 },
                 {
                     defaultContent: 'NA',
-                    data: 'uses_continuous_integration',
+                    data: 'has_ci',
                     render: function ( data, type, row ) {
                         if(data && data)
                             return '<span class="fa fa-check" style="color: green;"></span>'
@@ -167,17 +204,34 @@
                 {
                     data: null,
                     render: function ( data, type, row ) {
-                        return '<button class="delete-button btn btn-outline-danger btn-sm" style="float:right;">Delete</button>'
+                        const spinner_score = `<span id="score-spinner-${data.id}" class="mt-2" style="float:right; display:none;"><i class="score-spinner fa fa-spinner fa-pulse" ></i></span>`
+                        const btn_score = `<button id="score-button-${data.id}" class="score-button btn btn-outline-success btn-sm" style="float:right;">Score</button>`
+                        const btn_delete = '<button class="delete-button btn btn-outline-danger btn-sm ml-2" style="float:right;">Delete</button>'
+                        return btn_delete + btn_score + spinner_score
                     }
                 }
             ]
       });
 
+      // SCORE BUTTON
+      $('#table-repositories tbody').on( 'click', 'button.score-button', function () {
+           const data = table.row( $(this).parents('tr') ).data();
+           //row_index = table.row( $(this).parents('tr')).index();
+           //row = table.row($(this).parents('tr'));
+           row = $(this).parents('tr');
+           $('#score-button-'+data.id).hide()
+           $('#score-spinner-'+data.id).show()
+
+           // TODO: call a function to run RepositoryScorer (async). Pass the id to, and when finished update row
+           scoreRepo(data.id, table, row)
+      });
+
+      // DELETE BUTTON
       $('#table-repositories tbody').on( 'click', 'button.delete-button', function () {
 
         var data = table.row( $(this).parents('tr') ).data();
 
-        userWantsToDeleteRow = confirm("Do you really want to delete this repository? All data related to this" +
+        userWantsToDeleteRow = confirm("Do you really want to delete this repository? All data related to this " +
                                        "repository (e.g., fixing-commits) will be erased.");
 
         if(userWantsToDeleteRow){
@@ -296,9 +350,7 @@
       });
    });
 </script>
-<script>
 
-</script>
 {% endblock %}
 
 

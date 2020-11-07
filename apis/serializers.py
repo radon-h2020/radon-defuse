@@ -16,7 +16,16 @@ class RepositorySerializer(serializers.ModelSerializer):
                   'watcher_count',
                   'primary_language',
                   'created_at',
-                  'pushed_at')
+                  'pushed_at',
+                  'indicators')
+                  #'commit_frequency',
+                  #'issue_frequency',
+                  #'core_contributors',
+                  #'comments_ratio',
+                  #'iac_ratio',
+                  #'sloc',
+                  #'has_ci',
+                  #'has_license')
 
 
 class FixingCommitSerializer(serializers.ModelSerializer):

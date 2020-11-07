@@ -105,7 +105,8 @@ class BackendRepositoryMiner:
                                                  environment={
                                                      'GITHUB_ACCESS_TOKEN': os.getenv('GITHUB_ACCESS_TOKEN'),
                                                      'GITLAB_ACCESS_TOKEN': os.getenv('GITLAB_ACCESS_TOKEN')
-                                                 })
+                                                 },
+                                                 auto_remove=True)
 
         result = container.wait()
         container.remove()

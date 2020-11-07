@@ -11,6 +11,7 @@ from apis.models import FixingCommit, FixedFile, MetricsFile, PredictiveModel, R
 from apis.serializers import FixingCommitSerializer, FixedFileSerializer, RepositorySerializer
 from backend.miner import BackendRepositoryMiner
 from backend.predictor import BackendTrainer
+from backend.scorer import BackendScorer
 
 
 @require_GET
@@ -147,6 +148,13 @@ def repository_mine(request, pk):
         return HttpResponse(status=202, content=task_id)
     else:
         return HttpResponse(status=500)
+
+
+@require_GET
+def repository_score(request, pk):
+    repository = get_object_or_404(Repository, pk=pk)
+    indicators = BackendScorer(repository).score()
+    return HttpResponse(json.dumps(indicators), status=200, content_type="application/json")
 
 
 def repository_train_settings(request, pk):

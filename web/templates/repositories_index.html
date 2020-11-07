@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
+
+{% block head %}{% endblock %}
+
 {% block sidebar_header %}
 <h1 class="text-white">RADON</h1>
 <h6 class="text-white">DEFECT PREDICTION </h6>
@@ -19,16 +22,26 @@
 {% block navbar_content %}{% endblock %}
 
 {% block body %}
+
+
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 mt-3 border-bottom">
     <p class="text-uppercase">Repositories</p>
+
     <div class="row" style="float:right;">
         <button id="id_add_repository" class="col btn btn-outline-secondary btn-sm ml-2 mr-2" style="float:right;" data-toggle="modal" data-target="#id_modal_add_repository">
             <span class="fa fa-plus"> </span>
         </button>
+
+        <a class="col btn btn-primary btn-sm mr-2 fa fa-upload" data-toggle="modal" data-target="#modal_import_repositories" style="float:right;"> </a>
         <a class="col btn btn-primary btn-sm mr-3 fa fa-download" href="{% url 'web:repositories_dump' %}"  style="float:right;"> </a>
     </div>
-
 </div>
+
+<!-- Progress Bar -->
+<div id="div-progressbar" class="progress mb-4 mt-4" style="display:none;">
+  <span id="progressbar-upload" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"> </span>
+</div>
+
 <table id="table-repositories" class="display table table-striped table-bordered" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-size: 12px;">
     <thead>
         <tr>
@@ -47,6 +60,31 @@
     <tbody>
     </tbody>
 </table>
+
+
+
+<!-- MODAL: import repository -->
+<div class="modal" id="modal_import_repositories" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <p class="modal-title text-uppercase">Import repositories</p>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input id="file-selector-repositories" type ="file" accept=".json">
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
 <!-- MODAL: add repository -->
 <div class="modal" id="id_modal_add_repository" tabindex="-1" role="dialog">
@@ -85,10 +123,73 @@
     </div>
   </div>
 </div>
+
+
 {% endblock %}
 
 {% block javascript %}
 <script src="{% static 'web/js/add-repository.js' %}"> </script>
+
+<script>
+
+var steps=0
+
+var initializeProgressbar = function(){
+    steps = 0
+    $("#div-progressbar").show()
+    $("#progressbar-upload").attr('aria-valuenow', 0).css('width', '0%');
+}
+
+var uploadProgressbar = function(value){
+    steps += 1
+    value = Math.ceil(value*steps);
+    $("#progressbar-upload").attr('aria-valuenow', value).css('width', value.toString()+'%');
+    if(value == 100){
+        toastr['success']('Repositories imported successfully' , 'Success.')
+        $("#div-progressbar").hide()
+        location.reload()
+    }
+}
+
+
+$('#file-selector-repositories').on('change',  (event) => {
+    var file = document.getElementById('file-selector-repositories').files[0];
+    event.preventDefault()
+    var reader = new FileReader();
+    reader.readAsText(file, "UTF-8");
+    reader.onload = function (evt) {
+
+        $('#modal_import_repositories').modal('toggle');
+
+        let content = evt.target.result.toString()
+        let repos = JSON.parse(content)
+
+        initializeProgressbar()
+        let step_value = parseFloat(100 / repos.length)
+
+        for(repo of repos){
+            $.ajax({
+                 url: '{% url "api:repositories-list" %}',
+                 type: "POST",
+                 data: repo,
+                 dataType: 'json',
+                 statusCode: {
+                    201: function(){
+                        uploadProgressbar(step_value)
+                    },
+                    409: function(){
+                        toastr['warning'](repo.full_name + ' already exists.' , 'Warning.')
+                        uploadProgressbar(step_value)
+                    },
+                 }
+            })
+        }
+
+    }
+});
+
+</script>
+
 
 <script>
 
@@ -124,13 +225,15 @@ function longPollingScoring(taskID, table){
                         }
                     })
 
-                    $('#score-spinner-'+data.id).hide()
-                    $('#score-button-'+data.id).show()
+                    data_id_html = data.id.toString().replaceAll('=','')
+                    $('#score-spinner-'+data_id_html).hide()
+                    $('#score-button-'+data_id_html).show()
                     toastr['success']('End scoring for repository ' + data.full_name, 'Success')
 
                 }else if(response.state == 'error'){
-                    $('#score-spinner-'+data.id).hide()
-                    $('#score-button-'+data.id).show()
+                    data_id_html = data.id.toString().replaceAll('=','')
+                    $('#score-spinner-'+data_id_html).hide()
+                    $('#score-button-'+data_id_html).show()
                     toastr['error']('The server failed to score ' + data.full_name, 'Error')
 
                 }else if(response.state == 'accepted' || response.state == 'running') {
@@ -259,8 +362,9 @@ $(document).ready(function() {
                     const display_spinner = inProgress.includes(data.id) ? 'inline' : 'none'
                     const display_btn_score = inProgress.includes(data.id) ? 'none' : 'inline'
 
-                    const spinner_score = `<span id="score-spinner-${data.id}" class="mt-2" style="float:right; display:${display_spinner};"><i class="score-spinner fa fa-spinner fa-pulse" ></i></span>`
-                    const btn_score = `<button id="score-button-${data.id}" class="score-button btn btn-outline-success btn-sm" style="float:right; display:${display_btn_score};">Score</button>`
+                    data_id_html = data.id.toString().replaceAll('=','')
+                    const spinner_score = `<span id="score-spinner-${data_id_html}" class="mt-2" style="float:right; display:${display_spinner};"><i class="score-spinner fa fa-spinner fa-pulse" ></i></span>`
+                    const btn_score = `<button id="score-button-${data_id_html}" class="score-button btn btn-outline-success btn-sm" style="float:right; display:${display_btn_score};">Score</button>`
                     const btn_delete = '<button class="delete-button btn btn-outline-danger btn-sm ml-2" style="float:right;">Delete</button>'
                     return btn_delete + btn_score + spinner_score
                 }
@@ -272,8 +376,10 @@ $(document).ready(function() {
   $('#table-repositories tbody').on( 'click', 'button.score-button', function () {
        const data = table.row( $(this).parents('tr') ).data();
        row = $(this).parents('tr');
-       $('#score-button-'+data.id).hide()
-       $('#score-spinner-'+data.id).show()
+
+       data_id_html = data.id.toString().replaceAll('=','')
+       $('#score-button-'+data_id_html).hide()
+       $('#score-spinner-'+data_id_html).show()
 
        inProgress.push(data.id)
        scoreRepo(data.id, table, row)

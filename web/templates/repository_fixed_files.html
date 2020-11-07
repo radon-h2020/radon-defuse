@@ -1,0 +1,93 @@
+{% extends "repository_template.html" %}
+
+{% block body %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 border-bottom">
+<p class="text-uppercase">Fixed-files</p>
+<a class="btn btn-primary btn-sm  fa fa-download" href="{% url 'web:repository_dump_fixed_files' repository.id %}"  style="float:right;"> </a>
+</div>
+<small class="mb-4">These are the files involved in the identified fixing-commits.</small>
+
+<table id="table-fixed-files" class="display table table-striped table-bordered" style="font-size: 13px; font-family: Verdana, Geneva, Tahoma, sans-serif;">
+    <thead>
+        <tr>
+            <th><span class="badge badge-pill badge-info">Filepath</span></th>
+            <th><span class="badge badge-pill badge-success">Fixing-commit</span></th>
+            <th><span class="badge badge-pill badge-danger">Bug-inducing commit</span></th>
+            <th><span class="badge badge-pill badge-warning">True positive</span></th>
+        </tr>
+    </thead>
+    <tbody>
+</table>
+{% endblock %}
+
+
+{% block javascript %}
+
+<script>
+$(document).ready(function() {
+
+    toastr.options = {
+        "closeButton": true,
+        "positionClass": "toast-bottom-right",
+        "preventDuplicates": true,
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut",
+        "timeOut": 1000
+    }
+
+    var table = $( "#table-fixed-files" ).DataTable({
+        processing: true,
+        ajax:  {
+            url: '{% url "api:fixed-files-list" %}?repository=' + {{ repository.id }},
+            type: "GET",
+            dataSrc: ''
+        },
+        columns: [
+            {data: 'filepath'},
+            {
+                data: 'fixing_commit',
+                render: function ( data, type, row ) {
+                    return `<a href="{{ repository.url }}/commit/${data}" target="_blank" style="color:black;"> ${data} </a>`
+                }
+            },
+            {
+                data: 'bug_inducing_commit',
+                render: function ( data, type, row ) {
+                    return `<a href="{{ repository.url }}/commit/${data}" target="_blank" style="color:black;"> ${data} </a>`
+                }
+            },
+            {
+                data: 'is_false_positive',
+                render: function ( data, type, row ) {
+                    if(data)
+                        return '<span class="fa fa-times" style="color: red;"></span>'+
+                               '<small class="change-positiveness" style="float:right;cursor: pointer;">change</small>'
+                    else
+                        return '<span class="fa fa-check" style="color: green;"></span>' +
+                               '<small class="change-positiveness" style="float:right;cursor: pointer;">change</small>'
+                }
+            }
+        ]
+    });
+
+    $('#table-fixed-files tbody').on( 'click', 'small.change-positiveness', function () {
+        var data = table.row($(this).parents('tr')).data();
+
+        // patch is_false_positive
+        $.ajax({
+            url: '{% url "api:fixed-files-list" %}' + data.id + '/', // Note the trailing slash. It is mandatory
+            method: 'PATCH',
+            statusCode: {
+                204: function(){
+                    table.ajax.reload(null, false)
+                    toastr['success']('Resource updated successfully' , 'Success.')
+                },
+                404: function(){
+                     toastr['error']('Resource not found.' , 'Ops.')
+                }
+            }
+        })
+    })
+});
+</script>
+{% endblock %}

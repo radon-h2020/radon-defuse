@@ -1,0 +1,160 @@
+{% extends "repository_template.html" %}
+
+{% block head %}
+<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+{% endblock %}
+
+{% block body %}
+
+<div class="col">
+    <ul class="list-group list-group-flush" >
+        <li class="list-group-item">
+            <div class="row">
+                <div class="col">
+                    <h5 class="card-title">Data balancing</h5>
+                </div>
+                <div class="col">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-data-balancing"><i class="fa fa-cogs"></i> Setup </button>
+                        <input id="data-balancing-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="small">
+                    </div>
+                </div>
+            </div>
+        </li>
+        <li class="list-group-item" >
+            <div class="row">
+                <div class="col">
+                    <h5 class="card-title">Feature normalization</h5>
+                </div>
+                <div class="col">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-feature-normalization"><i class="fa fa-cogs"></i> Setup </button>
+                        <input id="feature-normalization-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="small">
+                    </div>
+                </div>
+            </div>
+        </li>
+        <li class="list-group-item" >
+            <div class="row">
+                <div class="col">
+                    <h5 class="card-title">Feature selection</h5>
+                </div>
+                <div class="col">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-feature-selection"><i class="fa fa-cogs"></i> Setup </button>
+                        <input id="feature-selection-checkbox" class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="small">
+                    </div>
+                </div>
+            </div>
+        </li>
+        <li class="list-group-item">
+            <div class="row">
+                <div class="col">
+                    <h5 class="card-title">Classifiers</h5>
+                </div>
+                <div class="col">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-classifiers"><i class="fa fa-cogs"></i> Setup </button>
+                        <input class="pull-right" type="checkbox" checked data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="small">
+                    </div>
+                </div>
+            </div>
+        </li>
+        <li class="list-group-item">
+            <div class="form-group text-center mb-2" >
+              <button id="dropdown-train-language-btn" type="button" class="btn btn-outline-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width: 100%;">
+              &nbsp;Ansible
+              </button>
+              <div class="dropdown-menu" style="width: 100%;">
+                <a id="dropdown-mine-language-item" class="dropdown-item">Tosca</a>
+              </div>
+            </div>
+            <button id="btn-train" type="button" class="btn btn-success btn-xl pull-right mt-4" >Train</button>
+        </li>
+    </ul>
+</div>
+
+{% include 'modal_data_balancing.html' %}
+{% include 'modal_feature_normalization.html' %}
+{% include 'modal_feature_selection.html' %}
+{% include 'modal_classifiers.html' %}
+
+{% endblock %}
+
+{% block javascript %}
+{% load static %}
+<script src="{% static 'web/js/modal-data-balancing.js' %}"> </script>
+<script src="{% static 'web/js/modal-feature-normalization.js' %}"> </script>
+<script src="{% static 'web/js/modal-classifiers.js' %}"> </script>
+
+<script>
+const LANGUAGES = ['ansible', 'tosca']
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+$("#dropdown-train-language-item").click(function(){
+  item = $("#dropdown-train-language-item").text().trim().toLowerCase()
+  index = LANGUAGES.indexOf(item)
+
+  $("#dropdown-train-language-btn").html('&nbsp;' + capitalizeFirstLetter(LANGUAGES[index]))
+  $("#dropdown-train-language-item").html(capitalizeFirstLetter(LANGUAGES[(index+1) % 2]))
+});
+
+$("#btn-train").click(function(){
+
+    balancers = []
+    if($('#rus-checkbox').prop('checked'))
+        balancers.push('rus')
+    if($('#ros-checkbox').prop('checked'))
+        balancers.push('ros')
+
+    normalizers = []
+    if($('#minmax-scaler-checkbox').prop('checked'))
+        normalizers.push('minmax')
+    if($('#std-scaler-checkbox').prop('checked'))
+        normalizers.push('std')
+
+    classifiers = []
+    if($('#dt-classifier-checkbox').prop('checked'))
+        classifiers.push('dt')
+    if($('#lr-classifier-checkbox').prop('checked'))
+        classifiers.push('logit')
+    if($('#nb-classifier-checkbox').prop('checked'))
+        classifiers.push('nb')
+    if($('#rf-classifier-checkbox').prop('checked'))
+        classifiers.push('rf')
+    if($('#svm-classifier-checkbox').prop('checked'))
+        classifiers.push('svm')
+
+    var language = $("#dropdown-train-language-btn").text().trim().toLowerCase()
+
+    payload = JSON.stringify({
+        "language": language,
+        "balancers": balancers,
+        "normalizers": normalizers,
+        "feature_selectors": [],
+        "classifiers": classifiers
+    })
+
+    $.ajax({
+         url: '{% url "web:repository_train_start" pk=repository.id %}',
+         type: "POST",
+         headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+         },
+         data: payload,
+         statusCode: {
+            202: function(){
+                toastr['info']('The training is started. You will get notified when completed... <span><i class="fa fa-spinner fa-pulse"></i></span>', 'Started!')
+            },
+            500: function(){
+                toastr['error']('Some error occurred.' , 'Error.')
+            },
+         }
+    })
+})
+</script>
+{% endblock %}

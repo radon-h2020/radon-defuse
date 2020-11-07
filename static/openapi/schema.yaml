@@ -1,0 +1,576 @@
+openapi: 3.0.2
+info:
+  title: 'Radon Defect Predictor APIs'
+  version: 'v0'
+paths:
+  /api/repositories/:
+    get:
+      operationId: listRepositories
+      description: Retrieve all repositories.
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+              example:
+                - id: MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ
+                  full_name: Juniper/ansible-junos-stdlib
+                  url: https://github.com/Juniper/ansible-junos-stdlib
+                  default_branch: master
+                  description: Junos modules for Ansible
+                  num_issues: 149
+                  num_releases: 27
+                  num_stars: 252
+                  num_watchers: 68
+                  primary_language: python
+          description: 'The list of repositories.'
+      tags:
+      - repositories
+    post:
+      operationId: createRepositories
+      description: Create a repository.
+      parameters:
+        - in: body
+          name: id
+          required: True
+          schema:
+            type: string
+          example: 'MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ=='
+
+      requestBody:
+        $ref: '#/components/requestBodies/RepositoryBody'
+      responses:
+        '201':
+          description: 'The request has been fulfilled, resulting in the creation of a new repository.'
+        '400':
+          description: 'Bad request. One among (id, full_name, url) is missing.'
+        '409':
+          description: 'Conflict. There already exists a fixing-commit with this id.'
+      tags:
+      - repositories
+
+  /api/repositories/{id}/:
+      get:
+        operationId: retrieveRepositories
+        description: Retrieve a repository.
+        parameters:
+          - name: id
+            in: path
+            required: true
+            description: A unique value identifying this repository.
+            schema:
+              type: string
+        responses:
+          '200':
+            content:
+              application/json:
+                schema:
+                  type: object
+                example:
+                  - id: MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ==
+                    full_name: Juniper/ansible-junos-stdlib
+                    url: https://github.com/Juniper/ansible-junos-stdlib
+                    default_branch: master
+                    description: Junos modules for Ansible
+                    num_issues: 149
+                    num_releases: 27
+                    num_stars: 252
+                    num_watchers: 68
+                    primary_language: python
+            description: 'A repository.'
+          '404':
+            description: 'No repository found with this id.'
+        tags:
+          - repositories
+      patch:
+        operationId: partialUpdateRepositories
+        description: Update one or more fields on an existing repository.
+        parameters:
+          - name: id
+            in: path
+            required: true
+            description: A unique value identifying this repositories.
+            schema:
+              type: string
+        requestBody:
+          content:
+            application/json:
+              schema: { }
+            application/x-www-form-urlencoded:
+              schema: { }
+            multipart/form-data:
+              schema: { }
+        responses:
+          '200':
+            content:
+              application/json:
+                schema: { }
+            description: ''
+        tags:
+          - Not implemented
+      delete:
+        operationId: destroyRepositories
+        description: Delete a repository.
+        parameters:
+          - name: id
+            in: path
+            required: true
+            description: A unique value identifying this repository.
+            schema:
+              type: string
+        responses:
+          '204':
+            description: 'The repository has been deleted.'
+          '404':
+            description: 'No repository found with this id.'
+        tags:
+          - repositories
+
+  /api/fixing-commits/:
+    get:
+      operationId: listFixingCommitsViewSets
+      description: Retrieve all the fixing-commits.
+      parameters:
+        - name: repository
+          in: query
+          required: false
+          description: 'The id of the repository the commits belong to'
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  - sha: "d1f923c66126a1af0e2515ffc2643d9c7585e9de"
+                    msg: "fix wrong variable"
+                    date: "22/06/2020 20:39"
+                    is_false_positive: false
+                    repository: "6853087"
+                  - sha: "f9ec5c62381014e6370fafe705dbd70d9391b315"
+                    msg: "fix copy and paste error, in zammad version settings"
+                    date: "20/06/2020 12:27"
+                    is_false_positive: false
+                    repository: "6853087"
+          description: 'The list of all fixing-commits'
+      tags:
+        - fixing-commits
+    post:
+      operationId: createFixingCommitsViewSet
+      description: Create a fixing-commit.
+      parameters:
+        - in: body
+          name: sha
+          required: True
+          schema:
+            type: string
+          example: 'd1f923c66126a1af0e2515ffc2643d9c7585e9de'
+        - in: body
+          name: repository
+          required: True
+          schema:
+            type: string
+          example: '6853087'
+      requestBody:
+        $ref: '#/components/requestBodies/FixingCommitBody'
+      responses:
+        '201':
+          description: 'The request has been fulfilled, resulting in the creation of a new fixing-commit.'
+        '400':
+          description: 'Bad request. One among (id or repository) is missing or the repository id is wrong.'
+        '409':
+          description: 'Conflict. There already exists a fixing-commit with this sha.'
+      tags:
+        - fixing-commits
+
+  /api/fixing-commits/{sha}/:
+    get:
+      operationId: retrieveFixingCommitsViewSet
+      description: Retrieve a fixing-commit.
+      parameters:
+        - name: sha
+          in: path
+          required: true
+          description: The commit hash.
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                sha: "d1f923c66126a1af0e2515ffc2643d9c7585e9de"
+                msg: "fix wrong variable"
+                date: "22/06/2020 20:39"
+                is_false_positive: false
+                repository: "6853087"
+          description: 'The fixing-commit.'
+        '404':
+          description: 'No fixing-commit found with this sha.'
+      tags:
+        - fixing-commits
+    patch:
+      operationId: partialUpdateFixingCommitsViewSet
+      description: 'Set up the is_false_positive field of a fixing-commit. If is_false_positive
+        equals False, then it switches to True, and vice-versa.'
+      parameters:
+        - name: sha
+          in: path
+          required: true
+          description: 'The commit hash.'
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'is_false_positive switched to the complementary boolean value.'
+        '404':
+          description: 'No fixing-commit found with this sha.'
+      tags:
+        - fixing-commits
+    delete:
+      operationId: destroyFixingCommitsViewSet
+      description: Delete a fixing-commit.
+      parameters:
+      - name: sha
+        in: path
+        required: true
+        description: 'The commit hash.'
+        schema:
+          type: string
+      responses:
+        '204':
+          description: 'The fixing-commit has been deleted.'
+        '404':
+          description: 'No fixing-commit found with this sha.'
+      tags:
+        - fixing-commits
+
+  /api/fixed-files/:
+    get:
+      operationId: listFixedFilesViewSets
+      description: Retrieve all the fixed-files.
+      parameters:
+        - name: fixing_commit
+          in: query
+          required: false
+          description: 'The fixing-commit hash. It allows to retrieve all fixed-files for a given fixing-commit'
+          schema:
+            type: string
+        - name: repository
+          in: query
+          required: false
+          description: 'The id of the repository the file belongs to'
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  - id: "61"
+                    filepath: "tasks/main.yml"
+                    is_false_positive: false
+                    bug_inducing_commit: "d1f923c66126a1af0e2515ffc2643d9c7585e9de"
+                    fixing_commit: "f9ec5c62381014e6370fafe705dbd70d9391b315"
+          description: 'The list of fixed-files. If the parameter repository is passed, then it returns the list of fixing-files related to true-positive fixing-commits only'
+        '400':
+          description: 'Bad request. Pass only one parameter among fixing_commit and repository, or none.'
+      tags:
+        - fixed-files
+
+    post:
+      operationId: createFixedFilesViewSet
+      description: Create a fixing-file.
+      parameters:
+        - in: body
+          name: filepath
+          required: True
+          schema:
+            type: string
+          example: 'tasks/main.yml'
+        - in: body
+          name: bug_inducing_commit
+          required: True
+          schema:
+            type: string
+          example: 'd1f923c66126a1af0e2515ffc2643d9c7585e9de'
+        - in: body
+          name: fixing_commit
+          required: True
+          schema:
+            type: string
+          example: 'f9ec5c62381014e6370fafe705dbd70d9391b315'
+      requestBody:
+        $ref: '#/components/requestBodies/FixedFileBody'
+      responses:
+        '201':
+          description: 'The request has been fulfilled, resulting in the creation of a new fixing-file.'
+        '400':
+          description: 'Bad request. One among (filepath, bug_inducing_commit, fixing_commit) is missing or the fixing_commit does not exist.'
+        '409':
+          description: 'Conflict. There already exists a fixing-file with this properties.'
+      tags:
+      - fixed-files
+
+  /api/fixed-files/{id}/:
+    patch:
+      operationId: partialUpdateFixedFilesViewSet
+      description: 'Set up the is_false_positive field of a fixing-file. If is_false_positive
+        equals False, then it switches to True, and vice-versa.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: 'The file auto-generated id.'
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: 'is_false_positive switched to the complementary boolean value.'
+        '404':
+          description: 'No fixing-file found with this id.'
+      tags:
+      - fixed-files
+    delete:
+      operationId: destroyFixedFilesViewSet
+      description: Delete a fixing-file.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: 'The file auto-generated id.'
+        schema:
+          type: string
+      responses:
+        '204':
+          description: 'The fixing-file has been deleted.'
+        '404':
+          description: 'No fixing-file found with this id.'
+      tags:
+      - fixed-files
+
+  /api/tasks/:
+    get:
+      operationId: listTasks
+      description: Retrieve all tasks of a repository.
+      parameters:
+        - name: repository
+          in: query
+          required: true
+          description: A unique value identifying the repository.
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: false
+          description: 'Get only tasks with this state'
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+              example:
+                - id: 1
+                  state: 'running'
+                  name: 'train'
+                  repository: 124612574
+          description: 'The list of repositories.'
+        '400':
+          description: 'Query parameter "repository" is missing.'
+        '404':
+          description: 'Repository not found'
+      tags:
+        - tasks
+
+  /api/tasks/{id}:
+    get:
+      operationId: retrieveRepositories
+      description: Retrieve a repository.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: A unique value identifying this repository.
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                - id: 1
+                  state: 'running'
+                  name: 'train'
+                  repository: 124612574
+          description: 'A task.'
+        '404':
+          description: 'Repository not found'
+      tags:
+        - tasks
+
+
+components:
+  requestBodies:
+    RepositoryBody:
+      description: A JSON object containing repository information
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Repository'
+          example:
+            id: MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ==
+            full_name: jnv/ansible-role-unattended-upgrades
+            url: https://github.com/jnv/ansible-role-unattended-upgrades
+    FixingCommitBody:
+      description: A JSON object containing fixing-commit information
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FixingCommit'
+          example:
+            sha: "d1f923c66126a1af0e2515ffc2643d9c7585e9de"
+            msg: "fix wrong variable"
+            date: "22/06/2020 20:39"
+            repository: "6853087"
+    FixedFileBody:
+      description: A JSON object containing fixing-file information
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FixedFile'
+          example:
+            filepath: "tasks/main.yaml"
+            bug_inducing_commit: "d1f923c66126a1af0e2515ffc2643d9c7585e9de"
+            fixing_commit: "f9ec5c62381014e6370fafe705dbd70d9391b315"
+            is_false_positive: false
+
+  schemas:
+    Repository:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The repository unique identifier
+          example: MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ==
+        full_name:
+          type: string
+          description: The repository full name (owner/repository)
+          example: radon-h2020/radon-defect-prediction-api
+        url:
+          type: string
+          description: The url to the Github repository
+        default_branch:
+          type: string
+          description: 'The repository primary branch default: master'
+          example: master
+        description:
+          type: string
+          description: 'The repository description'
+        others:
+          type: string
+      required:
+        - id
+        - full_name
+        - url
+    FixingCommit:
+      type: object
+      properties:
+        sha:
+          type: string
+          description: The commit sha
+          example: 434669058b54a19b9eed1cc32b12a5834cca1de8
+        msg:
+          type: string
+          description: The message associate to the commit
+          example: "Fixed bug in issue #1"
+        date:
+          type: string
+          description: The commit date
+          example: "06/10/2020 19:30"
+        is_false_positive:
+          type: boolean
+          description: Whether the identified fixing-commit is a false positive
+          default: false
+        repository:
+          type: string
+          description: The id of the repository the commit belong to
+          example: MDEwOlJlcG9zaXRvcnkxNjE4MzAxNQ==
+      required:
+        - sha
+        - repository
+
+    FixedFile:
+      type: object
+      properties:
+        id:
+          type: int
+          description: Auto-increment id
+        filepath:
+          type: string
+          description: The file path within the repository
+          example: "tasks/main.yml"
+        is_false_positive:
+          type: boolean
+          description: Whether the identified fixing-commit is a false positive (i.e., it is not)
+          default: false
+        bug_inducing_commit:
+          type: string
+          description: The hash of the oldest commit (in the commit histort) to induce the bug in this file
+          example: d1f923c66126a1af0e2515ffc2643d9c7585e9de
+        fixing_commit:
+          type: string
+          description: The hash of the fixing-commit
+          example: f9ec5c62381014e6370fafe705dbd70d9391b315
+      required:
+        - filepath
+        - bug_inducing_commit
+        - fixing_commit
+
+    Task:
+      type: object
+      properties:
+        id:
+          type: int
+          description: Auto-increment id
+        state:
+          type: string
+          description: The current task's state. Can be 'pending', 'accepted', 'running', 'completed', 'error'
+          default: 'pending'
+        name:
+          type: string
+          description: A human-readable name describind the task. Can be 'extract-metrics', 'mine-fixing-commits', 'mine-fixed-files', 'mine-failure-prone-files', 'scoring', 'train'
+        repository:
+          type: string
+          description: The repository id the task belongs to
+          example: 'MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ'
+      required:
+        - state
+        - name
+        - repository
+
+
+  parameters:
+    Repository:
+      id: The repository unique identifier
+      type: string
+      example:
+        id: MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ==
+      required:
+        - id
+

@@ -1,0 +1,42 @@
+<div class="modal" id="modal-mine" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+
+      <div class="modal-content">
+        <div class="modal-header">
+          <p class="modal-title text-uppercase">Mining settings</p>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <form method="POST" id="mine-form" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group text-center mb-2" >
+              <button id="dropdown-mine-language-btn" type="button" class="btn btn-outline-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width: 100%;">
+              &nbsp;Ansible
+              </button>
+              <div class="dropdown-menu" style="width: 100%;">
+                <a id="dropdown-mine-language-item" class="dropdown-item">Tosca</a>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Bug-related labels</label><br/>
+              <input id="input-labels" type="text" class="form-control" placeholder="Separate labels by comma (e.g., bug, type: bug, bugfix)">
+              <small  class="form-text text-muted">These are the issue labels that will be used to identify bug-related issues.</small>
+            </div>
+
+            <div class="form-group">
+              <label>Regex</label><br/>
+              <input id="input-regex" type="text" class="form-control" placeholder="e.g., (bug|fix|error|crash|problem|fail|defect|patch)">
+              <small class="form-text text-muted">This is the regular expression that will be used to match fixing-commit messages.</small>
+            </div>
+
+            <button id="btn-mine" type="submit" class="btn btn-primary btn-md btn-block">Mine</button>
+          </form>
+        </div>
+      </div>
+  </div>
+</div>

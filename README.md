@@ -27,16 +27,32 @@ Ultimately, this enables continuous deloyment and accelerates the expected Retur
 
 # How to use
 
+Clone
 ```text
 git clone https://github.com/radon-h2020/radon-defect-prediction-api.git
 ```
 ```text
 cd radon-defect-prediction-api
 ```
+
+Install requirements
+```text
+pip install -r requirements.txt
+```
+
+Create migrations
 ```text
 python manage.py makemigrations apis
 python manage.py migrate apis
 ```
+
+Export Github and Gitlab access tokens to mine repositories
+```
+export GITHUB_ACCESS_TOKEN=*************************
+export GITLAB_ACCESS_TOKEN=***************
+```
+
+Run server
 ```text
 python manage.py runserver
 ```
@@ -44,7 +60,7 @@ python manage.py runserver
 Open your browser and go to `http://127.0.0.1:8000/web/repositories/` to start using the web-app.
 
 
-**Note:** a MongoDB must be installed. A db called `iac_miner` will be created automatically.
+**Note:** a MongoDB must be installed. A db called `testing_iac_miner` will be created automatically.
 
 **A DETAILED DOCUMENTATION WILL BE AVAILABLE SOON**
 

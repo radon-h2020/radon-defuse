@@ -178,7 +178,13 @@ $('#file-selector-repositories').on('change',  (event) => {
                         uploadProgressbar(step_value)
                     },
                     409: function(){
+                        console.log('Conflict: ' + repo.full_name)
                         toastr['warning'](repo.full_name + ' already exists.' , 'Warning.')
+                        uploadProgressbar(step_value)
+                    },
+                    400: function(){
+                        console.log('Bad request: ' + repo.full_name)
+                        toastr['error']('For ' + repo.full_name, 'Bad request.')
                         uploadProgressbar(step_value)
                     },
                  }
@@ -225,15 +231,13 @@ function longPollingScoring(taskID, table){
                         }
                     })
 
-                    data_id_html = data.id.toString().replaceAll('=','')
-                    $('#score-spinner-'+data_id_html).hide()
-                    $('#score-button-'+data_id_html).show()
+                    //$('#score-spinner-'+data.id).hide()
+                    //$('#score-button-'+data.id).show()
                     toastr['success']('End scoring for repository ' + data.full_name, 'Success')
 
                 }else if(response.state == 'error'){
-                    data_id_html = data.id.toString().replaceAll('=','')
-                    $('#score-spinner-'+data_id_html).hide()
-                    $('#score-button-'+data_id_html).show()
+                    $('#score-spinner-'+data.id).hide()
+                    $('#score-button-'+data.id).show()
                     toastr['error']('The server failed to score ' + data.full_name, 'Error')
 
                 }else if(response.state == 'accepted' || response.state == 'running') {
@@ -299,6 +303,15 @@ $(document).ready(function() {
                return json;
             }
         },
+        fnRowCallback: function(row, data, iDisplayIndex, iDisplayIndexFull) {
+          if(data.indicators.commit_frequency>=2 && data.indicators.issue_frequency>=0.023 && data.indicators.core_contributors>=2
+             && data.indicators.comments_ratio >= 0.002 && data.indicators.iac_ratio >= 0.11 && data.indicators.repository_size >= 190
+             && data.indicators.has_ci && data.indicators.has_license){
+            $('td', row).css('background-color', '#e6ffcc');
+          }else{
+            $('td', row).css('background-color', '#ffcccc');
+          }
+        },
         columns: [
             {
               data: null,
@@ -362,9 +375,8 @@ $(document).ready(function() {
                     const display_spinner = inProgress.includes(data.id) ? 'inline' : 'none'
                     const display_btn_score = inProgress.includes(data.id) ? 'none' : 'inline'
 
-                    data_id_html = data.id.toString().replaceAll('=','')
-                    const spinner_score = `<span id="score-spinner-${data_id_html}" class="mt-2" style="float:right; display:${display_spinner};"><i class="score-spinner fa fa-spinner fa-pulse" ></i></span>`
-                    const btn_score = `<button id="score-button-${data_id_html}" class="score-button btn btn-outline-success btn-sm" style="float:right; display:${display_btn_score};">Score</button>`
+                    const spinner_score = `<span id="score-spinner-${data.id}" class="mt-2" style="float:right; display:${display_spinner};"><i class="score-spinner fa fa-spinner fa-pulse" ></i></span>`
+                    const btn_score = `<button id="score-button-${data.id}" class="score-button btn btn-outline-success btn-sm" style="float:right; display:${display_btn_score};">Score</button>`
                     const btn_delete = '<button class="delete-button btn btn-outline-danger btn-sm ml-2" style="float:right;">Delete</button>'
                     return btn_delete + btn_score + spinner_score
                 }
@@ -377,9 +389,8 @@ $(document).ready(function() {
        const data = table.row( $(this).parents('tr') ).data();
        row = $(this).parents('tr');
 
-       data_id_html = data.id.toString().replaceAll('=','')
-       $('#score-button-'+data_id_html).hide()
-       $('#score-spinner-'+data_id_html).show()
+       $('#score-button-'+data.id).hide()
+       $('#score-spinner-'+data.id).show()
 
        inProgress.push(data.id)
        scoreRepo(data.id, table, row)

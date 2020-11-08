@@ -30,7 +30,10 @@ class BackendScorer:
         task.save()
 
         docker_client = docker.from_env()
+        container_name = f'{self.repository.full_name}-scorer'
+        container_name = container_name.replace('/', '_')
         container = docker_client.containers.run(image='radonconsortium/repo-scorer:latest',
+                                                 name=container_name,
                                                  command=f'{host} {self.repository.full_name} /tmp/',
                                                  detach=True,
                                                  environment={

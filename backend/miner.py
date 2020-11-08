@@ -96,9 +96,11 @@ class BackendRepositoryMiner:
             self.EXCLUDED_COMMITS_FILENAME,
             self.INCLUDED_COMMITS_FILENAME,
             self.EXCLUDED_FILES_FILENAME)
-        
+
         docker_client = docker.from_env()
+        container_name = self.repository.full_name.replace('/', '_') + '-miner'
         container = docker_client.containers.run(image='radonconsortium/repo-miner:latest',
+                                                 name=container_name,
                                                  command=command,
                                                  detach=True,
                                                  volumes=volumes,
@@ -111,10 +113,11 @@ class BackendRepositoryMiner:
         container.remove()
 
         # For debug
-        print(result)
+        print(self.repository.full_name, result)
 
         if result['StatusCode'] != 0:
             task.state = Task.ERROR
+            task.save()
         else:
             with open(os.path.join(path_to_task, self.FIXING_COMMITS_FILENAME)) as f:
                 fixing_commits = json.load(f)
@@ -135,7 +138,7 @@ class BackendRepositoryMiner:
                 fixed_files = json.load(f)
 
                 # Remove existing true positives (they might be replaced by new files given new fixing-commits)
-                existing_files = FixedFile.objects.all()
+                existing_files = FixedFile.objects.filter(fixing_commit__repository=self.repository)
                 for file in existing_files:
                     if not file.is_false_positive:
                         file.delete()
@@ -149,7 +152,7 @@ class BackendRepositoryMiner:
                                                     defaults=dict(
                                                          bug_inducing_commit=file['bic'],
                                                          is_false_positive=False,
-                                                     ))
+                                                    ))
 
             # delete all labeled files and re-label
             labeled_files = FailureProneFile.objects.filter(fixing_commit__repository=self.repository)
@@ -167,8 +170,8 @@ class BackendRepositoryMiner:
                                                            commit=file['commit'],
                                                            fixing_commit=fixing_commit)
 
-        task.state = Task.COMPLETED
-        task.save()
+            task.state = Task.COMPLETED
+            task.save()
 
         try:
             shutil.rmtree(path_to_task)

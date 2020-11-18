@@ -17,5 +17,6 @@ urlpatterns = [
     path('repositories/<str:pk>/mine/', views.repository_mine, name='repository_mine'),
     path('repositories/<str:pk>/score/', views.repository_score, name='repository_score'),
     path('repositories/<str:pk>/train/', views.repository_train_settings, name='repository_train_settings'),
+    path('repositories/<str:pk>/extract-metrics/', views.repository_extract_metrics, name='repository_extract_metrics'),
     path('repositories/<str:pk>/start-train/', views.repository_train_start, name='repository_train_start')
 ]

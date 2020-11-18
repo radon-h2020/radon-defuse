@@ -71,6 +71,7 @@
               </div>
             </div>
             <button id="btn-train" type="button" class="btn btn-success btn-xl pull-right mt-4" >Train</button>
+            <button id="btn-extract-metrics" type="button" class="btn btn-warning btn-xl pull-right mt-4 mr-2" >Extract metrics only</button>
         </li>
     </ul>
 </div>
@@ -102,6 +103,33 @@ $("#dropdown-train-language-item").click(function(){
   $("#dropdown-train-language-btn").html('&nbsp;' + capitalizeFirstLetter(LANGUAGES[index]))
   $("#dropdown-train-language-item").html(capitalizeFirstLetter(LANGUAGES[(index+1) % 2]))
 });
+
+
+$("#btn-extract-metrics").click(function(){
+
+    var language = $("#dropdown-train-language-btn").text().trim().toLowerCase()
+
+    payload = JSON.stringify({
+        "language": language
+    })
+
+    $.ajax({
+         url: '{% url "web:repository_extract_metrics" pk=repository.id %}',
+         type: "POST",
+         headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+         },
+         data: payload,
+         statusCode: {
+            202: function(){
+                toastr['info']('The extraction is started. You will get notified when completed... <span><i class="fa fa-spinner fa-pulse"></i></span>', 'Started!')
+            },
+            500: function(){
+                toastr['error']('Some error occurred.' , 'Error.')
+            },
+         }
+    })
+})
 
 $("#btn-train").click(function(){
 

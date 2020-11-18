@@ -10,6 +10,7 @@ from github import Github, GithubException
 from apis.models import FixingCommit, FixedFile, MetricsFile, PredictiveModel, Repository, Task
 from apis.serializers import FixingCommitSerializer, FixedFileSerializer, RepositorySerializer
 from backend.miner import BackendRepositoryMiner
+from backend.metrics import BackendMetrics
 from backend.predictor import BackendTrainer
 from backend.scorer import BackendScorer
 
@@ -76,7 +77,7 @@ def repository_dump_fixed_files(request, pk: str):
 def repository_dump_metrics(request, pk: str):
     repository = get_object_or_404(Repository, pk=pk)
     metrics = get_object_or_404(MetricsFile, repository=repository, language='ansible')
-    df = pd.read_csv(io.BytesIO(metrics.file))
+    df = pd.read_csv(io.StringIO(metrics.file))
 
     filename = f'{repository.full_name}_ansible_metrics.csv'
     response = HttpResponse(content_type='text/csv')
@@ -178,6 +179,17 @@ def repository_train_start(request, pk):
         balancers=body.get('balancers'),
         normalizers=body.get('normalizers'),
         selectors=body.get('selectors')).train()
+
+    if task_state == Task.ACCEPTED or task_state == Task.RUNNING:
+        return HttpResponse(status=202, content=task_id)
+    else:
+        return HttpResponse(status=500)
+
+
+def repository_extract_metrics(request, pk):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    task_id, task_state = BackendMetrics(repo_id=pk, language=body.get('language')).extract()
 
     if task_state == Task.ACCEPTED or task_state == Task.RUNNING:
         return HttpResponse(status=202, content=task_id)

@@ -135,7 +135,7 @@ class FixingCommitsViewSet(viewsets.ViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# ===================================== FIXING FILES ===============================================================#
+# ===================================== FIXED FILES ===============================================================#
 
 class FixedFilesViewSet(viewsets.ViewSet):
     """
@@ -149,7 +149,7 @@ class FixedFilesViewSet(viewsets.ViewSet):
     create:
     Create a fixing-file.
 
-    partial_update: Set up the is_false_positive field of a fixing-file. If is_false_positive equals False,
+    partial_update: Set up the is_false_positive field of a fixed-file. If is_false_positive equals False,
     then it switches to True, and vice-versa.
 
     destroy:

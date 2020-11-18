@@ -72,7 +72,10 @@ class BackendTrainer:
                                                                                  self.FAILURE_PRONE_FILES_FILENAME,
                                                                                  self.language)
         docker_client = docker.from_env()
+        container_name = f'{self.repository.full_name}-metrics-extractor'
+        container_name = container_name.replace('/', '_')
         container = docker_client.containers.run(image='radonconsortium/repo-miner:latest',
+                                                 name=container_name,
                                                  command=command,
                                                  detach=True,
                                                  volumes=volumes,

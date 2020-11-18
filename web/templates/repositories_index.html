@@ -124,7 +124,6 @@
   </div>
 </div>
 
-
 {% endblock %}
 
 {% block javascript %}
@@ -308,6 +307,10 @@ $(document).ready(function() {
              && data.indicators.comments_ratio >= 0.002 && data.indicators.iac_ratio >= 0.11 && data.indicators.repository_size >= 190
              && data.indicators.has_ci && data.indicators.has_license){
             $('td', row).css('background-color', '#e6ffcc');
+          }else if(data.indicators.commit_frequency>=2 && (data.indicators.issue_frequency==0 || data.indicators.issue_frequency>=0.023) && data.indicators.core_contributors>=2
+             && data.indicators.comments_ratio >= 0.002 && data.indicators.iac_ratio >= 0.11 && data.indicators.repository_size >= 190
+             && (data.indicators.has_ci || data.indicators.has_license)){
+            $('td', row).css('background-color', '#ffe6cc');
           }else{
             $('td', row).css('background-color', '#ffcccc');
           }
@@ -352,7 +355,7 @@ $(document).ready(function() {
                 defaultContent: 'NA',
                 data: 'indicators.has_ci',
                 render: function ( data, type, row ) {
-                    if(data && data)
+                    if(data)
                         return '<span class="fa fa-check" style="color: green;"></span>'
                     else
                         return '<span class="fa fa-times" style="color: red;"></span>'
@@ -362,7 +365,7 @@ $(document).ready(function() {
                 defaultContent: 'NA',
                 data: 'indicators.has_license',
                 render: function ( data, type, row ) {
-                    if(data && data)
+                    if(data)
                         return '<span class="fa fa-check" style="color: green;"></span>'
                     else
                         return '<span class="fa fa-times" style="color: red;"></span>'
@@ -377,7 +380,8 @@ $(document).ready(function() {
 
                     const spinner_score = `<span id="score-spinner-${data.id}" class="mt-2" style="float:right; display:${display_spinner};"><i class="score-spinner fa fa-spinner fa-pulse" ></i></span>`
                     const btn_score = `<button id="score-button-${data.id}" class="score-button btn btn-outline-success btn-sm" style="float:right; display:${display_btn_score};">Score</button>`
-                    const btn_delete = '<button class="delete-button btn btn-outline-danger btn-sm ml-2" style="float:right;">Delete</button>'
+                    //const btn_delete = '<button class="delete-button btn btn-outline-danger btn-sm ml-2" style="float:right;">Delete</button>'
+                    const btn_delete = `<button class="delete-button btn btn-outline-danger btn-sm ml-2" data-toggle="modal" data-target="#confirm-delete-modal" data-id="${data.id}" style="float:right;">Delete</button>`
                     return btn_delete + btn_score + spinner_score
                 }
             }
@@ -401,7 +405,9 @@ $(document).ready(function() {
 
     var data = table.row( $(this).parents('tr') ).data();
 
-    userWantsToDeleteRow = confirm("Do you really want to delete this repository? All data related to this " +
+
+
+    userWantsToDeleteRow = confirm("Do you really want to delete " + data.full_name + "? All data related to this " +
                                    "repository (e.g., fixing-commits) will be erased.");
 
     if(userWantsToDeleteRow){
@@ -421,6 +427,7 @@ $(document).ready(function() {
                     toastr['success']('Repository deleted successfully' , 'Success.')
                 },
                 404: function(){
+                    table.ajax.reload(null, false)
                     toastr['warning']('Repository not found.' , 'Warning.')
                 },
             }

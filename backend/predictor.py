@@ -88,7 +88,7 @@ class BackendTrainer:
         container.remove()
 
         # For debug
-        print(result)
+        print(self.repository.full_name, result)
 
         if result['StatusCode'] != 0:
             task.state = Task.ERROR

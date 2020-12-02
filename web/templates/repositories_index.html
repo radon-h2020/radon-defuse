@@ -303,12 +303,12 @@ $(document).ready(function() {
             }
         },
         fnRowCallback: function(row, data, iDisplayIndex, iDisplayIndexFull) {
-          if(data.indicators.commit_frequency>=2 && data.indicators.issue_frequency>=0.023 && data.indicators.core_contributors>=2
-             && data.indicators.comments_ratio >= 0.002 && data.indicators.iac_ratio >= 0.11 && data.indicators.repository_size >= 190
+          if(data.indicators.commit_frequency>=2 && data.indicators.issue_frequency>=0.01 && data.indicators.core_contributors>=2
+             && data.indicators.comments_ratio >= 0.001 && data.indicators.iac_ratio >= 0.1 && data.indicators.repository_size >= 100
              && data.indicators.has_ci && data.indicators.has_license){
             $('td', row).css('background-color', '#e6ffcc');
-          }else if(data.indicators.commit_frequency>=2 && (data.indicators.issue_frequency==0 || data.indicators.issue_frequency>=0.023) && data.indicators.core_contributors>=2
-             && data.indicators.comments_ratio >= 0.002 && data.indicators.iac_ratio >= 0.11 && data.indicators.repository_size >= 190
+          }else if(data.indicators.commit_frequency>=2 && (data.indicators.issue_frequency==0 || data.indicators.issue_frequency>=0.01) && data.indicators.core_contributors>=2
+             && data.indicators.comments_ratio >= 0.001 && data.indicators.iac_ratio >= 0.1 && data.indicators.repository_size >= 100
              && (data.indicators.has_ci || data.indicators.has_license)){
             $('td', row).css('background-color', '#ffe6cc');
           }else{

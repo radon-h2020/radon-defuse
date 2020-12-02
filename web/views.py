@@ -79,7 +79,7 @@ def repository_dump_metrics(request, pk: str):
     metrics = get_object_or_404(MetricsFile, repository=repository, language='ansible')
     df = pd.read_csv(io.StringIO(metrics.file))
 
-    filename = f'{repository.full_name}_ansible_metrics.csv'
+    filename = f'{repository.full_name.replace("/", "__")}__ansible_metrics.csv'
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=' + filename
     df.to_csv(path_or_buf=response, index=False)

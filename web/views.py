@@ -2,17 +2,118 @@ import io
 import json
 import pandas as pd
 
+from datetime import datetime
+
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.views.decorators.http import require_GET, require_POST
+
 from github import Github, GithubException
 
 from apis.models import FixingCommit, FixedFile, MetricsFile, PredictiveModel, Repository, Task
 from apis.serializers import FixingCommitSerializer, FixedFileSerializer, RepositorySerializer
+from backend.crawler import BackendRepositoriesCollector
 from backend.miner import BackendRepositoryMiner
 from backend.metrics import BackendMetrics
 from backend.predictor import BackendTrainer
 from backend.scorer import BackendScorer
+from web.forms import CrawlerSettingsForm
+
+
+def __tmp_crawl(settings: dict):
+    yield """
+        <html>
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+            <body class="bg-dark">
+                <div class="py-5 text-center bg-dark text-white">
+                    <h2>Mining report</h2>
+                    <p class="lead font-weight-bold">Attention! Do not close this page while the analysis is running!</p>
+                    <p class="lead font-weight-light">Mining started at: {0}</p>
+                </div>
+                <table class="table table-striped table-dark">
+                    <thead>
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">Repository</th>
+                          <th scope="col"><span class="badge badge-pill badge-danger">Issues</span></th>
+                          <th scope="col"><span class="badge badge-pill badge-success">Releases</span></th>
+                          <th scope="col"><span class="badge badge-pill badge-warning">Stars</span></th>
+                          <th scope="col"><span class="badge badge-pill badge-info">Watchers</span></th>
+                          <th scope="col"><span class="badge badge-pill badge-secondary">Primary language</span></th>
+                          <th scope="col"><span class="badge badge-pill badge-light">Last push</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        """.format(datetime.now().today())
+
+    i = 0
+
+    last_date_from = ''
+    crawler = BackendRepositoriesCollector(settings)
+    for crawl_data in crawler.crawl():
+        if str(crawl_data['search_since']) > str(last_date_from):
+            last_date_from = crawl_data['search_since']
+            yield """
+                    <tr><td colspan="8" style='text-align:center;vertical-align:middle'>
+                        Search interval: {0} - {1} <br> 
+                        Quota: {2} - Reset at {3}
+                    </td></tr>
+                """.format(crawl_data['search_since'],
+                           crawl_data['search_until'],
+                           crawl_data['quota'],
+                           crawl_data['quota_reset_at'])
+
+        i += 1
+
+        repo = crawl_data['repository']
+
+        yield """
+                    <tr>
+                      <th scope="row">{0}</th>
+                      <td><a href="{1}" target="_blank">{2}/{3}</a></td>
+                      <td>{4}</td>
+                      <td>{5}</td>
+                      <td>{6}</td>
+                      <td>{7}</td>
+                      <td>{8}</td>
+                      <td>{9}</td>
+                    </tr>
+                """.format(
+            i,
+            repo['url'],
+            repo['owner'],
+            repo['name'],
+            repo['issues'],
+            repo['releases'],
+            repo['stars'],
+            repo['watchers'],
+            repo['primary_language'],
+            repo['pushed_at']
+        )
+
+    yield """</tbody>
+                </table>
+
+                <div class="py-5 text-center bg-dark text-white">
+                    <p class="lead font-weight-light">Mining completed at: {0}</p>
+                </div>
+            </body>
+            <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+            </html>""".format(datetime.now().today())
+
+
+def crawler_settings(request):
+    form = CrawlerSettingsForm(request.GET)
+
+    if request.method == 'POST':
+        form = CrawlerSettingsForm(request.POST)
+        if form.is_valid():
+            return StreamingHttpResponse(__tmp_crawl(form.cleaned_data))
+
+    return render(request, 'crawler_settings.html', {'form': form})
 
 
 @require_GET

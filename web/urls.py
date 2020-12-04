@@ -4,6 +4,9 @@ from . import views
 
 
 urlpatterns = [
+    path('', TemplateView.as_view(template_name='main.html'), name='main'),
+    path('crawler/', views.crawler_settings, name='repositories_crawler'),
+    #path('crawler/', TemplateView.as_view(template_name='crawler_settings.html'), name='repositories_crawler'),
     path('repositories/get-github-repo/', views.get_github_repository, name='get_github_repo'),
     path('repositories/', TemplateView.as_view(template_name='repositories_index.html'), name='repositories_index'),
     path('repositories/dump/', views.repositories_dump, name='repositories_dump'),

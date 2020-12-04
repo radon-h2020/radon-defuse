@@ -8,6 +8,7 @@ pydriller~=1.15.3
 pygithub~=1.53
 python-gitlab~=2.5.0
 pyyaml~=5.3.1
+repositories-collector~=0.0.3
 radon-defect-predictor~=0.2.3
 requests~=2.25.0
 uritemplate~=3.0.1

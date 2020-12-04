@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Github IaC Repositories Collector
+{% endblock %}
+
+{% block head %}
+<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+{% endblock %}
+
+
+{% block body %}
+
+
+<div class="container">
+    <div class="py-5 text-center">
+        <img class="d-block mx-auto mb-2" src="{% static "img/repocollector.png" %}" alt="" width="100" height="100">
+        <h2>Github IaC Repositories Collector</h2>
+        <p class="lead text-muted">Start mining Github!</p>
+    </div>
+
+    <form class="needs-validation" method="POST" target="_blank">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col">
+                <label>From</label>
+                {{ form.input_date_from }}
+                <small class="form-text text-muted">Collect repositories created after this date</small>
+            </div>
+            <div class="col">
+                <label>To</label>
+                {{ form.input_date_to }}
+                <small class="form-text text-muted">Collect repositories created up to this date</small>
+            </div>
+            <div class="col">
+                <label>Pushed after</label>
+                {{ form.input_pushed_after }}
+                <small class="form-text text-muted">Collect repositories pushed after this date</small>
+            </div>
+            <div class="col">
+                <label>Time interval</label>
+                {{ form.input_timedelta }}
+                <small class="form-text text-muted">Scan Github at this time interval
+                    <i class="fa fa-info-circle" data-toggle="tooltip" title="GraphQL returns a limited number of repositories between two dates.  To search for as many repositories as possible select a small interval. Note: a small interval also means a longer mining time."></i>
+                </small>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col">
+                <label>Issues</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" style="background-color:white;"> <i class="fa fa-exclamation-circle"></i></span>
+                    </div>
+                    {{ form.input_issues }}
+                </div>
+                <small class="form-text text-muted">Minimum number of issues</small>
+            </div>
+            <div class="col">
+                <label>Releases</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" style="background-color:white;"> <i class="fa fa-tag"></i></span>
+                    </div>
+                    {{ form.input_releases }}
+                </div>
+                <small class="form-text text-muted">Minimum number of releases</small>
+            </div>
+            <div class="col">
+                <label>Stars</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" style="background-color:white;"> <i class="fa fa-star"></i></span>
+                    </div>
+                    {{ form.input_stars }}
+                </div>
+                <small class="form-text text-muted">Minimum number of stars</small>
+            </div>
+            <div class="col">
+                <label>Watchers</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" style="background-color:white;"> <i class="fa fa-eye"></i></span>
+                    </div>
+                    {{ form.input_watchers }}
+                </div>
+                <small class="form-text text-muted">Minimum number of watchers</small>
+            </div>
+        </div>
+        <div class=" mt-4 text-center" align="center">
+        {{ form.input_language }}
+        </div>
+
+
+        <hr class="mb-4">
+        <button class="btn btn-primary btn-lg btn-block" type="submit">Start</button>
+    </form>
+
+    <footer class="my-5 pt-5 text-muted text-center text-small">
+        <p class="mb-1">&copy; 2020 RADON-H2020</p>
+        <ul class="list-inline">
+            <li class="list-inline-item"><a href="#">About</a></li>
+            <li class="list-inline-item"><a href="#">Support</a></li>
+        </ul>
+    </footer>
+</div>
+
+{% endblock %}

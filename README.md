@@ -63,36 +63,3 @@ Open your browser and go to `http://127.0.0.1:8000/web/repositories/` to start u
 **Note:** a MongoDB must be installed. A db called `testing_iac_miner` will be created automatically.
 
 **A DETAILED DOCUMENTATION WILL BE AVAILABLE SOON**
-
-
----
-
-## How to build and run (OLD VERSION)
- 
-Installation is made simple by the Docker technology.
-Clone the repository and run the following command within the project folder:
-
-```
-docker build -t radon-dp:latest .
-```
-
-then run it with
-
-```
-docker run -p 5000:5000 radon-dp:latest
-```
-
-
-## How to use
-
-You can test the **/classify** API as follows:
-
-```
-curl -X POST "http://localhost:5000/api/classification/classify" -H  "accept: */*" -H  "Content-Type: plain/text" -d "- host: all"
-```
-
-## Related tools
-
-* AnsibleMetrics: [AnsibleMetrics](https://radon-h2020.github.io/radon-ansible-metrics/) is a tool to quantify the characteristic of infrastructure code used by the defect predictor to extract metrics from an Ansible blueprint and use them for the detection of defects.
-
-* Visual Studio Extension: available on the VSC Marketplace at this [link](https://marketplace.visualstudio.com/items?itemName=sdallapalma.radon-defect-predictor).

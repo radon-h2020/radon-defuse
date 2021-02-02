@@ -7,18 +7,12 @@
     <div class="card mb-4 box-shadow shadow p-3 mb-5 bg-white rounded">
       <div class="card-body">
         <h1 class="card-title pricing-card-title"><small class="text-muted">Mine repository</small></h1>
-        <ul class="list-unstyled">
-          <li>...</li>
-        </ul>
         <button class="btn btn-lg btn-block btn-outline-primary" data-toggle="modal" data-target="#modal-mine">Mine</button>
       </div>
     </div>
     <div class="card mb-4 box-shadow  shadow p-3 mb-5 bg-white rounded">
       <div class="card-body">
         <h1 class="card-title pricing-card-title"><small class="text-muted"> Train a model </small></h1>
-        <ul class="list-unstyled">
-          <li> ... </li>
-        </ul>
         <a class="btn btn-lg btn-block btn-outline-primary" href="{% url 'web:repository_train_settings' repository.id %}" role="button">Train</a>
       </div>
     </div>

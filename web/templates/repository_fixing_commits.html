@@ -12,6 +12,7 @@
         <tr>
             <th><span class="badge badge-pill badge-success">Sha</span></th>
             <th><span class="badge badge-pill badge-info">Description</span></th>
+            <th><span class="badge badge-pill badge-info">Labels</span></th>
             <th><span class="badge badge-pill badge-warning">True Positive</span></th>
         </tr>
     </thead>
@@ -46,10 +47,20 @@ $(document).ready(function() {
             {
                 data: 'sha',
                 render: function ( data, type, row ) {
-                    return `<a href="{{ repository.url }}/commit/${data}" target="_blank" style="color:black;"> ${data} </a>`
+                    return `<a href="{{ repository.url }}/commit/${data}" target="_blank" style="color:black;"> ${data.substring(0,6)} </a>`
                 }
             },
             {data: 'msg'},
+            {
+                data: 'labels',
+                render: function ( data, type, row ) {
+                    let labels = ""
+                    for(let i=0; i<JSON.parse(data).length; i++){
+                        labels += JSON.parse(data)[i]['label'] + ";\n"
+                    }
+                    return labels
+                }
+            },
             {
                 data: 'is_false_positive',
                 render: function ( data, type, row ) {

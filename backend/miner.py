@@ -10,7 +10,6 @@ from apis.models import FailureProneFile, FixingCommit, FixedFile, Repository, T
 
 
 class BackendRepositoryMiner:
-
     EXCLUDED_COMMITS_FILENAME = 'excluded_commits.json'
     INCLUDED_COMMITS_FILENAME = 'included_commits.json'
     EXCLUDED_FILES_FILENAME = 'excluded_files.json'
@@ -19,11 +18,9 @@ class BackendRepositoryMiner:
     FIXED_FILES_FILENAME = 'fixed-files.json'
     FAILURE_PRONE_FILES_FILENAME = 'failure-prone-files.json'
 
-    def __init__(self, repo_id: str, language: str, labels: list = None, regex: str = None):
+    def __init__(self, repo_id: str, language: str):
         """
         :param repo_id:
-        :param labels:
-        :param regex:
         """
 
         if language not in ('ansible', 'tosca'):
@@ -31,8 +28,6 @@ class BackendRepositoryMiner:
 
         self.repository = Repository.objects.get(pk=repo_id)
         self.language = language
-        self.labels = labels if labels else None
-        self.regex = regex if regex else None
 
     def mine(self):
 
@@ -75,7 +70,6 @@ class BackendRepositoryMiner:
         except Exception as e:
             print(e)
 
-
         volumes = {
             path_to_task: {
                 'bind': '/app',
@@ -99,7 +93,7 @@ class BackendRepositoryMiner:
 
         docker_client = docker.from_env()
         container_name = self.repository.full_name.replace('/', '_') + '-miner'
-        container = docker_client.containers.run(image='radonconsortium/repo-miner:latest',
+        container = docker_client.containers.run(image='radonconsortium/repo-miner:0.9.0',
                                                  name=container_name,
                                                  command=command,
                                                  detach=True,
@@ -124,13 +118,15 @@ class BackendRepositoryMiner:
 
                 # Save fixing-commits
                 for commit in RepositoryMining(path_to_repo=self.repository.url,
-                                               only_commits=fixing_commits,
+                                               only_commits=fixing_commits.keys(),
                                                order='reverse').traverse_commits():
+
                     FixingCommit.objects.get_or_create(sha=commit.hash,
                                                        defaults=dict(
                                                            msg=commit.msg,
                                                            date=commit.committer_date.strftime("%d/%m/%Y %H:%M"),
                                                            is_false_positive=False,
+                                                           labels=[{'label': label} for label in fixing_commits[commit.hash]],
                                                            repository=self.repository
                                                        ))
 
@@ -150,8 +146,8 @@ class BackendRepositoryMiner:
                     FixedFile.objects.get_or_create(filepath=file['filepath'],
                                                     fixing_commit=fixing_commit,
                                                     defaults=dict(
-                                                         bug_inducing_commit=file['bic'],
-                                                         is_false_positive=False,
+                                                        bug_inducing_commit=file['bic'],
+                                                        is_false_positive=False,
                                                     ))
 
             # delete all labeled files and re-label

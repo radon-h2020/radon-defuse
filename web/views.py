@@ -240,11 +240,7 @@ def repository_fixed_files(request, pk):
 def repository_mine(request, pk):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
-    task_id, task_state = BackendRepositoryMiner(
-        repo_id=pk,
-        language=body.get('language'),
-        labels=body.get('labels'),
-        regex=body.get('regex')).mine()
+    task_id, task_state = BackendRepositoryMiner(repo_id=pk, language=body.get('language')).mine()
 
     if task_state == Task.ACCEPTED or task_state == Task.RUNNING:
         return HttpResponse(status=202, content=task_id)

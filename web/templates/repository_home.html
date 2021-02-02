@@ -94,18 +94,7 @@ $(document).ready(function(){
   $("#mine-form").on('submit', function(event){
     event.preventDefault();
 
-    var labels = undefined
-    if($("#input-labels").val()){
-      labels = $("#input-labels").val().split(',')
-    }
-
     var language = $("#dropdown-mine-language-btn").text().trim().toLowerCase()
-
-    payload = JSON.stringify({
-      'language': language,
-      'labels': labels,
-      'regex': $("#input-regex").val(),
-    })
 
     // Call { url repository_mine }
     $.ajax({
@@ -114,7 +103,7 @@ $(document).ready(function(){
          headers: {
             'X-CSRFToken': '{{ csrf_token }}'
          },
-         data: payload,
+         data: JSON.stringify({'language': language}),
          dataType: 'json',
          statusCode: {
             202: function(response) {

@@ -38,11 +38,19 @@ class Repository(models.Model):
         return self.id == other.id
 
 
+class Label(models.Model):
+    label = models.CharField(max_length=50)
+
+    class Meta:
+        abstract = True
+
+
 class FixingCommit(models.Model):
     sha = models.CharField(max_length=50, blank=False, editable=False, primary_key=True, unique=True)
     msg = models.TextField(blank=True, default='')
     date = models.CharField(max_length=30, blank=True, default='')
     is_false_positive = models.BooleanField(blank=True, default=False)
+    labels = models.ArrayField(model_container=Label, default=[{'label': 'FAILURE-PRONE'}])
     repository = models.ForeignKey(Repository, on_delete=models.CASCADE)
 
     def __hash__(self):

@@ -26,9 +26,9 @@ class BaseViewTest(APITestCase):
         return repository
 
     @staticmethod
-    def create_fixing_commit(sha: str, msg: str, date: str, is_false_positive: bool, repository: Repository):
+    def create_fixing_commit(sha: str, msg: str, date: str, is_false_positive: bool, labels: list, repository: Repository):
         fixing_commit = FixingCommit(sha=sha, msg=msg, date=date, is_false_positive=is_false_positive,
-                                     repository=repository)
+                                     labels=labels, repository=repository)
         fixing_commit.save()
         return fixing_commit
 
@@ -67,11 +67,11 @@ class BaseViewTest(APITestCase):
                                             created_at='2014-01-15T16:46:51Z', pushed_at='2020-08-09T12:22:24Z')
 
         # add test fixing-commits
-        self.fic1 = self.create_fixing_commit('123456789', 'Fixed issue #1', '06/10/2020 17:26', False, self.repo1)
-        self.fic2 = self.create_fixing_commit('23456789', 'Fixed issue #2', '06/10/2020 17:27', False, self.repo1)
-        self.fic3 = self.create_fixing_commit('3456789', 'Fixed issue #3', '06/10/2020 17:28', False, self.repo2)
-        self.fic4 = self.create_fixing_commit('456789', 'Fixed issue #4', '06/10/2020 17:29', False, self.repo2)
-        self.fic5 = self.create_fixing_commit('56789', 'Fixed issue #5', '06/10/2020 17:30', False, self.repo2)
+        self.fic1 = self.create_fixing_commit('123456789', 'Fixed issue #1', '06/10/2020 17:26', False, [{'label': 'IDEMPOTENCY'}], self.repo1)
+        self.fic2 = self.create_fixing_commit('23456789', 'Fixed issue #2', '06/10/2020 17:27', False, [{'label': 'DEPENDENCY'}], self.repo1)
+        self.fic3 = self.create_fixing_commit('3456789', 'Fixed issue #3', '06/10/2020 17:28', False, [{'label': 'SERVICE'}], self.repo2)
+        self.fic4 = self.create_fixing_commit('456789', 'Fixed issue #4', '06/10/2020 17:29', False, [{'label': 'SYNTAX'}], self.repo2)
+        self.fic5 = self.create_fixing_commit('56789', 'Fixed issue #5', '06/10/2020 17:30', False, [{'label': 'SYNTAX'}], self.repo2)
 
         # add test fixed-files
         self.file1 = self.create_fixing_file('filename1.yaml', False, 'bic_123456789', self.fic1)
@@ -270,6 +270,7 @@ class FixingCommitsTest(BaseViewTest):
             'sha': '987654321',
             'msg': 'This is a new fixing-commit for testing!',
             'date': '06/10/2020 17:52',
+            'labels': [{'label': 'SYNTAX'}, {'label': 'DEPENDENCY'}],
             'repository': 'MDEwOlJlcG9zaXRvcnkxNTk0MTM0NQ=='
         }
 

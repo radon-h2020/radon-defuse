@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apis.models import FailureProneFile, FixingCommit, FixedFile, Repository, Task
+from apis.models import FailureProneFile, FixingCommit, FixedFile, Label, Repository, Task
 
 
 class RepositorySerializer(serializers.ModelSerializer):
@@ -26,6 +26,12 @@ class RepositorySerializer(serializers.ModelSerializer):
         return dict(obj.indicators)
 
 
+class LabelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Label
+        fields = ('label')
+
+
 class FixingCommitSerializer(serializers.ModelSerializer):
     class Meta:
         model = FixingCommit
@@ -33,6 +39,7 @@ class FixingCommitSerializer(serializers.ModelSerializer):
                   'msg',
                   'date',
                   'is_false_positive',
+                  'labels',
                   'repository')
 
 

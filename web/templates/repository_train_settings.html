@@ -71,7 +71,7 @@
               </div>
             </div>
             <button id="btn-train" type="button" class="btn btn-success btn-xl pull-right mt-4" >Train</button>
-            <button id="btn-extract-metrics" type="button" class="btn btn-warning btn-xl pull-right mt-4 mr-2" >Extract metrics only</button>
+            <button id="btn-extract-metrics" type="button" class="btn btn-warning btn-xl pull-right mt-4 mr-2" data-toggle="modal" data-target="#modal-extract-metrics" >Extract metrics only</button>
         </li>
     </ul>
 </div>
@@ -80,6 +80,7 @@
 {% include 'modal_feature_normalization.html' %}
 {% include 'modal_feature_selection.html' %}
 {% include 'modal_classifiers.html' %}
+{% include 'modal_extract_metrics.html' %}
 
 {% endblock %}
 
@@ -88,6 +89,7 @@
 <script src="{% static 'web/js/modal-data-balancing.js' %}"> </script>
 <script src="{% static 'web/js/modal-feature-normalization.js' %}"> </script>
 <script src="{% static 'web/js/modal-classifiers.js' %}"> </script>
+<script src="{% static 'web/js/modal-extract-metrics.js' %}"> </script>
 
 <script>
 const LANGUAGES = ['ansible', 'tosca']
@@ -105,12 +107,16 @@ $("#dropdown-train-language-item").click(function(){
 });
 
 
-$("#btn-extract-metrics").click(function(){
+//$("#btn-extract-metrics").click(function(){
+$("#extract-metrics-form").on('submit', function(event){
+    event.preventDefault();
 
     var language = $("#dropdown-train-language-btn").text().trim().toLowerCase()
+    var label = $("#dropdown-extract-metrics-label-btn").text().trim().toLowerCase()
 
     payload = JSON.stringify({
-        "language": language
+        "language": language,
+        "label": label
     })
 
     $.ajax({
@@ -124,11 +130,19 @@ $("#btn-extract-metrics").click(function(){
             202: function(){
                 toastr['info']('The extraction is started. You will get notified when completed... <span><i class="fa fa-spinner fa-pulse"></i></span>', 'Started!')
             },
+            204: function(){
+                toastr['warning'](`There are not commits related to ${label} issues.`, 'Completed!')
+            },
             500: function(){
                 toastr['error']('Some error occurred.' , 'Error.')
             },
          }
     })
+
+    // finally, dismiss modal
+    $('#modal-extract-metrics').modal('hide');
+    $('body').removeClass('modal-open');
+    $('.modal-backdrop').remove();
 })
 
 $("#btn-train").click(function(){

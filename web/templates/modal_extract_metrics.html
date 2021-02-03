@@ -1,0 +1,36 @@
+<div class="modal" id="modal-extract-metrics" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+
+      <div class="modal-content">
+        <div class="modal-header">
+          <p class="modal-title text-uppercase">Extract metrics settings</p>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <form method="POST" id="extract-metrics-form" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group text-center mb-2" >
+              <button id="dropdown-extract-metrics-label-btn" type="button" class="btn btn-outline-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width: 100%;">
+              Conditional
+              </button>
+              <div class="dropdown-menu" style="width: 100%;">
+                <a id="dropdown-extract-metrics-label-item-1" class="dropdown-item">Configuration_data</a>
+                <a id="dropdown-extract-metrics-label-item-3" class="dropdown-item">Dependency</a>
+                <a id="dropdown-extract-metrics-label-item-4" class="dropdown-item">Documentation</a>
+                <a id="dropdown-extract-metrics-label-item-5" class="dropdown-item">Idempotency</a>
+                <a id="dropdown-extract-metrics-label-item-6" class="dropdown-item">Security</a>
+                <a id="dropdown-extract-metrics-label-item-7" class="dropdown-item">Service</a>
+                <a id="dropdown-extract-metrics-label-item-8" class="dropdown-item">Syntax</a>
+              </div>
+            </div>
+
+            <button id="btn-mine" type="submit" class="btn btn-primary btn-md btn-block">Extract</button>
+          </form>
+        </div>
+      </div>
+  </div>
+</div>

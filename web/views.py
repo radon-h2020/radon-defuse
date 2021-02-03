@@ -286,9 +286,11 @@ def repository_train_start(request, pk):
 def repository_extract_metrics(request, pk):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
-    task_id, task_state = BackendMetrics(repo_id=pk, language=body.get('language')).extract()
+    task_id, task_state = BackendMetrics(repo_id=pk, language=body.get('language'), label=body.get('label')).extract()
 
     if task_state == Task.ACCEPTED or task_state == Task.RUNNING:
         return HttpResponse(status=202, content=task_id)
+    elif task_state == Task.COMPLETED:
+        return HttpResponse(status=204, content=task_id)
     else:
         return HttpResponse(status=500)

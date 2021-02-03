@@ -93,7 +93,7 @@ class BackendRepositoryMiner:
 
         docker_client = docker.from_env()
         container_name = self.repository.full_name.replace('/', '_') + '-miner'
-        container = docker_client.containers.run(image='radonconsortium/repo-miner:0.9.0',
+        container = docker_client.containers.run(image='radonconsortium/repo-miner:0.9.1',
                                                  name=container_name,
                                                  command=command,
                                                  detach=True,

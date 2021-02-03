@@ -28,6 +28,7 @@
 {% block javascript %}
 {% load static %}
 <script src="{% static 'web/js/modal-mine.js' %}"> </script>
+<script src="{% static 'web/js/modal-extract-metrics.js' %}"> </script>
 
 <script>
 function longPollingMining(taskID){
@@ -91,6 +92,7 @@ $(document).ready(function(){
 
   handleRunningTasks()
 
+  // |----------------- MINE FORM -----------------|
   $("#mine-form").on('submit', function(event){
     event.preventDefault();
 

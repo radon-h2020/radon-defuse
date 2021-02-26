@@ -20,11 +20,11 @@ class BackendMetrics:
         self.repository = Repository.objects.get(pk=repo_id)
         self.language = language
 
-        if label.upper() not in ('CONFIGURATION_DATA', 'CONDITIONAL', 'DEPENDENCY', 'DOCUMENTATION', 'IDEMPOTENCY',
-                                 'SECURITY', 'SERVICE', 'SYNTAX'):
+        if label.upper().strip() not in ('CONFIGURATION_DATA', 'CONDITIONAL', 'DEPENDENCY', 'DOCUMENTATION',
+                                         'IDEMPOTENCY', 'SECURITY', 'SERVICE', 'SYNTAX'):
             raise ValueError('Label not supported')
         else:
-            self.label = label.upper()
+            self.label = label.upper().strip()
 
     def extract(self):
         task = Task(state=Task.ACCEPTED, name=Task.EXTRACT_METRICS, repository=self.repository)
@@ -33,8 +33,7 @@ class BackendMetrics:
         labeled_files = []
         commits = []
         for commit in FixingCommit.objects.filter(repository=self.repository):
-            labels = [label_dict['label'] for label_dict in commit.labels]
-
+            labels = [label_dict['label'].upper() for label_dict in commit.labels]
             if self.label in labels:
                 commits.append(commit.sha)
 
@@ -57,7 +56,6 @@ class BackendMetrics:
                 json.dump(labeled_files, f)
 
         except Exception as e:
-            print(e)
             return task.id, Task.ERROR
 
         thread_name = f'{self.repository.full_name.replace("/", "_")}_metrics_thread'
@@ -83,7 +81,7 @@ class BackendMetrics:
                                                                                      self.FAILURE_PRONE_FILES_FILENAME,
                                                                                      self.language)
         docker_client = docker.from_env()
-        container_name = f'{self.repository.full_name}-metrics-extractor'
+        container_name = f'{self.repository.full_name}-metrics-extractor-{self.label}'
         container_name = container_name.replace('/', '_')
         container = docker_client.containers.run(image='radonconsortium/repo-miner:0.9.1',
                                                  name=container_name,

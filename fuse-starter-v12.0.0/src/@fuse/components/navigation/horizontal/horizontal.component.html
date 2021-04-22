@@ -1,0 +1,33 @@
+<div class="fuse-horizontal-navigation-wrapper">
+
+    <ng-container *ngFor="let item of navigation">
+
+        <!-- Skip the hidden items -->
+        <ng-container *ngIf="(item.hidden && !item.hidden(item)) || !item.hidden">
+
+            <!-- Basic -->
+            <fuse-horizontal-navigation-basic-item
+                class="fuse-horizontal-navigation-menu-item"
+                *ngIf="item.type === 'basic'"
+                [item]="item"
+                [name]="name"></fuse-horizontal-navigation-basic-item>
+
+            <!-- Branch: aside, collapsable, group -->
+            <fuse-horizontal-navigation-branch-item
+                class="fuse-horizontal-navigation-menu-item"
+                *ngIf="item.type === 'aside' || item.type === 'collapsable' || item.type === 'group'"
+                [item]="item"
+                [name]="name"></fuse-horizontal-navigation-branch-item>
+
+            <!-- Spacer -->
+            <fuse-horizontal-navigation-spacer-item
+                class="fuse-horizontal-navigation-menu-item"
+                *ngIf="item.type === 'spacer'"
+                [item]="item"
+                [name]="name"></fuse-horizontal-navigation-spacer-item>
+
+        </ng-container>
+
+    </ng-container>
+
+</div>

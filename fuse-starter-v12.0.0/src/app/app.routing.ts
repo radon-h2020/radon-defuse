@@ -73,8 +73,25 @@ export const appRoutes: Route[] = [
             initialData: InitialDataResolver,
         },
         children   : [
+            //{path: 'inventory', loadChildren: () => import('app/modules/admin/inventory/inventory.module').then(m => m.InventoryModule)},
             {path: 'dashboard', loadChildren: () => import('app/modules/admin/example/repository.module').then(m => m.RepositoryModule)},
             {path: 'models', loadChildren: () => import('app/modules/admin/example/repository.module').then(m => m.RepositoryModule)},
         ]
-    }
+    },
+
+    {
+        path       : '',
+        canActivate: [AuthGuard],
+        canActivateChild: [AuthGuard],
+        component  : LayoutComponent,
+        resolve    : {
+            initialData: InitialDataResolver,
+        },
+        data: {
+            layout: 'empty'
+        },
+        children   : [
+            {path: 'inventory', loadChildren: () => import('app/modules/admin/inventory/inventory.module').then(m => m.InventoryModule)},
+        ]
+    },
 ];

@@ -74,8 +74,8 @@ export const appRoutes: Route[] = [
         },
         children   : [
             //{path: 'inventory', loadChildren: () => import('app/modules/admin/inventory/inventory.module').then(m => m.InventoryModule)},
-            {path: 'dashboard', loadChildren: () => import('app/modules/admin/example/repository.module').then(m => m.RepositoryModule)},
-            {path: 'models', loadChildren: () => import('app/modules/admin/example/repository.module').then(m => m.RepositoryModule)},
+            {path: 'dashboard', loadChildren: () => import('app/modules/admin/repository/repository.module').then(m => m.RepositoryModule)},
+            {path: 'models', loadChildren: () => import('app/modules/admin/repository/repository.module').then(m => m.RepositoryModule)},
         ]
     },
 

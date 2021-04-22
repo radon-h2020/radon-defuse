@@ -14,7 +14,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { RepositoryComponent } from 'app/modules/admin/example/repository.component';
+import { RepositoryComponent } from 'app/modules/admin/repository/repository.component';
 
 
 const repositoryRoutes: Route[] = [

@@ -18,25 +18,36 @@
                     [autocomplete]="'off'"
                     [placeholder]="'Search repositories'">
             </mat-form-field>
-            <!-- Add product button
-            <button
-                class="ml-4"
-                mat-flat-button
-                [color]="'primary'"
-                (click)="createProduct()">
-                <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                <span class="ml-2 mr-1">Add</span>
-            </button>-->
         </div>
     </div>
 
     <!-- Main -->
     <div class="flex-auto mt-4 sm:mt-6">
 
-        <button mat-fab color="accent" style="position: fixed; right: 16px; bottom: 24px; z-index: 100;">
-            <mat-icon>add</mat-icon>
-        </button>
-        
+        <div id="fab-dismiss" 
+            *ngIf="fabTogglerState==='active'" 
+            (click)="onToggleFab()">
+        </div>    
+        <div class="fab-container" 
+             style="position: fixed; right: 16px; bottom: 24px; z-index: 100;">
+             <button mat-fab class="fab-toggler"
+                (click)="onToggleFab()">
+                    <i class="material-icons" [@fabToggler]="{value: fabTogglerState}">add</i> <!-- Animation here -->
+            </button>
+            <div [@speedDialStagger]="buttons.length"> <!-- and here -->
+                <button *ngFor="let btn of buttons"
+                        mat-mini-fab
+                        class="fab-secondary"
+                        color="primary"
+                        #tooltip="matTooltip"
+                        [matTooltip]="btn.tooltip"
+                        matTooltipPosition="left">
+                <i class="material-icons">{{btn.icon}}</i>
+                </button>
+            </div>
+        </div>
+            
+
         <!-- Tabs -->
         <mat-tab-group mat-align-tabs="center" class="sm:px-2" [animationDuration]="'0'" *ngIf="(repositoriesGithub.length + repositoriesGitlab.length) > 0; else noRepositories">
 

@@ -4,6 +4,7 @@ import { MatTableDataSource } from '@angular/material/table';
 
 import { InventoryService } from 'app/core/inventory/inventory.service';
 import { Repository } from 'app/core/repository/repository.model';
+import { speedDialFabAnimations } from 'app/shared/speed-dial-fab.animations';
 
 import { merge, Observable, Subject } from 'rxjs';
 import { debounceTime, map, switchMap, takeUntil } from 'rxjs/operators';
@@ -13,9 +14,27 @@ import { debounceTime, map, switchMap, takeUntil } from 'rxjs/operators';
  */
 @Component({
   selector     : 'inventory',
-  templateUrl  : './inventory.component.html'
+  templateUrl  : './inventory.component.html',
+  animations: speedDialFabAnimations
 })
 export class InventoryComponent implements AfterViewInit, OnInit {
+
+    buttons = [];
+    fabTogglerState = 'inactive';
+
+    showItems() {
+      this.fabTogglerState = 'active';
+      this.buttons = [{ icon: 'timeline', tooltip: 'Add repository' }, { icon: 'view_headline', tooltip: 'Collect repositories' }];
+    }
+  
+    hideItems() {
+      this.fabTogglerState = 'inactive';
+      this.buttons = [];
+    }
+  
+    onToggleFab() {
+      this.buttons.length ? this.hideItems() : this.showItems();
+    }
 
     displayedColumns: string[] = ['name'];
 

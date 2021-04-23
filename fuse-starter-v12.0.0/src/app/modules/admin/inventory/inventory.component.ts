@@ -19,6 +19,10 @@ import { debounceTime, map, switchMap, takeUntil } from 'rxjs/operators';
 })
 export class InventoryComponent implements AfterViewInit, OnInit {
 
+
+    /**
+     * FABs button
+     */
     buttons = [];
     fabTogglerState = 'inactive';
 
@@ -36,6 +40,15 @@ export class InventoryComponent implements AfterViewInit, OnInit {
       this.buttons.length ? this.hideItems() : this.showItems();
     }
 
+    /**
+     * Sidenav
+     */
+    drawerMode: 'over' | 'side' = 'side';
+    drawerOpened: boolean = false;
+
+    /**
+     * Table
+     */
     displayedColumns: string[] = ['name'];
 
     repositoriesGithub: Repository[]

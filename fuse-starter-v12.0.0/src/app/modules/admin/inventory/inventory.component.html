@@ -2,14 +2,22 @@
 
     <!-- Header -->
     <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6  sm:pt-12 sm:px-10 bg-default dark:bg-transparent border-b">
-        <div class="flex-1 min-w-0">
-            <!-- Title -->
-            <div class="mt-2">
-                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
-                    Repositories
-                </h2>
+        <!-- Title -->
+        <div>
+            <div class="text-4xl font-extrabold tracking-tight leading-none">Repositories</div>
+            <div class="ml-0.5 font-medium text-secondary">
+                <ng-container *ngIf="repositoriesGithub.length + repositoriesGitlab.length > 0">
+                    {{repositoriesGithub.length + repositoriesGitlab.length}}
+                </ng-container>
+                {{repositoriesGithub.length + repositoriesGitlab.length | i18nPlural: {
+                    '=0'   : 'No repositories',
+                    '=1'   : 'repository',
+                    'other': 'repositories'}
+                }}
             </div>
         </div>
+
+
         <!-- Actions -->
         <div class="flex flex-shrink-0 items-center mt-6 sm:mt-0 sm:ml-4 gap-4">
             <!-- Search -->

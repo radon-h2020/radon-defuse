@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,8 +11,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatSortModule } from '@angular/material/sort';
-import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ScrollingModule } from '@angular/cdk/scrolling';
@@ -23,6 +23,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 
 import { InventoryComponent } from 'app/modules/admin/inventory/inventory.component';
 import { ItemComponent } from './item.component';
+import { AddRepositoryDialogComponent } from './add-repo.component';
 
 
 const inventoryRoutes: Route[] = [
@@ -34,14 +35,16 @@ const inventoryRoutes: Route[] = [
 
 @NgModule({
     declarations: [
-        InventoryComponent, ItemComponent
+        InventoryComponent, ItemComponent, AddRepositoryDialogComponent
     ],
     imports     : [
         RouterModule.forChild(inventoryRoutes),
         CommonModule,
+        FormsModule,
         MatButtonModule,
-        MatDividerModule,
         MatChipsModule,
+        MatDialogModule,
+        MatDividerModule,
         MatFormFieldModule,
         MatGridListModule,
         MatIconModule,
@@ -51,8 +54,6 @@ const inventoryRoutes: Route[] = [
         MatSelectModule,
         MatSnackBarModule,
         MatSidenavModule,
-        MatSortModule,
-        MatTableModule,
         MatTabsModule,
         MatToolbarModule,
         MatTooltipModule,

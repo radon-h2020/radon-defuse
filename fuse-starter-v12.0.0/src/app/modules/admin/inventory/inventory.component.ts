@@ -1,6 +1,9 @@
 import { Component, HostListener, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 import { InventoryService } from 'app/core/inventory/inventory.service';
+import { AddRepositoryDialogComponent } from './add-repo.component';
 import { Repository } from 'app/core/repository/repository.model';
 import { speedDialFabAnimations } from 'app/shared/speed-dial-fab.animations';
 
@@ -29,7 +32,7 @@ export class InventoryComponent implements OnInit {
       this.buttons = [
         { id: 'id-fab-add-repository', icon: 'add', tooltip: 'Add repository' },
         { id: 'id-fab-collect-repositories', icon: 'library_add', tooltip: 'Collect repositories'},
-        { id: 'id-fab-download-repositories', icon: 'download', tooltip: 'Download to CSV'}];
+        { id: 'id-fab-download-repositories', icon: 'download', tooltip: 'Download as CSV'}];
     }
 
     hideItems() {
@@ -88,8 +91,9 @@ export class InventoryComponent implements OnInit {
     }
 
 
-    constructor(
-      private inventoryService: InventoryService) {
+    constructor(private inventoryService: InventoryService,
+                private dialog: MatDialog,
+                private snackBar: MatSnackBar) {
         this.repositoriesGithub = []
         this.repositoriesGitlab = []
         this.filteredRepositoriesGithub = []
@@ -121,6 +125,27 @@ export class InventoryComponent implements OnInit {
     clickHandler(id: string) {
         if(id === 'id-fab-download-repositories'){
             this.export2csv()
+        }else if(id === 'id-fab-add-repository'){
+            // Open dialog
+            const dialogRef = this.dialog.open(AddRepositoryDialogComponent);
+            dialogRef.afterClosed().subscribe(result => {
+
+                // TODO show loading bar above list
+
+              this.inventoryService.addRepository(result.url, result.token)
+                  .subscribe(repository => {
+                    if(!repository){
+                        console.log('TO SHOW ERROR THROUGH MESSAGE')
+                    }else{
+                        // if github:
+                        console.log(repository)
+                        this.repositoriesGithub = [repository, ...this.repositoriesGithub]; // Prepend repository
+                        this.assignCopy()
+
+                        this.snackBar.open('Repository added!', 'Dismiss');
+                    }
+              });
+            });
         }
     }
 

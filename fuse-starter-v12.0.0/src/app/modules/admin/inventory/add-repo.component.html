@@ -1,0 +1,31 @@
+<h2 mat-dialog-title>Add a new repository</h2>
+<mat-dialog-content>
+
+    <div class="flex flex-col mt-4 pt-6 border-t space-y-8">
+        <!-- Remote URL to a Git(hub|lab) repository -->
+        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
+            <mat-icon matPrefix [svgIcon]="'heroicons_outline:link'"></mat-icon>
+            <input
+                matInput
+                [(ngModel)]="data.url"
+                [autocomplete]="'off'"
+                [placeholder]="'URL to the remote repository'"
+                required>
+        </mat-form-field>
+
+        <!-- Token (optional) -->
+        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
+            <mat-icon matPrefix [svgIcon]="'heroicons_outline:key'"></mat-icon>
+            <input
+                matInput
+                [(ngModel)]="data.token"
+                [autocomplete]="'off'"
+                [placeholder]="'APIs token'">
+        </mat-form-field>
+    </div>
+
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button [mat-dialog-close]="{'url':data.url, 'token':data.token}" cdkFocusInitial>Add</button>
+</mat-dialog-actions>

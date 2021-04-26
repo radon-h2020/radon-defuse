@@ -32,12 +32,18 @@ const REPO_DATA: Repository[] = [
 export class InventoryService {
 
   constructor(private httpClient: HttpClient){ }
-  
+
   getRepositories(): Observable<Repository[]> {
     const repos = of(REPO_DATA); // of(commits) returns an Observable<Commit[]> that emits a single value, the array of mock heroes. It simulates a HttpCall
     return repos;
 
     //return this.httpClient.get<Repository[]>('url/to/api/repos')
+  }
+
+  addRepository(url: string, token: string): Observable<Repository>{
+    // Call ocktac
+    const result = of({id: '2', full_name: 'radon-h2020/addedRepository', url: url, language: 'python'});
+    return result;
   }
 
   //postRepository(repository: Repository): Observable<boolean> {

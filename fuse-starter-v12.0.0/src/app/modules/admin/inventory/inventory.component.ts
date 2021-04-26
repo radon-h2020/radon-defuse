@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { InventoryService } from 'app/core/inventory/inventory.service';
@@ -17,7 +18,7 @@ import { debounceTime, map, switchMap, takeUntil } from 'rxjs/operators';
   templateUrl  : './inventory.component.html',
   animations: speedDialFabAnimations
 })
-export class InventoryComponent implements AfterViewInit, OnInit {
+export class InventoryComponent implements OnInit {
 
 
     /**
@@ -28,64 +29,94 @@ export class InventoryComponent implements AfterViewInit, OnInit {
 
     showItems() {
       this.fabTogglerState = 'active';
-      this.buttons = [{ icon: 'timeline', tooltip: 'Add repository' }, { icon: 'view_headline', tooltip: 'Collect repositories' }];
+      this.buttons = [
+        { icon: 'add', tooltip: 'Add repository', action: 'foo()' },
+        { icon: 'library_add', tooltip: 'Collect repositories', action: 'bar()' },
+        { icon: 'download', tooltip: 'Download to CSV', action: 'export2csv()'}];
     }
-  
+
     hideItems() {
       this.fabTogglerState = 'inactive';
       this.buttons = [];
     }
-  
+
     onToggleFab() {
       this.buttons.length ? this.hideItems() : this.showItems();
     }
 
-    /**
-     * Sidenav
-     */
-    drawerMode: 'over' | 'side' = 'side';
-    drawerOpened: boolean = false;
+    export2csv(){
+        const csv = this.repositoriesGithub.map(item => { return Object.values(item).toString() }).join('\n')
+        console.log(csv)
+    }
 
+    foo(){
+        console.log('Clicked on Foo')
+    }
+
+    bar(){
+    }
     /**
-     * Table
+     * List
      */
-    displayedColumns: string[] = ['name'];
 
     repositoriesGithub: Repository[]
     repositoriesGitlab: Repository[]
-    
-    dataSourceGithub: MatTableDataSource<Repository>;
-    dataSourceGitlab: MatTableDataSource<Repository>;
+    filteredRepositoriesGithub: Repository[]
+    filteredRepositoriesGitlab: Repository[]
 
-    @ViewChild('PaginatorGithub') paginatorGithub: MatPaginator;
-    @ViewChild('PaginatorGitlab') paginatorGitlab: MatPaginator;
+    languages = [{ text: 'All', value: 'all'},
+                 { text: 'Ansible', value: 'ansible'},
+                 { text: 'Python', value: 'python'},
+                 { text: 'Tosca', value: 'tosca'}]
+
+    languageSelected: string = 'all'
+
+    languageChanged(){
+      if(this.languageSelected.toLowerCase() === 'all'){
+          this.assignCopy();
+      }else{
+          this.filteredRepositoriesGithub = Object.assign([], this.repositoriesGithub).filter(
+             item => item.language.toLowerCase().indexOf(this.languageSelected) > -1
+          )
+          this.filteredRepositoriesGitlab = Object.assign([], this.repositoriesGitlab).filter(
+             item => item.language.toLowerCase().indexOf(this.languageSelected) > -1
+          )
+      }
+    }
+
+    filterItem(value){
+      if(!value){
+          this.assignCopy();
+      } // when nothing has typed
+      this.filteredRepositoriesGithub = Object.assign([], this.repositoriesGithub).filter(
+         item => item.full_name.toLowerCase().indexOf(value.toLowerCase()) > -1
+      )
+      this.filteredRepositoriesGitlab = Object.assign([], this.repositoriesGitlab).filter(
+         item => item.full_name.toLowerCase().indexOf(value.toLowerCase()) > -1
+      )
+    }
+
+    assignCopy(){
+      this.filteredRepositoriesGithub = Object.assign([], this.repositoriesGithub);
+      this.filteredRepositoriesGitlab = Object.assign([], this.repositoriesGitlab);
+    }
+
 
     constructor(
       private inventoryService: InventoryService) {
         this.repositoriesGithub = []
         this.repositoriesGitlab = []
-    }
-
-    ngAfterViewInit() {
-      this.dataSourceGithub.paginator = this.paginatorGithub;
-      this.dataSourceGitlab.paginator = this.paginatorGitlab;
+        this.filteredRepositoriesGithub = []
+        this.filteredRepositoriesGitlab = []
     }
 
     ngOnInit() {
       this.getRepositories();
-      this.dataSourceGithub = new MatTableDataSource<Repository>(this.repositoriesGithub);
-      this.dataSourceGitlab = new MatTableDataSource<Repository>(this.repositoriesGitlab);
-    }
-    
-    applyFilterRepositories(filterValue: string) {
-      this.dataSourceGithub.filter = filterValue.trim().toLowerCase();
-      this.dataSourceGitlab.filter = filterValue.trim().toLowerCase();
+      this.filteredRepositoriesGithub = this.repositoriesGithub
+      this.filteredRepositoriesGitlab = this.repositoriesGitlab
     }
 
     getRepositories(){
-      //this.inventoryService.getRepositories()
-      //    .subscribe(repositories => this.repositories = repositories);
-
       this.inventoryService.getRepositories()
           .subscribe(repositories => {
             for(let repo of repositories){
@@ -96,20 +127,6 @@ export class InventoryComponent implements AfterViewInit, OnInit {
               }
             }
           });
-
-      /*this.inventoryService.getRepositories()
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((repositories: Repository[]) => {
-
-                // Update the counts
-                this.repositoriesCount = repositories.length;
-                console.log(repositories.length)
-                console.log(this.repositoriesCount)
-
-                // Mark for check
-                //this._changeDetectorRef.markForCheck();
-            });
-        */
     }
 }
 

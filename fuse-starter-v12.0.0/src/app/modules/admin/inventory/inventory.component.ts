@@ -1,7 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import { Component, HostListener, OnInit } from '@angular/core';
 
 import { InventoryService } from 'app/core/inventory/inventory.service';
 import { Repository } from 'app/core/repository/repository.model';
@@ -30,9 +27,9 @@ export class InventoryComponent implements OnInit {
     showItems() {
       this.fabTogglerState = 'active';
       this.buttons = [
-        { icon: 'add', tooltip: 'Add repository', action: 'foo()' },
-        { icon: 'library_add', tooltip: 'Collect repositories', action: 'bar()' },
-        { icon: 'download', tooltip: 'Download to CSV', action: 'export2csv()'}];
+        { id: 'id-fab-add-repository', icon: 'add', tooltip: 'Add repository' },
+        { id: 'id-fab-collect-repositories', icon: 'library_add', tooltip: 'Collect repositories'},
+        { id: 'id-fab-download-repositories', icon: 'download', tooltip: 'Download to CSV'}];
     }
 
     hideItems() {
@@ -44,17 +41,6 @@ export class InventoryComponent implements OnInit {
       this.buttons.length ? this.hideItems() : this.showItems();
     }
 
-    export2csv(){
-        const csv = this.repositoriesGithub.map(item => { return Object.values(item).toString() }).join('\n')
-        console.log(csv)
-    }
-
-    foo(){
-        console.log('Clicked on Foo')
-    }
-
-    bar(){
-    }
     /**
      * List
      */
@@ -128,6 +114,33 @@ export class InventoryComponent implements OnInit {
             }
           });
     }
+
+    trackEmployeeById(index: number, repo: Repository): string { return repo.id; }
+
+    @HostListener('click', ['$event.target.id'])
+    clickHandler(id: string) {
+        if(id === 'id-fab-download-repositories'){
+            this.export2csv()
+        }
+    }
+
+    export2csv(){
+        const header = Object.keys(this.repositoriesGithub[0]).toString()
+        const content = this.repositoriesGithub.map(item => { return Object.values(item).toString() }).join('\n')
+        var hiddenElement = document.createElement('a');
+        hiddenElement.href = 'data:attachment/csv,' + encodeURI(header + '\n' + content);
+        hiddenElement.target = '_blank';
+        hiddenElement.download = 'repositories.csv';
+        hiddenElement.click();
+    }
+
+//     foo(){
+//         console.log('Clicked on Foo')
+//     }
+//
+//     bar(){
+//         console.log('Clicked on Bar')
+//     }
 }
 
 

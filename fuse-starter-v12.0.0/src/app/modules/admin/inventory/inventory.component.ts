@@ -126,9 +126,10 @@ export class InventoryComponent implements OnInit {
 
     export2csv(){
         const header = Object.keys(this.repositoriesGithub[0]).toString()
-        const content = this.repositoriesGithub.map(item => { return Object.values(item).toString() }).join('\n')
+        const contentGithub = this.repositoriesGithub.map(item => { return Object.values(item).toString() }).join('\n')
+        const contentGitlab = this.repositoriesGitlab.map(item => { return Object.values(item).toString() }).join('\n')
         var hiddenElement = document.createElement('a');
-        hiddenElement.href = 'data:attachment/csv,' + encodeURI(header + '\n' + content);
+        hiddenElement.href = 'data:attachment/csv,' + encodeURI(header + '\n' + contentGithub + '\n' + contentGitlab);
         hiddenElement.target = '_blank';
         hiddenElement.download = 'repositories.csv';
         hiddenElement.click();

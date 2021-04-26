@@ -42,7 +42,7 @@
                 <mat-tab label="Github" *ngIf="repositoriesGithub.length > 0">
                     <div class="flex-col flex-auto mt-2 overflow-x-auto" style="min-width: 800px; max-width: 1000px; margin: auto;">
                         <mat-list class="mat-list-content">
-                            <mat-list-item class="p-10" *ngFor="let item of filteredRepositoriesGithub" style="margin-bottom: 30px;">
+                            <mat-list-item class="p-10" *ngFor="let item of filteredRepositoriesGithub; trackBy: trackRepositoryById" style="margin-bottom: 30px;">
                                 <inventory-item [item]="item" style="width:100%;"></inventory-item>
                                 <mat-divider class="background-divider p-10"></mat-divider>
                             </mat-list-item>
@@ -54,7 +54,7 @@
                 <mat-tab label="Gitlab" *ngIf="repositoriesGitlab.length > 0">
                     <div class="flex-col flex-auto mt-2 overflow-x-auto" style="min-width: 800px; max-width: 1000px; margin: auto;">
                         <mat-list class="mat-list-content">
-                            <mat-list-item class="p-10" *ngFor="let item of filteredRepositoriesGitlab" style="margin-bottom: 30px;">
+                            <mat-list-item class="p-10" *ngFor="let item of filteredRepositoriesGitlab; trackBy: trackRepositoryById" style="margin-bottom: 30px;">
                                 <inventory-item [item]="item" style="width:100%;"></inventory-item>
                                 <mat-divider class="background-divider p-10"></mat-divider>
                             </mat-list-item>
@@ -96,8 +96,7 @@
                 color="accent"
                 #tooltip="matTooltip"
                 [matTooltip]="btn.tooltip"
-                matTooltipPosition="left"
-                [(click)]="btn.action">
+                matTooltipPosition="left">
         <i class="material-icons">{{btn.icon}}</i>
         </button>
     </div>

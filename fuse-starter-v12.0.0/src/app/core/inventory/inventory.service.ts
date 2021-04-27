@@ -46,6 +46,12 @@ export class InventoryService {
     return result;
   }
 
+  delete(id: string): Observable<boolean>{
+    // Call ocktac
+    const result = of(true);
+    return result;
+  }
+
   //postRepository(repository: Repository): Observable<boolean> {
   //  const result = of(true);
   //  return result;

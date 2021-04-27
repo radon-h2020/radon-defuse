@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
 import { InventoryService } from 'app/core/inventory/inventory.service';
-import { AddRepositoryDialogComponent } from './add-repo.component';
+import { AddRepositoryDialogComponent, AddRepositoryDialogData } from './add-repo.component';
 import { Repository } from 'app/core/repository/repository.model';
 import { speedDialFabAnimations } from 'app/shared/speed-dial-fab.animations';
 
@@ -119,35 +119,57 @@ export class InventoryComponent implements OnInit {
           });
     }
 
+
+    onDelete(id:string){
+        this.inventoryService.delete(id)
+          .subscribe(deleted => {
+            if(!deleted){
+                console.log('TO SHOW ERROR THROUGH MESSAGE')
+            }else{
+
+                this.repositoriesGithub.forEach((repo,index)=>{
+                    if(repo.id==id) this.repositoriesGithub.splice(index,1);
+                });
+                this.repositoriesGitlab.forEach((repo,index)=>{
+                    if(repo.id==id) this.repositoriesGithub.splice(index,1);
+                });
+
+                this.assignCopy()
+                this.snackBar.open('Repository deleted!', 'Dismiss');
+            }
+      });
+    }
+
     trackEmployeeById(index: number, repo: Repository): string { return repo.id; }
 
     @HostListener('click', ['$event.target.id'])
     clickHandler(id: string) {
+        console.log(id)
+
         if(id === 'id-fab-download-repositories'){
             this.export2csv()
         }else if(id === 'id-fab-add-repository'){
             // Open dialog
             const dialogRef = this.dialog.open(AddRepositoryDialogComponent);
-            dialogRef.afterClosed().subscribe(result => {
+            dialogRef.afterClosed()
+                     .subscribe(result => {
 
-                // TODO show loading bar above list
-
-              this.inventoryService.addRepository(result.url, result.token)
-                  .subscribe(repository => {
-                    if(!repository){
-                        console.log('TO SHOW ERROR THROUGH MESSAGE')
-                    }else{
-                        // if github:
-                        console.log(repository)
-                        this.repositoriesGithub = [repository, ...this.repositoriesGithub]; // Prepend repository
-                        this.assignCopy()
-
-                        this.snackBar.open('Repository added!', 'Dismiss');
-                    }
-              });
-            });
+                  // TODO show loading bar above list
+                  this.inventoryService.addRepository(result.url, result.token)
+                      .subscribe(repository => {
+                        if(!repository){
+                            console.log('TO SHOW ERROR THROUGH MESSAGE')
+                        }else{
+                            // if github and if gitlab:
+                            this.repositoriesGithub = [repository, ...this.repositoriesGithub]; // Prepend repository
+                            this.assignCopy()
+                            this.snackBar.open('Repository added!', 'Dismiss');
+                        }
+                  });
+                });
         }
     }
+
 
     export2csv(){
         const header = Object.keys(this.repositoriesGithub[0]).toString()

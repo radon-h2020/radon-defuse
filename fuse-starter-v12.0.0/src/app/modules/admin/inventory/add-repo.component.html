@@ -10,7 +10,8 @@
                 [(ngModel)]="data.url"
                 [autocomplete]="'off'"
                 [placeholder]="'URL to the remote repository'"
-                required>
+                required
+                cdkFocusInitial>
         </mat-form-field>
 
         <!-- Token (optional) -->
@@ -26,6 +27,6 @@
 
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancel</button>
-  <button mat-button [mat-dialog-close]="{'url':data.url, 'token':data.token}" cdkFocusInitial>Add</button>
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-button [mat-dialog-close]="{'url':data.url, 'token':data.token}">Add</button>
 </mat-dialog-actions>

@@ -22,6 +22,20 @@ export const appRoutes: Route[] = [
             layout: 'empty'
         },
         loadChildren: () => import('app/modules/repository-list/repository-list.module').then(m => m.RepositoryListModule),
-    }
+    },
+
+    {
+        path       : 'repository/:id',
+        component  : LayoutComponent,
+        //loadChildren: () => import('app/modules/dashboard/dashboard.module').then(m => m.DashboardModule),
+        data: {
+            layout: 'centered'
+        },
+        children   : [
+            {path: 'dashboard', loadChildren: () => import('app/modules/dashboard/dashboard.module').then(m => m.DashboardModule)},
+            {path: 'models', loadChildren: () => import('app/modules/dashboard/dashboard.module').then(m => m.DashboardModule)},
+        ]
+
+    },
 ];
 

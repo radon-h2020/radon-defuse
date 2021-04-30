@@ -50,24 +50,19 @@
                 <fuse-horizontal-navigation
                     class="mr-2"
                     [name]="'mainNavigation'"
-                    [navigation]="data.navigation.horizontal"></fuse-horizontal-navigation>
+                    [navigation]="navigation">
+                </fuse-horizontal-navigation>
             </ng-container>
-            <!-- Navigation toggle button -->
-            <ng-container *ngIf="isScreenSmall">
-                <button
-                    class="mr-2"
-                    mat-icon-button
-                    (click)="toggleNavigation('mainNavigation')">
-                    <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
-                </button>
-            </ng-container>
+
             <!-- Components -->
             <div class="flex items-center pl-2 ml-auto space-x-2">
-                <search [appearance]="'bar'"></search>
-                <shortcuts [shortcuts]="data.shortcuts"></shortcuts>
-                <messages [messages]="data.messages"></messages>
-                <notifications [notifications]="data.notifications"></notifications>
-                <user-menu></user-menu>
+
+                    <p> Components right </p>
+<!--                <search [appearance]="'bar'"></search>-->
+<!--                <shortcuts [shortcuts]="data.shortcuts"></shortcuts>-->
+<!--                <messages [messages]="data.messages"></messages>-->
+<!--                <notifications [notifications]="data.notifications"></notifications>-->
+<!--                <user-menu></user-menu>-->
             </div>
         </div>
 
@@ -80,7 +75,7 @@
 
         <!-- Footer -->
         <div class="relative flex flex-0 items-center justify-start w-full h-16 sm:h-20 px-6 sm:px-8 z-49 bg-card border-t dark:bg-default print:hidden">
-            <span class="font-medium text-secondary">Fuse &copy; {{currentYear}}</span>
+            <span class="font-medium text-secondary">Defuse &copy; {{currentYear}}</span>
         </div>
 
     </div>

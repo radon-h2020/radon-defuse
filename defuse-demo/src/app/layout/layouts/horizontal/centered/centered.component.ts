@@ -3,8 +3,26 @@ import { ActivatedRoute, Data, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
-import { FuseNavigationService } from '@fuse/components/navigation';
+import { FuseNavigationItem, FuseNavigationService } from '@fuse/components/navigation';
 import { InitialData } from 'app/app.types';
+
+export let horizontalNavigation: FuseNavigationItem[] = [
+    {
+        id   : 'dashboard',
+        title: 'Dashboard',
+        type : 'basic',
+        icon : 'heroicons_outline:home',
+        link : '/dashboard'
+    },
+    {
+        id   : 'models',
+        title: 'Models',
+        type : 'basic',
+        icon : 'heroicons_outline:beaker',
+        link : '/models'
+    }
+];
+
 
 @Component({
     selector     : 'centered-layout',
@@ -16,6 +34,7 @@ export class CenteredLayoutComponent implements OnInit, OnDestroy
     data: InitialData;
     isScreenSmall: boolean;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+    navigation: FuseNavigationItem[] = horizontalNavigation
 
     /**
      * Constructor
@@ -50,10 +69,15 @@ export class CenteredLayoutComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
+        const id=this._activatedRoute.snapshot.paramMap.get("id");
+
+        this.navigation[0].link = '/repository/' + id + '/dashboard'
+        this.navigation[1].link = '/repository/' + id + '/models'
+
         // Subscribe to the resolved route mock-api
-        this._activatedRoute.data.subscribe((data: Data) => {
-            this.data = data.initialData;
-        });
+//         this._activatedRoute.data.subscribe((data: Data) => {
+//             this.data = data.initialData;
+//         });
 
         // Subscribe to media changes
         this._fuseMediaWatcherService.onMediaChange$
@@ -73,26 +97,5 @@ export class CenteredLayoutComponent implements OnInit, OnDestroy
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next();
         this._unsubscribeAll.complete();
-    }
-
-    // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Toggle navigation
-     *
-     * @param name
-     */
-    toggleNavigation(name: string): void
-    {
-        // Get the navigation
-        const navigation = this._fuseNavigationService.getComponent(name);
-
-        if ( navigation )
-        {
-            // Toggle the opened status
-            navigation.toggle();
-        }
     }
 }

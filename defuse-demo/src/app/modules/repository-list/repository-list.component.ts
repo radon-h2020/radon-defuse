@@ -1,29 +1,28 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog'
 
-import { DialogAddRepositoryComponent } from './../dialog-add-repository/dialog-add-repository.component';
-import { DialogDeleteRepositoryComponent } from './../dialog-delete-repository/dialog-delete-repository.component';
-import { RepositoryModel } from 'app/core/repository/repository.model'
-import { RepositoriesService } from 'app/core/repository/repositories.service'
+import { DialogAddRepositoryComponent } from './dialog-add-repository/dialog-add-repository.component';
+import { DialogDeleteRepositoryComponent } from './dialog-delete-repository/dialog-delete-repository.component';
+import { RepositoryModel } from 'app/models/repository.model'
+import { RepositoryListService } from 'app/services/repository-list.service'
 
 import { AngularFirestore } from '@angular/fire/firestore'
 
 @Component({
-  selector: 'app-repositories-list',
-  templateUrl: './repositories-list.component.html',
+  selector: 'app-repository-list',
+  templateUrl: './repository-list.component.html',
   encapsulation: ViewEncapsulation.None
 })
-export class RepositoriesListComponent implements OnInit {
-
+export class RepositoryListComponent implements OnInit {
 
     repositories: RepositoryModel[] = []
     filteredRepositoriesGithub: RepositoryModel[] = []
     filteredRepositoriesGitlab: RepositoryModel[] = []
 
-    constructor(private repositoriesService: RepositoriesService, public dialog: MatDialog) {
+    constructor(private repositoryListService: RepositoryListService, public dialog: MatDialog) {
 
         // Initialize list of repositories
-        this.repositoriesService.getAll().subscribe(repositories => {
+        this.repositoryListService.getAll().subscribe(repositories => {
             this.repositories = repositories
             this.filteredRepositoriesGithub = this.repositories.filter(item => item.url.includes('github.com'));
             this.filteredRepositoriesGitlab = this.repositories.filter(item => item.url.includes('gitlab.com'));
@@ -46,7 +45,7 @@ export class RepositoriesListComponent implements OnInit {
     }
 
     onAdd(url: string, token: string){
-        this.repositoriesService.addRepository(url, token)
+        this.repositoryListService.addRepository(url, token)
             .subscribe(added => {
                 console.log(added)
                 // Notify user with notification or snackbar
@@ -58,7 +57,7 @@ export class RepositoriesListComponent implements OnInit {
     @param id: repository id
     */
     onDelete(id){
-        this.repositoriesService.deleteRepository(id)
+        this.repositoryListService.deleteRepository(id)
             .subscribe(deleted => {
                 console.log(deleted)
                 // Notify user with notification or snackbar

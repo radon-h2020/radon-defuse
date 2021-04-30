@@ -1,9 +1,9 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import {ViewEncapsulation} from '@angular/core';
+import { ViewEncapsulation } from '@angular/core';
 
 @Component({
-  selector: 'repositories-item',
-  templateUrl: './repositories-item.component.html',
+  selector: 'repository-item',
+  templateUrl: './repository-item.component.html',
   encapsulation: ViewEncapsulation.None
 })
 export class RepositoryItemComponent{

@@ -3,15 +3,13 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators'
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore'
-import { RepositoryModel } from './repository.model';
+import { RepositoryModel } from 'app/models/repository.model';
 
 
 @Injectable({
   providedIn: 'root',
 })
-export class RepositoriesService {
-
-    //@Output() repositoryAdded: EventEmitter<RepositoryModel> = new EventEmitter();
+export class RepositoryListService {
 
     repositoriesCollection: AngularFirestoreCollection<RepositoryModel>;
     repositories: Observable<RepositoryModel[]>;

@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RepositoriesListComponent } from './repositories-list.component';
+import { RepositoryListComponent } from './repository-list.component';
 
-describe('RepositoriesListComponent', () => {
+describe('RepositoryListComponent', () => {
   let component: RepositoriesListComponent;
   let fixture: ComponentFixture<RepositoriesListComponent>;
 
@@ -14,7 +14,7 @@ describe('RepositoriesListComponent', () => {
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RepositoriesListComponent);
+    fixture = TestBed.createComponent(RepositoryListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

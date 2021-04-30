@@ -1,5 +1,5 @@
 import { Route } from '@angular/router';
-import { LandingWelcomeComponent } from 'app/welcome/welcome.component';
+import { LandingWelcomeComponent } from './welcome.component';
 
 export const landingWelcomeRoutes: Route[] = [
     {

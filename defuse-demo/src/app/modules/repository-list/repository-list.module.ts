@@ -11,10 +11,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatTabsModule } from '@angular/material/tabs';
 
-import { DialogAddRepositoryComponent } from './../dialog-add-repository/dialog-add-repository.component';
-import { DialogDeleteRepositoryComponent } from './../dialog-delete-repository/dialog-delete-repository.component';
-import { RepositoriesListComponent } from './repositories-list.component';
-import { RepositoryItemComponent } from './repositories-item.component';
+import { DialogAddRepositoryComponent } from './dialog-add-repository/dialog-add-repository.component';
+import { DialogDeleteRepositoryComponent } from './dialog-delete-repository/dialog-delete-repository.component';
+import { RepositoryListComponent } from './repository-list.component';
+import { RepositoryItemComponent } from './repository-item.component';
 
 // import { MatSelectModule } from '@angular/material/select';
 // import { MatSidenavModule } from '@angular/material/sidenav';
@@ -29,10 +29,10 @@ import { RepositoryItemComponent } from './repositories-item.component';
 // import { AddRepositoryDialogComponent } from './add-repo.component';
 
 
-const repositoriesListRoutes: Route[] = [
+const repositoryListRoutes: Route[] = [
     {
         path     : '',
-        component: RepositoriesListComponent
+        component: RepositoryListComponent
     }
 ];
 
@@ -54,11 +54,11 @@ const modules = [
         DialogAddRepositoryComponent,
         DialogDeleteRepositoryComponent,
         RepositoryItemComponent,
-        RepositoriesListComponent
+        RepositoryListComponent
     ],
     entryComponents: [DialogAddRepositoryComponent],
     imports     : [
-        RouterModule.forChild(repositoriesListRoutes),
+        RouterModule.forChild(repositoryListRoutes),
         ...modules
 
 //         MatChipsModule,
@@ -76,6 +76,6 @@ const modules = [
 //         ScrollingModule
     ]
 })
-export class RepositoriesListModule
+export class RepositoryListModule
 {
 }

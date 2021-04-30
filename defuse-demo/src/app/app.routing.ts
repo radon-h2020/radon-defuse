@@ -1,6 +1,5 @@
 import { Route } from '@angular/router';
 import { LayoutComponent } from 'app/layout/layout.component';
-import { RepositoriesListComponent } from 'app/repositories-list/repositories-list.component';
 
 // @formatter:off
 // tslint:disable:max-line-length
@@ -10,7 +9,7 @@ export const appRoutes: Route[] = [
     {
         path: '',
         component  : LayoutComponent,
-        loadChildren: () => import('app/welcome/welcome.module').then(m => m.LandingWelcomeModule),
+        loadChildren: () => import('app/modules/welcome/welcome.module').then(m => m.LandingWelcomeModule),
         data: {
             layout: 'empty'
         }
@@ -22,7 +21,7 @@ export const appRoutes: Route[] = [
         data: {
             layout: 'empty'
         },
-        loadChildren: () => import('app/repositories-list/repositories-list.module').then(m => m.RepositoriesListModule),
+        loadChildren: () => import('app/modules/repository-list/repository-list.module').then(m => m.RepositoryListModule),
     }
 ];
 

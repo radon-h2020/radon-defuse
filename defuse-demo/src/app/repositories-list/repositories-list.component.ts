@@ -2,6 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog'
 
 import { DialogAddRepositoryComponent } from './../dialog-add-repository/dialog-add-repository.component';
+import { DialogDeleteRepositoryComponent } from './../dialog-delete-repository/dialog-delete-repository.component';
 import { RepositoryModel } from 'app/core/repository/repository.model'
 import { RepositoriesService } from 'app/core/repository/repositories.service'
 
@@ -44,10 +45,6 @@ export class RepositoriesListComponent implements OnInit {
 //         )
     }
 
-    onDeleteButtonClick(){
-        console.log('Click on delete button')
-    }
-
     onAdd(url: string, token: string){
         this.repositoriesService.addRepository(url, token)
             .subscribe(added => {
@@ -74,6 +71,18 @@ export class RepositoriesListComponent implements OnInit {
         dialogRef.afterClosed().subscribe(result => {
             if(result.url != undefined){
                 this.onAdd(result.url, result.token)
+            }
+        })
+    }
+
+    openDeleteDialog(id: number){
+
+        const repoToDelete = this.repositories.filter(item => item.id == id)[0]
+
+        let dialogRef = this.dialog.open(DialogDeleteRepositoryComponent, {data: {full_name: repoToDelete.full_name}});
+        dialogRef.afterClosed().subscribe(confirmDelete => {
+            if(confirmDelete){
+                this.onDelete(repoToDelete.id)
             }
         })
     }

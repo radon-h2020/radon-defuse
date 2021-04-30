@@ -12,6 +12,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatTabsModule } from '@angular/material/tabs';
 
 import { DialogAddRepositoryComponent } from './../dialog-add-repository/dialog-add-repository.component';
+import { DialogDeleteRepositoryComponent } from './../dialog-delete-repository/dialog-delete-repository.component';
 import { RepositoriesListComponent } from './repositories-list.component';
 import { RepositoryItemComponent } from './repositories-item.component';
 
@@ -51,6 +52,7 @@ const modules = [
 @NgModule({
     declarations: [
         DialogAddRepositoryComponent,
+        DialogDeleteRepositoryComponent,
         RepositoryItemComponent,
         RepositoriesListComponent
     ],

@@ -62,7 +62,7 @@
                     <div class="flex-col flex-auto mt-2 overflow-x-auto" style="min-width: 800px; max-width: 1000px; margin: auto;">
                         <mat-list class="mat-list-content">
                             <mat-list-item class="p-10" *ngFor="let item of filteredRepositoriesGithub; trackBy: trackRepositoryById" style="margin-bottom: 30px;">
-                                <repositories-item [item]="item" (deleted)="onDelete($event)" style="width:100%;"></repositories-item>
+                                <repositories-item [item]="item" (deleted)="openDeleteDialog($event)" style="width:100%;"></repositories-item>
                                 <mat-divider class="background-divider p-10"></mat-divider>
                             </mat-list-item>
                         </mat-list>
@@ -74,7 +74,7 @@
                     <div class="flex-col flex-auto mt-2 overflow-x-auto" style="min-width: 800px; max-width: 1000px; margin: auto;">
                         <mat-list class="mat-list-content">
                             <mat-list-item class="p-10" *ngFor="let item of filteredRepositoriesGitlab; trackBy: trackRepositoryById" style="margin-bottom: 30px;">
-                                <repositories-item [item]="item" (deleted)="onDelete($event)" style="width:100%;"></repositories-item>
+                                <repositories-item [item]="item" (deleted)="openDeleteDialog($event)" style="width:100%;"></repositories-item>
                                 <mat-divider class="background-divider p-10"></mat-divider>
                             </mat-list-item>
                         </mat-list>

@@ -66,7 +66,7 @@ export class RepositoriesListComponent implements OnInit {
 
     }
 
-    openDialog(){
+    openAddDialog(){
         let dialogRef = this.dialog.open(DialogAddRepositoryComponent);
         dialogRef.afterClosed().subscribe(result => {
             if(result.url != undefined){

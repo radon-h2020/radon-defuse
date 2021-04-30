@@ -36,7 +36,7 @@
         </div>
         <!-- Commit Frequency -->
         <div class="col-span-1 flex flex-col items-center justify-center">
-            <ng-container>
+            <ng-container *ngIf="item.commit_frequency != undefined">
                 <div class="flex items-center">
                     <mat-icon
                         class="icon-size-5 text-hint"
@@ -49,7 +49,7 @@
         </div>
         <!-- Issue Frequency -->
         <div class="col-span-1 flex flex-col items-center justify-center">
-            <ng-container>
+            <ng-container *ngIf="item.issue_frequency != undefined">
                 <div class="flex items-center">
                     <mat-icon
                         class="icon-size-5 text-hint"
@@ -62,7 +62,7 @@
         </div>
         <!-- Core contributor -->
         <div class="col-span-1 flex flex-col items-center justify-center">
-            <ng-container>
+            <ng-container *ngIf="item.core_contributors != undefined">
                 <div class="flex items-center">
                     <mat-icon
                         class="icon-size-5 text-hint"
@@ -75,7 +75,7 @@
         </div>
         <!-- Continuous integration -->
         <div class="col-span-1 flex flex-col items-center justify-center">
-            <ng-container>
+            <ng-container  *ngIf="item.continuous_integration != undefined">
                 <div class="flex items-center">
                     <mat-icon
                         class="icon-size-5 text-hint"
@@ -88,7 +88,7 @@
         </div>
         <!-- License -->
         <div class="col-span-1 flex flex-col items-center justify-center">
-            <ng-container>
+            <ng-container  *ngIf="item.license != undefined">
                 <div class="flex items-center">
                     <mat-icon
                         class="icon-size-5 text-hint"
@@ -101,12 +101,12 @@
         </div>
         <!-- Comments -->
         <div class="col-span-1 flex flex-col items-center justify-center">
-            <ng-container>
+            <ng-container *ngIf="item.comment_ratio != undefined">
                 <div class="flex items-center">
                     <mat-icon
                         class="icon-size-5 text-hint"
                         matTooltip="Comment ratio"
-                        matTooltipPosition="below"
+                        matTooltipPosition="right"
                         style="cursor: pointer;">comment</mat-icon>
                     <div class="ml-1.5 text-md text-secondary">50%</div>
                 </div>
@@ -114,7 +114,7 @@
         </div>
         <!-- Repository code size -->
         <div class="col-span-1 flex flex-col items-center justify-center">
-            <ng-container>
+            <ng-container *ngIf="item.size != undefined">
                 <div class="flex items-center">
                     <mat-icon
                         class="icon-size-5 text-hint"

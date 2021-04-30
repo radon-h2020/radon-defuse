@@ -1,0 +1,112 @@
+<div class="absolute inset-0 flex flex-col min-w-0 bg-white dark:bg-transparent">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6  sm:pt-12 sm:px-10 bg-default dark:bg-transparent border-b">
+        <!-- Title -->
+        <div>
+            <div class="text-4xl font-extrabold tracking-tight leading-none">Repositories</div>
+            <div class="ml-0.5 font-medium text-secondary">
+                <ng-container *ngIf="repositoriesGithub.length + repositoriesGitlab.length > 0">
+                    {{repositoriesGithub.length + repositoriesGitlab.length}}
+                </ng-container>
+                {{repositoriesGithub.length + repositoriesGitlab.length | i18nPlural: {
+                    '=0'   : 'No repositories',
+                    '=1'   : 'repository',
+                    'other': 'repositories'}
+                }}
+            </div>
+        </div>
+
+
+        <!-- Actions -->
+        <div class="flex flex-shrink-0 items-center mt-6 sm:mt-0 sm:ml-4 gap-4">
+            <!-- Search -->
+            <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-50">
+                <mat-icon matPrefix [svgIcon]="'heroicons_outline:search'"></mat-icon>
+                <input
+                    matInput
+                    (keyup)="filterItem($event.target.value)"
+                    [autocomplete]="'off'"
+                    [placeholder]="'Find a repository...'">
+            </mat-form-field>
+
+            <!-- Language filter -->
+            <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-25">
+                <mat-select [(value)]="languageSelected" (selectionChange)="languageChanged()" [placeholder]="'Language'">
+                    <mat-option *ngFor="let language of languages" [value]="language.value">
+                        {{language.text}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+
+
+    <!-- Main -->
+    <div class="w-full max-w-screen-xl mx-auto mt-6">
+        <ng-container *ngIf="repositoriesGithub.length + repositoriesGitlab.length > 0; else noRepositories" >
+            <mat-tab-group mat-align-tabs="center" class="sm:px-2" [animationDuration]="'0'">
+                <!-- Github -->
+                <mat-tab label="Github" *ngIf="repositoriesGithub.length > 0">
+                    <div class="flex-col flex-auto mt-2 overflow-x-auto" style="min-width: 800px; max-width: 1000px; margin: auto;">
+                        <mat-list class="mat-list-content">
+                            <mat-list-item class="p-10" *ngFor="let item of filteredRepositoriesGithub; trackBy: trackRepositoryById" style="margin-bottom: 30px;">
+                                <inventory-item [item]="item" style="width:100%;"></inventory-item>
+                                <mat-divider class="background-divider p-10"></mat-divider>
+                            </mat-list-item>
+                        </mat-list>
+                    </div>
+                </mat-tab>
+
+                <!-- Gitlab -->
+                <mat-tab label="Gitlab" *ngIf="repositoriesGitlab.length > 0">
+                    <div class="flex-col flex-auto mt-2 overflow-x-auto" style="min-width: 800px; max-width: 1000px; margin: auto;">
+                        <mat-list class="mat-list-content">
+                            <mat-list-item class="p-10" *ngFor="let item of filteredRepositoriesGitlab; trackBy: trackRepositoryById" style="margin-bottom: 30px;">
+                                <inventory-item [item]="item" style="width:100%;"></inventory-item>
+                                <mat-divider class="background-divider p-10"></mat-divider>
+                            </mat-list-item>
+                        </mat-list>
+                    </div>
+                </mat-tab>
+
+            </mat-tab-group>
+        </ng-container>
+
+        <ng-template #noRepositories>
+            <div class="items-center justify-center sm:p-10">
+                <div class="mt-6 sm:mt-24 text-4xl md:text-7xl font-extrabold tracking-tight leading-tight md:leading-none text-center">You don't have any projects yet.</div>
+                <div class="mt-2 text-lg md:text-xl font-medium tracking-tight text-center text-secondary">Start connecting a repository by clicking the bottom-right button!</div>
+            </div>
+        </ng-template>
+    </div>
+
+
+
+</div>
+
+<!-- FABs -->
+<div id="fab-dismiss"
+    *ngIf="fabTogglerState==='active'"
+    (click)="onToggleFab()">
+</div>
+<div class="fab-container"
+    style="position: fixed; right: 24px; bottom: 24px; z-index: 100;">
+    <button
+        mat-fab class="fab-toggler"
+        (click)="onToggleFab()">
+        <i class="material-icons" [@fabToggler]="{value: fabTogglerState}">settings</i> <!-- Animation here -->
+    </button>
+    <div [@speedDialStagger]="buttons.length"> <!-- and here -->
+        <button *ngFor="let btn of buttons"
+                mat-mini-fab
+                class="fab-secondary"
+                color="accent"
+                #tooltip="matTooltip"
+                [matTooltip]="btn.tooltip"
+                matTooltipPosition="left">
+        <i [id]="btn.id" class="material-icons">{{btn.icon}}</i>
+        </button>
+    </div>
+</div>
+

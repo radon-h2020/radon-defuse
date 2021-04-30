@@ -1,0 +1,216 @@
+
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Main -->
+    <div class="flex-auto mt-4 sm:mt-6">
+
+        <button mat-fab color="accent" style="position: fixed; right: 16px; bottom: 24px; z-index: 100;"
+                #tooltip="matTooltip"
+                matTooltip="Mine repository"
+                matTooltipPosition="left"
+                (click)="mine()">
+            <!--<mat-icon>bug_report</mat-icon>
+            <mat-icon>sync</mat-icon>-->
+            <mat-icon>power_settings_new</mat-icon>
+        </button>
+
+        <div class="w-full max-w-screen-xl mx-auto">
+
+            <!-- Tabs -->
+            <mat-tab-group
+                class="sm:px-2"
+                [animationDuration]="'0'">
+
+                <!-- Home -->
+                <mat-tab label="Home">
+
+                    <ng-template matTabContent>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-6 gap-6 w-full min-w-0">
+                            <!-- Commit frequency -->
+                            <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+                                <div class="flex flex-col items-center mt-2">
+                                    <div class="text-6l sm:text-8xl font-bold tracking-tight leading-none text-blue-500">11</div>
+                                    <div class="text-l font-medium text-blue-600 dark:text-blue-500">Commit Frequency</div>
+                                </div>
+                            </div>
+
+                            <!-- Issue frequency -->
+                            <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+                                <div class="flex flex-col items-center mt-2">
+                                    <div class="text-6l sm:text-8xl font-bold tracking-tight leading-none text-blue-500">0.02</div>
+                                    <div class="text-l font-medium text-blue-600 dark:text-blue-500">Issue Frequency</div>
+                                </div>
+                            </div>
+
+                            <!-- Contributors -->
+                            <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+                                <div class="flex flex-col items-center mt-2">
+                                    <div class="text-6l sm:text-8xl font-bold tracking-tight leading-none text-blue-500">3</div>
+                                    <div class="text-l font-medium text-blue-600 dark:text-blue-500">Core Contributors</div>
+                                </div>
+                            </div>
+
+                            <!-- Metric 2 -->
+                            <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+                                <div class="flex flex-col items-center mt-2">
+                                    <div class="text-6l sm:text-8xl font-bold tracking-tight leading-none text-blue-500">21</div>
+                                    <div class="text-l font-medium text-blue-600 dark:text-blue-500">Due Tasks</div>
+                                </div>
+                            </div>
+
+                            <!-- Metric 2 -->
+                            <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+                                <div class="flex flex-col items-center mt-2">
+                                    <div class="text-6l sm:text-8xl font-bold tracking-tight leading-none text-blue-500">21</div>
+                                    <div class="text-l font-medium text-blue-600 dark:text-blue-500">Due Tasks</div>
+                                </div>
+                            </div>
+
+                            <!-- Metric 2 -->
+                            <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+                                <div class="flex flex-col items-center mt-2">
+                                    <div class="text-6l sm:text-8xl font-bold tracking-tight leading-none text-blue-500">21</div>
+                                    <div class="text-l font-medium text-blue-600 dark:text-blue-500">Due Tasks</div>
+                                </div>
+                            </div>
+
+
+                            <!-- Table fixing commits -->
+                            <div class="sm:col-span-6 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+                                <div class="text-lg font-medium tracking-tight leading-6 truncate"> Defect-fixing commits </div>
+
+                                <div class="flex flex-col flex-auto mt-2 overflow-x-auto">
+
+                                    <table mat-table [dataSource]="dataSourceCommits" >
+
+                                        <!-- Hash Column -->
+                                        <ng-container matColumnDef="hash">
+                                            <th mat-header-cell *matHeaderCellDef> Hash </th>
+                                            <td mat-cell *matCellDef="let commit">
+                                            <span class="flex items-center">
+                                                <span
+                                                    class="w-2 h-2 rounded-full"
+                                                    [ngClass]="{'bg-red-500': commit.valid === false,
+                                                                'bg-green-500': commit.valid === true}"
+                                                    (click)="patchCommit(commit)"
+                                                    #tooltip="matTooltip"
+                                                    [matTooltip]="commit.valid ? 'Exclude commit' : 'Include commit'"
+                                                    matTooltipPosition="below"
+                                                    style="cursor: pointer;"></span>
+                                                <span class="ml-3 leading-4" style="font-size: 12px;">{{commit.hash.substring(0,8)}}</span>
+                                            </span>
+                                        </td>
+                                        </ng-container>
+
+                                        <!-- Message Column -->
+                                        <ng-container matColumnDef="msg">
+                                            <th mat-header-cell *matHeaderCellDef> Message </th>
+                                            <td mat-cell *matCellDef="let commit" style="font-size: 12px;"> {{commit.msg.substring(0,100)}} </td>
+                                        </ng-container>
+
+                                        <!-- Defects Column -->
+                                        <ng-container matColumnDef="defects">
+                                            <th mat-header-cell *matHeaderCellDef> Defect types </th>
+                                            <td mat-cell *matCellDef="let commit">
+                                                <mat-chip-list aria-label="Defect types" style="font-size:caption">
+                                                    <mat-chip class="flex items-center justify-center py-1 px-3 rounded-full leading-normal text-gray-500 bg-gray-100 dark:text-gray-300 dark:bg-gray-700" *ngFor="let type of commit.defects" style="font-size: 10px;">{{type}}</mat-chip>
+                                                </mat-chip-list>
+                                            </td>
+                                        </ng-container>
+
+                                        <tr mat-header-row *matHeaderRowDef="displayedColumnsTableCommits"></tr>
+                                        <tr mat-row *matRowDef="let row; columns: displayedColumnsTableCommits;"></tr>
+                                        </table>
+
+                                        <!-- Table footer (paginator + search filter)-->
+                                        <div class="grid grid-cols-1 sm:grid-cols-6 gap-6 w-full min-w-0" style="padding-top: 10px">
+                                            <div class="sm:col-span-3 lg:col-span-4 flex flex-col flex-auto">
+                                                <mat-paginator
+                                                    #PaginatorCommits="matPaginator"
+                                                    [pageSizeOptions]="[5, 10, 20]"
+                                                    showFirstLastButtons></mat-paginator>
+                                            </div>
+                                            <div class="sm:col-span-3 lg:col-span-2 flex flex-col flex-auto">
+                                                <mat-form-field appearance="legacy">
+                                                    <input
+                                                        matInput
+                                                        (keyup)="applyFilterCommits($event.target.value)"
+                                                        placeholder="Filter"
+                                                    />
+                                                    <mat-icon matSuffix>search</mat-icon>
+                                                    </mat-form-field>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div>
+
+                            <!-- Table fixed files -->
+                            <div class="sm:col-span-6 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+                                <div class="text-lg font-medium tracking-tight leading-6 truncate">Fixed files</div>
+                                <div class="flex flex-col flex-auto mt-2 overflow-x-auto">
+
+                                    <table mat-table [dataSource]="dataSourceFiles">
+                                        <ng-container matColumnDef="hash_fix">
+                                            <th mat-header-cell *matHeaderCellDef> Fixing commit </th>
+                                            <td mat-cell *matCellDef="let file">
+                                            <span class="flex items-center">
+                                                <span
+                                                    class="w-2 h-2 rounded-full"
+                                                    [ngClass]="{'bg-red-500': file.valid === false,
+                                                                'bg-green-500': file.valid === true}"
+                                                    (click)="patchFile(file)"
+                                                    #tooltip="matTooltip"
+                                                    [matTooltip]="file.valid ? 'Exclude file' : 'Include file'"
+                                                    matTooltipPosition="below"
+                                                    style="cursor: pointer;"></span>
+                                                <span class="ml-3 leading-4">{{file.hash_fix.substring(0,8)}}</span>
+                                            </span>
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="hash_bic">
+                                            <th mat-header-cell *matHeaderCellDef> Bug introducing commit </th>
+                                            <td mat-cell *matCellDef="let file"> {{file.hash_bic.substring(0,8)}}</td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="path">
+                                            <th mat-header-cell *matHeaderCellDef> File </th>
+                                            <td mat-cell *matCellDef="let file"> {{file.path}} </td>
+                                        </ng-container>
+
+                                        <tr mat-header-row *matHeaderRowDef="displayedColumnsTableFiles"></tr>
+                                        <tr mat-row *matRowDef="let row; columns: displayedColumnsTableFiles;"></tr>
+                                    </table>
+
+                                    <!-- Table footer (paginator + search filter)-->
+                                    <div class="grid grid-cols-1 sm:grid-cols-6 gap-6 w-full min-w-0" style="padding-top: 10px">
+                                        <div class="sm:col-span-3 lg:col-span-4 flex flex-col flex-auto">
+                                            <mat-paginator
+                                                #PaginatorFiles="matPaginator"
+                                                [pageSizeOptions]="[5, 10, 20]"
+                                                showFirstLastButtons></mat-paginator>
+                                        </div>
+                                        <div class="sm:col-span-3 lg:col-span-2 flex flex-col flex-auto">
+                                            <mat-form-field appearance="legacy">
+                                                <input
+                                                    matInput
+                                                    (keyup)="applyFilterFiles($event.target.value)"
+                                                    placeholder="Filter"
+                                                />
+                                                <mat-icon matSuffix>search</mat-icon>
+                                                </mat-form-field>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </ng-template>
+
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+    </div>
+</div>

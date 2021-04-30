@@ -8,10 +8,8 @@ import { AngularFirestoreModule } from '@angular/fire/firestore'
 import { MarkdownModule } from 'ngx-markdown';
 import { FuseModule } from '@fuse';
 import { FuseConfigModule } from '@fuse/services/config';
-import { FuseMockApiModule } from '@fuse/lib/mock-api';
 import { CoreModule } from 'app/core/core.module';
 import { appConfig } from 'app/core/config/app.config';
-import { mockApiServices } from 'app/mock-api';
 import { LayoutModule } from 'app/layout/layout.module';
 import { AppComponent } from 'app/app.component';
 import { appRoutes } from 'app/app.routing';
@@ -34,10 +32,9 @@ const routerConfig: ExtraOptions = {
         RouterModule.forRoot(appRoutes, routerConfig),
         HttpClientModule,
 
-        // Fuse & Fuse Mock API
+        // Fuse
         FuseModule,
         FuseConfigModule.forRoot(appConfig),
-        FuseMockApiModule.forRoot(mockApiServices),
 
         // Core
         CoreModule,
@@ -49,8 +46,8 @@ const routerConfig: ExtraOptions = {
         MarkdownModule.forRoot({}),
 
         // Firestore
-         AngularFireModule.initializeApp(environment.firebase),
-         AngularFirestoreModule
+        AngularFireModule.initializeApp(environment.firebase),
+        AngularFirestoreModule
     ],
     bootstrap   : [
         AppComponent

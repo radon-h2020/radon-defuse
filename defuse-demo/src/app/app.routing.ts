@@ -25,17 +25,33 @@ export const appRoutes: Route[] = [
     },
 
     {
-        path       : 'repository/:id',
+        path       : 'repository/:id/dashboard',
         component  : LayoutComponent,
-        //loadChildren: () => import('app/modules/dashboard/dashboard.module').then(m => m.DashboardModule),
+        loadChildren: () => import('app/modules/dashboard/dashboard.module').then(m => m.DashboardModule),
         data: {
             layout: 'centered'
-        },
-        children   : [
-            {path: 'dashboard', loadChildren: () => import('app/modules/dashboard/dashboard.module').then(m => m.DashboardModule)},
-            {path: 'models', loadChildren: () => import('app/modules/dashboard/dashboard.module').then(m => m.DashboardModule)},
-        ]
-
+        }
     },
+    {
+        path       : 'repository/:id/models',
+        component  : LayoutComponent,
+        loadChildren: () => import('app/modules/dashboard/dashboard.module').then(m => m.DashboardModule),
+        data: {
+            layout: 'centered'
+        }
+    },
+
+//     {
+//         path       : 'repository/:id',
+//         component  : LayoutComponent,
+//         //loadChildren: () => import('app/modules/dashboard/dashboard.module').then(m => m.DashboardModule),
+//         data: {
+//             layout: 'centered'
+//         },
+//         children   : [
+//             {path: 'dashboard', loadChildren: () => import('app/modules/dashboard/dashboard.module').then(m => m.DashboardModule)},
+//             {path: 'models', loadChildren: () => import('app/modules/dashboard/dashboard.module').then(m => m.DashboardModule)},
+//         ]
+//     },
 ];
 

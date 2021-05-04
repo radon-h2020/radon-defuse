@@ -79,13 +79,9 @@ export class RepositoryListService {
     }
 
     deleteRepository(id: number): Observable<boolean>{
-        this.repositoryDoc = this.store.    doc(`repositories/${id.toString()}`);
+        this.repositoryDoc = this.store.doc(`repositories/${id.toString()}`);
         this.repositoryDoc.delete();
         return of(true)
     }
 
 }
-
-
-// to add fixing commit
-//this.store.collection('fixing-commits').doc(commit.hash).set({hash: 'hash1223', types: ['a', 'b']})

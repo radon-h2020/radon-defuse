@@ -37,7 +37,7 @@ export class CenteredLayoutComponent implements OnInit, OnDestroy
     navigation: FuseNavigationItem[] = horizontalNavigation
 
     /**
-     * Constructor
+     * Constructors
      */
     constructor(
         private _activatedRoute: ActivatedRoute,
@@ -69,8 +69,7 @@ export class CenteredLayoutComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
-        const id=this._activatedRoute.snapshot.paramMap.get("id");
-
+        const id = this._activatedRoute.snapshot.paramMap.get("id");
         this.navigation[0].link = '/repository/' + id + '/dashboard'
         this.navigation[1].link = '/repository/' + id + '/models'
 

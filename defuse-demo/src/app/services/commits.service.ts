@@ -14,7 +14,6 @@ export class CommitsService {
 
     commitsCollection: AngularFirestoreCollection<CommitModel>;
     commits: Observable<CommitModel[]>;
-    commitHashes: string[];
     commitDoc: AngularFirestoreDocument<CommitModel>;
 
     constructor(private httpClient: HttpClient, private store: AngularFirestore){}
@@ -28,7 +27,7 @@ export class CommitsService {
                     const data = item.payload.doc.data();
                     const msg = data['msg'] !== undefined ? data['msg'] : 'There is no message for this commit.'
 
-                    return {hash: data['hash'], msg: msg, valid: true, defects: []} as CommitModel
+                    return {hash: data['hash'], msg: msg, is_valid: data['is_valid'], defects: []} as CommitModel
                 })
             }))
     }
@@ -37,68 +36,10 @@ export class CommitsService {
         return this.commits;
     }
 
+    patchIsValid(commit: CommitModel): Observable<boolean>{
+        commit.is_valid = !commit.is_valid
+        this.commitDoc = this.store.doc(`commits/${commit.hash}`);
+        this.commitDoc.update(commit);
+        return of(true)
+    }
 }
-
-
-//         this.commitsCollection = this.store.collection('commits');
-//         this.commits = this.commitsCollection.snapshotChanges().pipe(map(changes => {
-//            return changes.map(item => {
-//                const data = item.payload.doc.data();
-//                return {hash: data.hash, msg: 'string', valid: true, defects: ['']} as CommitModel})
-//         }))
-
-
-
-//         this.store.doc('repositories/240532248').get()
-//                   .subscribe(async (doc) => {
-//                       this.commitHashes = doc.data()['commits'];
-
-//                       const snapshots = await this.store.collection('commits', ref => ref.where('hash', 'in', this.commitHashes)).get();
-//                       snapshots.forEach(snapshot => {
-//                         snapshot.docs.forEach(doc => {
-//                             console.log(typeof(doc))
-//                             console.log(doc.data())
-//                             this.commits.push({
-//                                 hash: data.hash,
-//                                 msg: data.msg,
-//                                 valid: data.is_valid,
-//                                 defects: data.defects
-//                             })
-//                         })
-//                       });
-
-//                       this.commitsCollection = this.store.collection('commits');
-//                       this.commits = this.commitsCollection.snapshotChanges().pipe(map(changes => {
-//                         return changes.map(item => {
-//                             const data = item.payload.doc.data();
-//                             return {hash: data.hash, msg: 'string', valid: true, defects: ['']} as CommitModel})
-//                       }))
-//                   })
-
-
-//        this.commitsCollection = this.store.collection('commits');
-
-//         this.commits = this.commitsCollection.snapshotChanges().pipe(map(changes => {
-//             return changes.map(item => {
-//                 const data = item.payload.doc.data();
-//
-//                 if(commitHashes.includes(data.hash)){
-//                     const commit = {
-//                         hash: data.hash,
-//                         msg: data.msg,
-//                         valid: data.is_valid,
-//                         defects: data.defects
-//                     } as CommitModel
-//
-//                     return commit
-//                 }
-//             })
-//         }))
-
-
-
-
-
-
-// to add fixing commit
-//this.store.collection('fixing-commits').doc(commit.hash).set({hash: 'hash1223', types: ['a', 'b']})

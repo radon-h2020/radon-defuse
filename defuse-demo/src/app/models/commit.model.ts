@@ -1,6 +1,6 @@
 export interface CommitModel {
     hash: string;
     msg?: string;
-    valid: boolean;
+    is_valid: boolean;
     defects: string[]
 }

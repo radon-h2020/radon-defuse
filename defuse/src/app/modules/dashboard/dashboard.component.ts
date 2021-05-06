@@ -11,6 +11,7 @@ import { FixedFileModel } from 'app/models/fixed-file.model';
 // Services
 import { CommitsService } from 'app/services/commits.service';
 import { FixedFilesService } from 'app/services/fixed-files.service';
+import { TasksService } from 'app/services/tasks.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -35,6 +36,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     constructor(private activatedRoute: ActivatedRoute,
                 private commitsService: CommitsService,
                 private filesService: FixedFilesService,
+                private tasksService: TasksService,
                 private snackBar: MatSnackBar) {
 
         this.repositoryId = this.activatedRoute.snapshot.paramMap.get("id");
@@ -86,7 +88,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     }
 
     startMining(){
-        console.log('Call MiningService')
+        this.tasksService.mine()
     }
 }
 

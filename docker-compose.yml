@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+
+  defuse-backend:
+    build: ./backend
+    container_name: defuse-backend
+    ports:
+      - 5001:5000
+
+  defuse-ui:
+    build: ./defuse
+    container_name: defuse-ui
+    ports:
+      - 4201:4200
+    links:
+      - defuse-backend

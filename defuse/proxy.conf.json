@@ -1,6 +1,6 @@
 {
     "/api": {
-        "target": "http://localhost:5000/",
+        "target": "http://defuse-backend:5000/",
         "secure": false,
         "changeOrigin": false,
         "pathRewrite": {

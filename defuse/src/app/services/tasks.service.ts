@@ -39,7 +39,7 @@ export class TasksService {
     }
 
     mine(): void{
-        console.log('In mining')
+        console.log('In mining.')
 
         this.httpClient.get('api/mine').subscribe(response => {
                 console.log(response)

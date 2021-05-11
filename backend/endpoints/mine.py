@@ -30,7 +30,7 @@ class Mine(Resource):
             self.db.collection('commits').document(hash).set({
                 'hash': hash,
                 'is_valid': True,
-                'repository_id': args.get('id'),
+                'repository_id': int(args.get('id')),
                 'defects': defects,
                 'languages': [args.get('language').lower()]  # if exists: set(languages + new language)
             })
@@ -43,7 +43,7 @@ class Mine(Resource):
                 'hash_bic': file['bic'],
                 'filepath': file['filepath'],
                 'is_valid': True,
-                'repository_id': args.get('id'),
+                'repository_id': int(args.get('id')),
                 'languages': [args.get('language').lower()]  # if exists: set(languages + new language)
             })
 

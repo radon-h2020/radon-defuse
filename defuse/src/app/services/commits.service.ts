@@ -27,7 +27,7 @@ export class CommitsService {
                     const data = item.payload.doc.data();
                     const msg = data['msg'] !== undefined ? data['msg'] : 'There is no message for this commit.'
 
-                    return {hash: data['hash'], msg: msg, is_valid: data['is_valid'], defects: []} as CommitModel
+                    return {hash: data['hash'], msg: msg, is_valid: data['is_valid'], defects: data['defects']} as CommitModel
                 })
             }))
     }

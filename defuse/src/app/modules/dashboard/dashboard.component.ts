@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -34,6 +34,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     @ViewChild('PaginatorFiles') paginatorFiles: MatPaginator;
 
     constructor(private activatedRoute: ActivatedRoute,
+                private cdr: ChangeDetectorRef,
                 private commitsService: CommitsService,
                 private filesService: FixedFilesService,
                 private tasksService: TasksService,
@@ -46,11 +47,15 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.commitsService.getAll().subscribe(commits => {
             this.commits = commits
             this.dataSourceCommits = new MatTableDataSource<CommitModel>(this.commits);
+            this.cdr.detectChanges();
+            this.dataSourceCommits.paginator = this.paginatorCommits;
         });
 
         this.filesService.getAll().subscribe(files => {
             this.files = files
             this.dataSourceFiles = new MatTableDataSource<FixedFileModel>(this.files);
+            this.cdr.detectChanges();
+            this.dataSourceFiles.paginator = this.paginatorFiles;
         });
     }
 

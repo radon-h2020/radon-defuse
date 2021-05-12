@@ -126,16 +126,22 @@ class Train(Resource):
             dp.train(data)
             b_model = dp.dumps_model()
 
-            # Create Task
+            # Create model record
             model_id = self.db.collection('models').add({
                 'repository_id': self.args.get('id'),
                 'language': self.args.get('language'),
                 'defect': self.args.get('defect'),
                 'created_at': time.time(),
-                'average_precision': dp.best_estimator_average_precision
+                'average_precision': round(dp.best_estimator_average_precision, 4)
             })[1].id
 
             blob = self.bucket.blob(f'{model_id}.joblib')
+            metadata = {
+                'defect': self.args.get('defect'),
+                'language': self.args.get('language'),
+                'repository_id': self.args.get('id')
+            }
+            blob.metadata = metadata
             blob.upload_from_string(b_model)
 
         except:

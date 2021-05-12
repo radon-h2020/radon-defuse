@@ -5,6 +5,7 @@ from flask_restful import Api
 
 from endpoints.mine import Mine
 from endpoints.train import Train
+from endpoints.predict import Predict
 
 # Initialize Firestore DB
 with open('.key.json') as f:
@@ -20,6 +21,7 @@ api = Api(app)
 
 api.add_resource(Mine, '/mine', resource_class_kwargs={'db': db})
 api.add_resource(Train, '/train', resource_class_kwargs={'db': db, 'bucket': bucket})
+api.add_resource(Predict, '/predict', resource_class_kwargs={'db': db, 'bucket': bucket})
 
 #
 # @app.route('/')

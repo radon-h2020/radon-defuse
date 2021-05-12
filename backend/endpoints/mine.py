@@ -23,7 +23,7 @@ class Mine(Resource):
 
         # Create Task
         task_id = self.db.collection('tasks').add({
-            'task': 'mine',
+            'name': 'mine',
             'repository_id': self.args.get('id'),
             'language': self.args.get('language'),
             'status': 'progress',

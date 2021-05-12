@@ -27,7 +27,7 @@ class Predict(Resource):
 
         # Create Task
         task_id = self.db.collection('tasks').add({
-            'task': 'predict',
+            'name': 'predict',
             'repository_id': self.args.get('id'),
             'status': 'progress',
             'started_at': time.time()

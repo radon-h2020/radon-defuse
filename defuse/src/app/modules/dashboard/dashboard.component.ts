@@ -30,7 +30,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     // Files
     files: FixedFileModel[] = [];
     dataSourceFiles: MatTableDataSource<FixedFileModel>;
-    displayedColumnsTableFiles: string[] = ['hash_fix', 'hash_bic', 'path'];
+    displayedColumnsTableFiles: string[] = ['hash_fix', 'hash_bic', 'filepath'];
     @ViewChild('PaginatorFiles') paginatorFiles: MatPaginator;
 
     constructor(private activatedRoute: ActivatedRoute,
@@ -73,7 +73,17 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     patchCommit(commit: CommitModel) {
         this.commitsService.patchIsValid(commit)
             .subscribe(patched => {
-              if(!patched) console.log('TO SHOW ERROR THROUGH MESSAGE')
+                if(!patched) {
+                    console.log('TO SHOW ERROR THROUGH MESSAGE')
+                } else {
+
+                    // Switch the validity of commit files accordingly
+                    for(let file of this.files){
+                        if(file.hash_fix === commit.hash){
+                            this.patchFile(file)
+                        }
+                    }
+                }
             });
     }
 

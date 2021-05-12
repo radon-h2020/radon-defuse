@@ -104,19 +104,19 @@
                                         [matTooltip]="file.is_valid ? 'Exclude file' : 'Include file'"
                                         matTooltipPosition="below"
                                         style="cursor: pointer;"></span>
-                                    <span class="ml-3 leading-4">{{file.hash_fix.substring(0,8)}}</span>
+                                    <span class="ml-3 leading-4" style="font-size: 12px;">{{file.hash_fix.substring(0,8)}}</span>
                                 </span>
                                 </td>
                             </ng-container>
 
                             <ng-container matColumnDef="hash_bic">
                                 <th mat-header-cell *matHeaderCellDef> Bug introducing commit </th>
-                                <td mat-cell *matCellDef="let file"> {{file.hash_bic.substring(0,8)}}</td>
+                                <td mat-cell *matCellDef="let file" style="font-size: 12px;"> {{file.hash_bic.substring(0,8)}}</td>
                             </ng-container>
 
-                            <ng-container matColumnDef="path">
+                            <ng-container matColumnDef="filepath">
                                 <th mat-header-cell *matHeaderCellDef> File </th>
-                                <td mat-cell *matCellDef="let file"> {{file.path}} </td>
+                                <td mat-cell *matCellDef="let file" style="font-size: 12px;"> {{file.filepath}} </td>
                             </ng-container>
 
                             <tr mat-header-row *matHeaderRowDef="displayedColumnsTableFiles"></tr>

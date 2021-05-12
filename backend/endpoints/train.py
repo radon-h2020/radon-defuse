@@ -24,7 +24,6 @@ class Train(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, required=True)
         parser.add_argument('language', type=str, required=True, choices=('ansible', 'tosca'))
-        parser.add_argument('branch', type=str, required=True)
         parser.add_argument('defect', type=str, required=True,
                             choices=('conditional', 'configuration_data', 'dependency', 'security', 'service'))
 
@@ -52,13 +51,15 @@ class Train(Resource):
         os.makedirs(clone_repo_to)
 
         try:
-            url = self.db.collection('repositories').document(str(self.args.get('id'))).get().to_dict().get('url')
+            repo_doc = self.db.collection('repositories').document(str(self.args.get('id'))).get().to_dict()
+            url = repo_doc.get('url')
+            default_branch = repo_doc.get('default_branch')
 
             if self.args.get('language').lower() == 'ansible':
-                miner = AnsibleMiner(url, self.args.get('branch'), clone_repo_to)
+                miner = AnsibleMiner(url, default_branch, clone_repo_to)
                 metrics_extractor = AnsibleMetricsExtractor(url, 'release', clone_repo_to)
             elif self.args.get('language').lower() == 'tosca':
-                miner = ToscaMiner(url, self.args.get('branch'), clone_repo_to)
+                miner = ToscaMiner(url, default_branch, clone_repo_to)
                 metrics_extractor = ToscaMetricsExtractor(url, 'release', clone_repo_to)
 
             # Get valid fixing-commits for the repository, language, and defect

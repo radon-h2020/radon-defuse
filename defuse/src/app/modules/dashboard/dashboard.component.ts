@@ -43,6 +43,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.repositoryId = this.activatedRoute.snapshot.paramMap.get("id");
         this.commitsService.initializeCommits(this.repositoryId)
         this.filesService.initializeFiles(this.repositoryId)
+        this.tasksService.initializeTasks(this.repositoryId)
 
         this.commitsService.getAll().subscribe(commits => {
             this.commits = commits
@@ -103,7 +104,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     }
 
     startMining(){
-        this.tasksService.mine()
+        this.tasksService.mine('ansible', 'master')
     }
 }
 

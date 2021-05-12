@@ -26,7 +26,6 @@ class Mine(Resource):
             'task': 'mine',
             'repo_id': self.args.get('id'),
             'language': self.args.get('language'),
-            'branch': self.args.get('branch'),
             'status': 'progress',
             'started_at': time.time()
         })[1].id

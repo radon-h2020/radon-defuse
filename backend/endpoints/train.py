@@ -34,7 +34,6 @@ class Train(Resource):
             'task': 'train',
             'repo_id': self.args.get('id'),
             'language': self.args.get('language'),
-            'branch': self.args.get('branch'),
             'defect': self.args.get('defect'),
             'status': 'progress',
             'started_at': time.time()

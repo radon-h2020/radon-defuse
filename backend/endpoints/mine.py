@@ -12,7 +12,6 @@ from repominer.mining.tosca import ToscaMiner
 class Mine(Resource):
 
     def __init__(self, **kwargs):
-        print(kwargs['db'])
         self.db = kwargs['db']
 
     def get(self):

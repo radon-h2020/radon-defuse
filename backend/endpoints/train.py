@@ -1,5 +1,12 @@
+import os
+import shutil
+import time
+import threading
+
 from flask import jsonify, make_response
 from flask_restful import Resource, Api, reqparse
+
+from radondp.predictors import DefectPredictor
 from repominer.mining.ansible import AnsibleMiner
 from repominer.mining.tosca import ToscaMiner
 from repominer.metrics.ansible import AnsibleMetricsExtractor
@@ -10,64 +17,128 @@ from repominer.files import FixedFileDecoder, FixedFileEncoder, FailureProneFile
 class Train(Resource):
 
     def __init__(self, **kwargs):
-        print(kwargs['db'])
         self.db = kwargs['db']
+        self.bucket = kwargs['bucket']
 
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('id', required=True)
-        parser.add_argument('language', required=True)
-        parser.add_argument('branch', required=True)
+        parser.add_argument('id', type=int, required=True)
+        parser.add_argument('language', type=str, required=True, choices=('ansible', 'tosca'))
+        parser.add_argument('branch', type=str, required=True)
+        parser.add_argument('defect', type=str, required=True,
+                            choices=('conditional', 'configuration_data', 'dependency', 'security', 'service'))
 
-        args = parser.parse_args()  # parse arguments to dictionary
-        url = self.db.collection('repositories').document(str(args.get('id'))).get().to_dict().get('url')
+        self.args = parser.parse_args()  # parse arguments to dictionary
 
-        if args.get('language').lower() == 'ansible':
-            miner = AnsibleMiner(url, args.get('branch'))
-            metricsExtractor = AnsibleMetricsExtractor(url, at='release')
-        elif args.get('language').lower() == 'tosca':
-            miner = ToscaMiner(url, args.get('branch'))
-            metricsExtractor = ToscaMetricsExtractor(url, at='release')
-        else:
-            return jsonify({'error': 'Language not supported. Select ansible or tosca'}), 403
+        # Create Task
+        task_id = self.db.collection('tasks').add({
+            'task': 'train',
+            'repo_id': self.args.get('id'),
+            'language': self.args.get('language'),
+            'branch': self.args.get('branch'),
+            'defect': self.args.get('defect'),
+            'status': 'progress',
+            'started_at': time.time()
+        })[1].id
 
-        # Get valid fixing-commits for the repository and language
-        commits = self.db.collection('commits') \
-            .where('repository_id', '==', id) \
-            .where('is_valid', '==', True) \
-            .where('languages', 'array_contains', args.get('language')).stream()
+        thread = threading.Thread(target=self.run_task, name="trainer", args=(task_id,))
+        thread.start()
 
-        for doc in commits:
-            miner.fixing_commits.append(doc.to_dict().get('hash'))
+        return make_response(jsonify({}), 202)
 
-        miner.sort_commits(miner.fixing_commits)
+    def run_task(self, task_id: str):
+        status = 'completed'
+        clone_repo_to = os.path.join('/tmp', task_id)
+        os.makedirs(clone_repo_to)
 
-        # Get valid fixed-files for the repository and language
-        files = self.db.collection('fixed-files') \
-            .where('repository_id', '==', id) \
-            .where('is_valid', '==', True) \
-            .where('languages', 'array_contains', args.get('language')).stream()
+        try:
+            url = self.db.collection('repositories').document(str(self.args.get('id'))).get().to_dict().get('url')
 
-        decoder = FixedFileDecoder()
-        for doc in files:
-            doc = doc.to_dict()
-            doc['fic'] = doc['hash_fix']
-            doc['bic'] = doc['hash_bic']
-            miner.fixed_files.append(decoder.to_object(doc))
+            if self.args.get('language').lower() == 'ansible':
+                miner = AnsibleMiner(url, self.args.get('branch'), clone_repo_to)
+                metrics_extractor = AnsibleMetricsExtractor(url, 'release', clone_repo_to)
+            elif self.args.get('language').lower() == 'tosca':
+                miner = ToscaMiner(url, self.args.get('branch'), clone_repo_to)
+                metrics_extractor = ToscaMetricsExtractor(url, 'release', clone_repo_to)
 
-        failure_prone_files = [file for file in miner.label()]
-        metricsExtractor.extract(failure_prone_files, product=True, process=False, delta=False)
+            # Get valid fixing-commits for the repository, language, and defect
+            commits = self.db.collection('commits') \
+                .where('repository_id', '==', self.args.get('id')) \
+                .where('is_valid', '==', True) \
+                .where('languages', 'array_contains', self.args.get('language')).stream()
 
-        # Train using metricsExtractor.dataset
-        print(metricsExtractor.dataset)
+            for doc in commits:
+                doc = doc.to_dict()
+                if self.args.get('defect').upper() in doc['defects']:
+                    miner.fixing_commits.append(doc['hash'])
 
-        return make_response(jsonify({"status": 'completed'}), 200)
+            miner.sort_commits(miner.fixing_commits)
 
+            # Get valid fixed-files for the repository and language
+            files = self.db.collection('fixed-files') \
+                .where('repository_id', '==', self.args.get('id')) \
+                .where('is_valid', '==', True) \
+                .where('language', '==', self.args.get('language')).stream()
 
+            decoder = FixedFileDecoder()
+            for doc in files:
+                doc = doc.to_dict()
 
+                if doc['hash_fix'] in miner.fixing_commits:
+                    doc['fic'] = doc['hash_fix']
+                    doc['bic'] = doc['hash_bic']
+                    miner.fixed_files.append(decoder.to_object(doc))
 
+            failure_prone_files = [file for file in miner.label()]
+            metrics_extractor.extract(failure_prone_files, product=False, process=True, delta=False)
 
+            trained = self.__train_model(metrics_extractor.dataset)
 
+            if not trained:
+                status = 'failed'
 
+        except Exception as e:
+            status = 'failed'
+        finally:
+            shutil.rmtree(clone_repo_to)
 
+        doc_ref = self.db.collection('tasks').document(task_id)
+        doc_ref.update({
+            'status': status,
+            'ended_at': time.time()
+        })
 
+    def __train_model(self, data):
+
+        dp = DefectPredictor()
+        dp.balancers = ['none']
+        dp.normalizers = ['minmax']
+        dp.classifiers = ['dt']
+
+        # Remove releases with only failure_prone equal 0 or 1
+        for commit in data.commit.unique():
+            tmp = data[data.commit == commit]
+            if tmp.failure_prone.to_list().count(0) == 0 or tmp.failure_prone.to_list().count(1) == 0:
+                indices = data[data.commit == commit].index
+                data.drop(indices, inplace=True)
+
+        try:
+            dp.train(data)
+            b_model = dp.dumps_model()
+
+            # Create Task
+            model_id = self.db.collection('models').add({
+                'repository_id': self.args.get('id'),
+                'language': self.args.get('language'),
+                'defect': self.args.get('defect'),
+                'created_at': time.time(),
+                'average_precision': dp.best_estimator_average_precision
+            })[1].id
+
+            blob = self.bucket.blob(f'{model_id}.joblib')
+            blob.upload_from_string(b_model)
+
+        except:
+            return False
+
+        return True

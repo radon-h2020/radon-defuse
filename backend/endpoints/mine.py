@@ -18,7 +18,6 @@ class Mine(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, required=True)
         parser.add_argument('language', type=str, required=True)
-        parser.add_argument('branch', type=str, required=True)
 
         self.args = parser.parse_args()  # parse arguments to dictionary
 
@@ -35,7 +34,7 @@ class Mine(Resource):
         thread = threading.Thread(target=self.run_task, name="miner", args=(task_id,))
         thread.start()
 
-        return make_response(jsonify({}), 202)
+        return make_response({}, 202)
 
     def run_task(self, task_id: str):
         status = 'completed'
@@ -44,12 +43,14 @@ class Mine(Resource):
         os.makedirs(clone_repo_to)
 
         try:
-            url = self.db.collection('repositories').document(str(self.args.get('id'))).get().to_dict().get('url')
+            repo_doc = self.db.collection('repositories').document(str(self.args.get('id'))).get().to_dict()
+            url = repo_doc.get('url')
+            default_branch = repo_doc.get('default_branch')
 
             if self.args.get('language').lower() == 'ansible':
-                miner = AnsibleMiner(url, self.args.get('branch'), clone_repo_to)
+                miner = AnsibleMiner(url, default_branch, clone_repo_to)
             elif self.args.get('language').lower() == 'tosca':
-                miner = ToscaMiner(url, self.args.get('branch'), clone_repo_to)
+                miner = ToscaMiner(url, default_branch, clone_repo_to)
             else:
                 return jsonify({'error': 'Language not supported. Select ansible or tosca'}), 403
 

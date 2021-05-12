@@ -30,7 +30,7 @@ export class FixedFilesService {
                         hash_fix: data['hash_fix'],
                         hash_bic: data['hash_bic'],
                         is_valid: data['is_valid'],
-                        path: data['path']
+                        filepath: data['filepath']
                     } as FixedFileModel
                 })
             }))

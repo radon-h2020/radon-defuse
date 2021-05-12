@@ -29,10 +29,12 @@ export class TasksService {
                     return {
                         id: item.payload.doc.id,
                         name: data['name'],
-                        status: data['status'],
                         language: data['language'],
-                        started_at: data['started_at'],
-//                         ended_at: data['ended_at']
+                        started_at: Math.ceil(data['started_at']),
+                        ended_at: data['ended_at'],
+                        completed: data['status'] == 'completed',
+                        failed: data['status'] == 'failed',
+                        in_progress: data['status'] == 'progress'
                     } as TaskModel
                 })
             }))

@@ -104,7 +104,9 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     }
 
     startMining(){
-        this.tasksService.mine('ansible', 'master')
+        this.tasksService.mine('ansible').subscribe(response => {
+            console.log('response', response.status)
+        })
     }
 }
 

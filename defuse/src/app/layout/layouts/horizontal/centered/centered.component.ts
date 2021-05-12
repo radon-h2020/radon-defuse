@@ -20,6 +20,13 @@ export let horizontalNavigation: FuseNavigationItem[] = [
         type : 'basic',
         icon : 'heroicons_outline:beaker',
         link : '/models'
+    },
+    {
+        id   : 'tasks',
+        title: 'Tasks',
+        type : 'basic',
+        icon : 'heroicons_outline:check-circle',
+        link : '/tasks'
     }
 ];
 
@@ -72,6 +79,7 @@ export class CenteredLayoutComponent implements OnInit, OnDestroy
         const id = this._activatedRoute.snapshot.paramMap.get("id");
         this.navigation[0].link = '/repository/' + id + '/dashboard'
         this.navigation[1].link = '/repository/' + id + '/models'
+        this.navigation[2].link = '/repository/' + id + '/tasks'
 
         // Subscribe to the resolved route mock-api
 //         this._activatedRoute.data.subscribe((data: Data) => {

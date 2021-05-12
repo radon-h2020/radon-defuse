@@ -7,9 +7,6 @@ from flask import jsonify, make_response
 from flask_restful import Resource, Api, reqparse
 from repominer.mining.ansible import AnsibleMiner
 from repominer.mining.tosca import ToscaMiner
-from repominer.files import FixedFileDecoder, FixedFileEncoder, FailureProneFileEncoder
-
-import sys
 
 
 class Mine(Resource):
@@ -84,8 +81,6 @@ class Mine(Resource):
                     .where('repository_id', '==', self.args.get('id')) \
                     .where('language', '==', self.args.get('language')).stream()
             ]
-
-            print(existing_files, file=sys.stderr)
 
             for file in miner.get_fixed_files():
 

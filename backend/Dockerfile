@@ -21,8 +21,5 @@ RUN pip install -r requirements.txt
 # Download SpaCy statistical model en_core_web_sm
 RUN python3 -m spacy download en_core_web_sm
 
-# Environment variable for temporary repositories
-ENV TMP_REPOSITORIES_DIR=/tmp/
-
 ENTRYPOINT [ "python" ]
 CMD [ "app.py" ]

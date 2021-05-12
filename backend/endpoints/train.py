@@ -32,7 +32,7 @@ class Train(Resource):
         # Create Task
         task_id = self.db.collection('tasks').add({
             'task': 'train',
-            'repo_id': self.args.get('id'),
+            'repository_id': self.args.get('id'),
             'language': self.args.get('language'),
             'defect': self.args.get('defect'),
             'status': 'progress',

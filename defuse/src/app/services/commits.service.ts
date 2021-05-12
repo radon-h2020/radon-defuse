@@ -12,7 +12,6 @@ import { CommitModel } from 'app/models/commit.model';
 })
 export class CommitsService {
 
-    commitsCollection: AngularFirestoreCollection<CommitModel>;
     commits: Observable<CommitModel[]>;
     commitDoc: AngularFirestoreDocument<CommitModel>;
 

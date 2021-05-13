@@ -17,7 +17,7 @@
 
         <!-- Tasks list -->
         <ng-container *ngIf="tasks && tasks.length > 0; else noTasks">
-            <div class="divide-y" CdkScrollable>
+            <div class="divide-y">
 
                 <!-- Task -->
                 <div
@@ -28,7 +28,7 @@
                                 'text-hint': !task.in_progress}">
 
                     <!-- Task content -->
-                    <div class="relative flex items-center h-full pl-10 pr-7">
+                    <div class="relative flex items-center h-full pl-10 pr-10">
 
                         <!-- Task status icon -->
                         <ng-container *ngIf="!task.in_progress">
@@ -43,14 +43,14 @@
                         </ng-container>
 
                         <!-- Id -->
-                        <div class="text-sm flex-auto mr-2 truncate ml-4">
+                        <div class="text-sm text-left flex-auto mr-2 truncate ml-4">
                             <ng-container>
-                                <span>{{task.id.substring(0,8)}}</span>
+                                <span>{{task.id}}</span>
                             </ng-container>
                         </div>
 
                         <!-- Name -->
-                        <div class="text-sm flex-auto mr-2 truncate ml-4">
+                        <div class="text-sm flex-auto mr-2 truncate ml-4" style="text-align:left">
                             <ng-container>
                                 <span>{{task.name | titlecase}}</span>
                             </ng-container>

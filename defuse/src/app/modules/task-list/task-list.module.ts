@@ -14,22 +14,22 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { TasksComponent } from './tasks.component';
+import { TaskListComponent } from './task-list.component';
 
 
-const tasksRoutes: Route[] = [
+const taskListRoutes: Route[] = [
     {
         path     : '',
-        component: TasksComponent
+        component: TaskListComponent
     }
 ];
 
 @NgModule({
     declarations: [
-        TasksComponent
+        TaskListComponent
     ],
     imports     : [
-        RouterModule.forChild(tasksRoutes),
+        RouterModule.forChild(taskListRoutes),
         CommonModule,
 //         MatButtonModule,
          MatChipsModule,
@@ -45,6 +45,6 @@ const tasksRoutes: Route[] = [
 //         MatTooltipModule
     ]
 })
-export class TasksModule
+export class TaskListModule
 {
 }

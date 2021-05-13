@@ -43,7 +43,7 @@ export const appRoutes: Route[] = [
     {
         path       : 'repository/:id/tasks',
         component  : LayoutComponent,
-        loadChildren: () => import('app/modules/tasks/tasks.module').then(m => m.TasksModule),
+        loadChildren: () => import('app/modules/task-list/task-list.module').then(m => m.TaskListModule),
         data: {
             layout: 'centered'
         }

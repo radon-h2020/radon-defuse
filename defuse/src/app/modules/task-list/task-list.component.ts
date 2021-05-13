@@ -6,9 +6,9 @@ import { TasksService } from 'app/services/tasks.service'
 
 @Component({
   selector: 'app-tasks',
-  templateUrl: './tasks.component.html'
+  templateUrl: './task-list.component.html'
 })
-export class TasksComponent implements OnInit {
+export class TaskListComponent implements OnInit {
     repositoryId: string
 
     tasks: TaskModel[];

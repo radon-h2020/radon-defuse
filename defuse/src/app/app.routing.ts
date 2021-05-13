@@ -35,7 +35,7 @@ export const appRoutes: Route[] = [
     {
         path       : 'repository/:id/models',
         component  : LayoutComponent,
-        loadChildren: () => import('app/modules/dashboard/dashboard.module').then(m => m.DashboardModule),
+        loadChildren: () => import('app/modules/model-manager/model-manager.module').then(m => m.ModelManagerModule),
         data: {
             layout: 'centered'
         }

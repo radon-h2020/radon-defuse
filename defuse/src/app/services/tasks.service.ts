@@ -48,4 +48,9 @@ export class TasksService {
         const URL = `/api/mine?id=${this.repositoryId}&language=${language}`;
         return this.httpClient.get<any>(URL, {observe:'response'})
     }
+
+    train(defect: string, language: string): Observable<any> {
+        const URL = `/api/train?id=${this.repositoryId}&defect=${defect}&language=${language}`;
+        return this.httpClient.get<any>(URL, {observe:'response'})
+    }
 }

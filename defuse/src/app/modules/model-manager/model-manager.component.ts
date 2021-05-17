@@ -1,9 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDrawer } from '@angular/material/sidenav';
+import { MatDialog } from '@angular/material/dialog';
+
+import { DialogTrainModelComponent } from './dialog-train-model/dialog-train-model.component';
+import { PredictiveModel } from 'app/models/predictive-model.model';
 
 import { ModelsService } from 'app/services/models.service';
-import { PredictiveModel } from 'app/models/predictive-model.model';
+import { TasksService } from 'app/services/tasks.service';
 
 @Component({
   selector: 'app-model-manager',
@@ -20,10 +24,13 @@ export class ModelManagerComponent implements OnInit {
     @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
 
     constructor(private _activatedRoute: ActivatedRoute,
-                private _modelsService: ModelsService) {
+                private _modelsService: ModelsService,
+                private _tasksService: TasksService,
+                private _dialog: MatDialog) {
 
         this.repositoryId = this._activatedRoute.snapshot.paramMap.get("id");
         this._modelsService.initializeModels(this.repositoryId)
+        this._tasksService.initializeTasks(this.repositoryId)
 
         this._modelsService.getAll().subscribe(models => {
             this.models = models
@@ -56,6 +63,21 @@ export class ModelManagerComponent implements OnInit {
         hiddenElement.target = '_blank';
         hiddenElement.download = `${this.selectedModel.id}.joblib`;
         hiddenElement.click();
+    }
+
+    onTrain(defect: string, language: string){
+        this._tasksService.train(defect, language).subscribe(response => {
+            console.log('response', response.status)
+        })
+    }
+
+    openTrainDialog(){
+        let dialogRef = this._dialog.open(DialogTrainModelComponent);
+        dialogRef.afterClosed().subscribe(result => {
+            if(result.defect !== undefined && result.language !== undefined){
+                this.onTrain(result.defect, result.language)
+            }
+        })
     }
 
 }

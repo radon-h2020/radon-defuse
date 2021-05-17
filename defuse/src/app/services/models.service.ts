@@ -27,8 +27,10 @@ export class ModelsService {
                     const data = item.payload.doc.data();
 
                     return {
-                        id: 'id',
-                        name: 'name'
+                        id: item.payload.doc.id,
+                        defect: data['defect'],
+                        language: data['language'],
+                        createdAt: data['created_at']
                     } as PredictiveModel
                 })
             }))

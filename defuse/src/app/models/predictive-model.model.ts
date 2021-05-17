@@ -1,6 +1,8 @@
 export interface PredictiveModel
 {
     id: string;
+    defect: string,
+    language: string,
     name?: string;
     createdBy?: string;
     createdAt?: string;

@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { MatDrawer } from '@angular/material/sidenav';
 
 @Component({
   selector: 'app-model-manager',
@@ -7,9 +9,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ModelManagerComponent implements OnInit {
 
-  constructor() { }
+    repositoryId: string
 
-  ngOnInit(): void {
-  }
+    models = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
+
+    @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
+
+    constructor(private activatedRoute: ActivatedRoute) {
+        this.repositoryId = this.activatedRoute.snapshot.paramMap.get("id");
+    }
+
+    ngOnInit(): void {
+    }
 
 }

@@ -9,6 +9,20 @@ class Model(Resource):
         self.bucket = kwargs['bucket']
         self.db = kwargs['db']
 
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('id', type=str, required=True)
+        model_id = parser.parse_args().get('id')
+        headers = {"Content-Disposition": "attachment; filename=%s.joblib" % model_id}
+
+        try:
+            blob = self.bucket.blob(f'{model_id}.joblib')
+            b_model = blob.download_as_bytes()
+            return make_response((b_model, headers))
+
+        except NotFound:
+            return make_response({}, 404)
+
     def delete(self):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=str, required=True)

@@ -10,7 +10,57 @@
             [position]="'end'"
             [disableClose]="true"
             #matDrawer>
-            <router-outlet></router-outlet>
+
+            <div class="flex flex-col flex-auto p-6 md:p-8">
+                <!-- Close button -->
+                <div class="flex items-center justify-end">
+                    <button
+                        mat-icon-button
+                        (click)="closeDrawer()">
+                        <mat-icon [svgIcon]="'heroicons_outline:x'"></mat-icon>
+                    </button>
+                </div>
+
+                <ng-container *ngIf="selectedModel">
+                    <!-- Name & Type -->
+                    <div class="flex flex-col items-start mt-8">
+                        <div class="text-xl font-medium">{{selectedModel.id}}</div>
+                        <div class="mt-1 px-1.5 rounded text-sm font-semibold leading-5 text-white bg-amber-600">
+                            .joblib
+                        </div>
+                    </div>
+
+                    <!-- Information -->
+                    <div class="text-lg font-medium mt-8">Information</div>
+                    <div class="flex flex-col mt-4 border-t border-b divide-y font-medium">
+                        <div class="flex items-center justify-between py-3">
+                            <div class="text-secondary">Defect</div>
+                            <div>{{selectedModel.defect}}</div>
+                        </div>
+                        <div class="flex items-center justify-between py-3">
+                            <div class="text-secondary">Language</div>
+                            <div>{{selectedModel.language}}</div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="grid grid-cols-2 gap-4 w-full mt-8">
+                        <button
+                            class="flex-auto"
+                            mat-flat-button
+                            [color]="'primary'">
+                            Download
+                        </button>
+                        <button
+                            class="flex-auto"
+                            mat-stroked-button
+                            (click)="onDelete()">
+                            Delete
+                        </button>
+                    </div>
+                </ng-container>
+            </div>
+
         </mat-drawer>
 
         <mat-drawer-content class="flex flex-col bg-gray-100 dark:bg-transparent">
@@ -22,8 +72,8 @@
                 <div class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between p-6 sm:py-12 md:px-8 border-b bg-card dark:bg-transparent">
                     <!-- Title -->
                     <div>
-                        <div class="text-4xl font-extrabold tracking-tight leading-none">File Manager</div>
-                        <div class="flex items-center mt-0.5 font-medium text-secondary">
+                        <div class="text-4xl font-extrabold tracking-tight leading-none">Model Manager</div>
+                        <div *ngIf="models" class="flex items-center mt-0.5 font-medium text-secondary">
                             {{models.length}} models
                         </div>
                     </div>
@@ -50,7 +100,9 @@
                             <ng-container *ngFor="let model of models; trackBy:trackByFn">
 
                                 <!-- Model template -->
-                                <div class="flex flex-col shadow rounded-2xl cursor-pointer bg-card">
+                                <div
+                                    class="flex flex-col shadow rounded-2xl cursor-pointer bg-card"
+                                    (click)="goToModel(model.id)">
                                     <div class="aspect-w-9 aspect-h-6">
                                         <div class="flex items-center justify-center">
                                             <!-- Icons -->
@@ -67,7 +119,7 @@
                                         </div>
                                     </div>
                                     <div class="pb-4 px-4 text-center text-sm font-medium truncate">
-                                        model name
+                                        {{model.language}} {{model.defect}}
                                     </div>
                                 </div>
 

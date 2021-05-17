@@ -40,9 +40,8 @@ export class ModelsService {
         return this.models;
     }
 
-    deleteModel(id: number): Observable<boolean>{
-        this.modelDoc = this.store.doc(`models/${id.toString()}`);
-        this.modelDoc.delete();
-        return of(true)
+    deleteModel(id: string): Observable<any>{
+        const URL = `/api/model?id=${id}`;
+        return this.httpClient.delete<any>(URL, {observe:'response'});
     }
 }

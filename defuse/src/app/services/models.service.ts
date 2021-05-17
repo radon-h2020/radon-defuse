@@ -10,7 +10,7 @@ import { PredictiveModel } from 'app/models/predictive-model.model';
 @Injectable({
   providedIn: 'root',
 })
-export class ModelManagerService {
+export class ModelsService {
 
     repositoryId: number;
     models: Observable<PredictiveModel[]>;

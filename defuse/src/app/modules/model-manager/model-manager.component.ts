@@ -49,4 +49,13 @@ export class ModelManagerComponent implements OnInit {
         })
     }
 
+    onDownload(){
+        const URL = `/api/model?id=${this.selectedModel.id}`;
+        var hiddenElement = document.createElement('a');
+        hiddenElement.href = URL;
+        hiddenElement.target = '_blank';
+        hiddenElement.download = `${this.selectedModel.id}.joblib`;
+        hiddenElement.click();
+    }
+
 }

@@ -25,7 +25,8 @@ class Train(Resource):
         parser.add_argument('id', type=int, required=True)
         parser.add_argument('language', type=str, required=True, choices=('ansible', 'tosca'))
         parser.add_argument('defect', type=str, required=True,
-                            choices=('conditional', 'configuration_data', 'dependency', 'security', 'service'))
+                            choices=('conditional', 'configuration_data', 'dependency', 'documentation', 'idempotency',
+                                     'security', 'service', 'syntax'))
 
         self.args = parser.parse_args()  # parse arguments to dictionary
 

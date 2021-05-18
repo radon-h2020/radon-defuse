@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SharedModule } from 'app/shared/shared.module';
 
@@ -35,6 +36,7 @@ export const modelManagerRoutes: Route[] = [
         MatIconModule,
         MatSidenavModule,
         MatSelectModule,
+        MatSnackBarModule,
         MatTooltipModule,
         SharedModule
     ]

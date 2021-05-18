@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDrawer } from '@angular/material/sidenav';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { DialogTrainModelComponent } from './dialog-train-model/dialog-train-model.component';
 import { PredictiveModel } from 'app/models/predictive-model.model';
@@ -26,7 +27,8 @@ export class ModelManagerComponent implements OnInit {
     constructor(private _activatedRoute: ActivatedRoute,
                 private _modelsService: ModelsService,
                 private _tasksService: TasksService,
-                private _dialog: MatDialog) {
+                private _dialog: MatDialog,
+                private _snackBar: MatSnackBar) {
 
         this.repositoryId = this._activatedRoute.snapshot.paramMap.get("id");
         this._modelsService.initializeModels(this.repositoryId)
@@ -67,7 +69,18 @@ export class ModelManagerComponent implements OnInit {
 
     onTrain(defect: string, language: string){
         this._tasksService.train(defect, language).subscribe(response => {
-            console.log('response', response.status)
+            let message = ''
+
+            if(response.status === 202){
+                message = 'Model building started...'
+            }else{
+                message = 'Some errors have occurred!'
+            }
+
+            this._snackBar.open(message, 'Dismiss', {
+                duration: 5000,
+                panelClass: ['custom-snack-bar']
+            });
         })
     }
 

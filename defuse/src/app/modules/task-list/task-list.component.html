@@ -52,11 +52,15 @@
 
 
                     <!-- Name -->
-                    <div class="col-span-1 flex flex-col items-start justify-center">
+                    <div class="col-span-1 flex flex-col items-start justify-center truncate">
                         <div class="text-sm flex-auto mr-2 truncate ml-4" style="text-align:left">
                             <ng-container>
                                 <span>{{task.name | titlecase}}</span>
                             </ng-container>
+                            <ng-container *ngIf="task.defect">
+                                <span>&nbsp;{{task.defect}}</span>
+                            </ng-container>
+
                         </div>
                     </div>
 

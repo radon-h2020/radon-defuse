@@ -35,6 +35,7 @@ export class TasksService {
                         id: item.payload.doc.id,
                         name: data['name'],
                         language: data['language'],
+                        defect: data['defect'] ? data['defect'] : undefined,
                         started_at: Math.ceil(data['started_at']),
                         ended_at: data['ended_at'],
                         completed: data['status'] == 'completed',

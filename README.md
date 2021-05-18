@@ -9,9 +9,11 @@
 
 The application relies on Firebase's [*Firestore Database*]() and [*Storage*](). Therefore, the following steps are mandatory to set it up.
 
-* **Step 1:** [Create](https://firebase.google.com/docs/web/setup#create-firebase-project) a Firebase project. Give it a name of your choice.
+* **Step 1:** Clone the repository with `git clone https://github.com/radon-h2020/radon-defect-prediction-api`.
 
-* **Step 2**: To initialize Firebase in your app, you need to provide your app's Firebase project configuration. You can [obtain your Firebase config object](https://support.google.com/firebase/answer/7015592) at any time.
+* **Step 2:** [Create](https://firebase.google.com/docs/web/setup#create-firebase-project) a Firebase project. Give it a name of your choice.
+
+* **Step 3**: To initialize Firebase in your app, you need to provide your app's Firebase project configuration. You can [obtain your Firebase config object](https://support.google.com/firebase/answer/7015592) at any time.
 Copy the Firebase configuration object containing keys and identifiers for your app in **defuse/src/environment<.prod>.ts**.
 
 
@@ -37,12 +39,12 @@ export const environment = {
 
 **Note**: it is recommended to use different configuration objects for development (**defuse/src/environment.ts**) and production (**defuse/src/environment.prod.ts**) environments.
 
-* **Step 3**: To use *Firebase Storage*, you need to [generate](https://firebase.google.com/docs/admin/setup?authuser=0#initialize-sdk) a private key file for your Firebase service account:
+* **Step 4**: To use *Firebase Storage*, you need to [generate](https://firebase.google.com/docs/admin/setup?authuser=0#initialize-sdk) a private key file for your Firebase service account:
     - In the Firebase console, open **Settings > Service Accounts**.
     - Click **Generate New Private Key**, then confirm by clicking **Generate Key**.
     - Rename the JSON file containing the key as `.key.json` and copy it the folder **backend**.
 
-* **Step 4**: To build the application ensure **docker-compose** is installed on your machine, then run `docker-compose build` in the repository root folder.
+* **Step 5**: To build the application ensure **docker-compose** is installed on your machine, then run `docker-compose build` in the repository root folder.
 
 
 ## How to run

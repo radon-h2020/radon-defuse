@@ -1,17 +1,7 @@
-import os
-import shutil
 import time
-import threading
 
 from flask import jsonify, make_response
 from flask_restful import Resource, Api, reqparse
-
-from radondp.predictors import DefectPredictor
-from repominer.mining.ansible import AnsibleMiner
-from repominer.mining.tosca import ToscaMiner
-from repominer.metrics.ansible import AnsibleMetricsExtractor
-from repominer.metrics.tosca import ToscaMetricsExtractor
-from repominer.files import FixedFileDecoder, FixedFileEncoder, FailureProneFileEncoder
 
 
 class Predict(Resource):
@@ -34,8 +24,8 @@ class Predict(Resource):
         })[1].id
 
         # Predict
-        blob = self.bucket.blob(f'{self.args.get("id")}.joblib')
-        b_model = blob.download_as_bytes()
+        # blob = self.bucket.blob(f'{self.args.get("id")}.joblib')
+        # b_model = blob.download_as_bytes()
 
         # Save prediction in collection "predictions"?
 
@@ -45,4 +35,4 @@ class Predict(Resource):
             'ended_at': time.time()
         })
 
-        return make_response(jsonify({"failure-prone": True }), 200)
+        return make_response(jsonify({"failure-prone": True}), 200)

@@ -1,8 +1,8 @@
-import { Injectable,  Output, EventEmitter } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators'
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore'
+import { map } from 'rxjs/operators'
+import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore'
 
 import { CommitModel } from 'app/models/commit.model';
 

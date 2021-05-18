@@ -1,8 +1,8 @@
-import { Injectable,  Output, EventEmitter } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators'
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore'
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators'
+import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore'
 
 import { PredictiveModel } from 'app/models/predictive-model.model';
 

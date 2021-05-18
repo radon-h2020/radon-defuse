@@ -55,59 +55,6 @@
 
     </div>
 
-    <!-- Header -->
-<!--    <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6  sm:pt-12 sm:px-10 bg-default dark:bg-transparent border-b">-->
-<!--        &lt;!&ndash; Title &ndash;&gt;-->
-<!--        <div>-->
-<!--            <div class="text-4xl font-extrabold tracking-tight leading-none">Repositories</div>-->
-<!--            <div class="ml-0.5 font-medium text-secondary">-->
-<!--                <ng-container *ngIf="repositories.length > 0">-->
-<!--                    {{repositories.length}}-->
-<!--                </ng-container>-->
-<!--                {{repositories.length | i18nPlural: {-->
-<!--                    '=0'   : 'No repositories',-->
-<!--                    '=1'   : 'repository',-->
-<!--                    'other': 'repositories'}-->
-<!--                }}-->
-<!--            </div>-->
-<!--        </div>-->
-
-<!--        &lt;!&ndash; Actions &ndash;&gt;-->
-<!--        <div class="flex flex-shrink-0 items-center mt-6 sm:mt-0 sm:ml-4 gap-4">-->
-<!--            &lt;!&ndash; Search &ndash;&gt;-->
-<!--            <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-50">-->
-<!--                <mat-icon matPrefix [svgIcon]="'heroicons_outline:search'"></mat-icon>-->
-<!--                <input-->
-<!--                    matInput-->
-<!--                    (keyup)="filterRepository($event.target.value)"-->
-<!--                    [autocomplete]="'off'"-->
-<!--                    [placeholder]="'Find a repository...'">-->
-<!--            </mat-form-field>-->
-
-<!--            &lt;!&ndash; Language filter &ndash;&gt;-->
-<!--&lt;!&ndash;            <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-25">&ndash;&gt;-->
-<!--&lt;!&ndash;                <mat-select [(value)]="languageSelected" (selectionChange)="languageChanged()" [placeholder]="'Language'">&ndash;&gt;-->
-<!--&lt;!&ndash;                    <mat-option *ngFor="let language of languages" [value]="language.value">&ndash;&gt;-->
-<!--&lt;!&ndash;                        {{language.text}}&ndash;&gt;-->
-<!--&lt;!&ndash;                    </mat-option>&ndash;&gt;-->
-<!--&lt;!&ndash;                </mat-select>&ndash;&gt;-->
-<!--&lt;!&ndash;            </mat-form-field>&ndash;&gt;-->
-
-
-<!--            &lt;!&ndash; Add repository button &ndash;&gt;-->
-<!--            <button-->
-<!--                *ngIf="repositories.length > 0"-->
-<!--                class="ml-4"-->
-<!--                mat-flat-button-->
-<!--                [color]="'primary'"-->
-<!--                (click)="openAddDialog()">-->
-<!--                <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>-->
-<!--                <span class="ml-2 mr-1">Add</span>-->
-<!--            </button>-->
-<!--        </div>-->
-<!--    </div>-->
-
-
     <!-- Main -->
     <div class="w-full max-w-screen-xl mx-auto mt-6">
         <ng-container *ngIf="repositories.length > 0; else noRepositories" >
@@ -156,7 +103,5 @@
             </div>
         </ng-template>
     </div>
-
-
 
 </div>

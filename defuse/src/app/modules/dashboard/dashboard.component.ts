@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -15,7 +15,8 @@ import { TasksService } from 'app/services/tasks.service';
 
 @Component({
   selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html'
+  templateUrl: './dashboard.component.html',
+  encapsulation: ViewEncapsulation.None,
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
 
@@ -38,7 +39,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
                 private commitsService: CommitsService,
                 private filesService: FixedFilesService,
                 private tasksService: TasksService,
-                private snackBar: MatSnackBar) {
+                private _snackBar: MatSnackBar) {
 
         this.repositoryId = this.activatedRoute.snapshot.paramMap.get("id");
         this.commitsService.initializeCommits(this.repositoryId)
@@ -105,7 +106,19 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
     startMining(){
         this.tasksService.mine('ansible').subscribe(response => {
-            console.log('response', response.status)
+
+            let message = ''
+
+            if(response.status === 202){
+                message = 'Mining started...'
+            }else{
+                message = 'Some errors have occurred!'
+            }
+
+            this._snackBar.open(message, 'Dismiss', {
+                duration: 5000,
+                panelClass: ['custom-snack-bar']
+            });
         })
     }
 }

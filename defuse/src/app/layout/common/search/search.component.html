@@ -1,0 +1,128 @@
+<!-- Bar search -->
+<ng-container *ngIf="appearance === 'bar'">
+    <button
+        mat-icon-button
+        *ngIf="!opened"
+        (click)="open()">
+        <mat-icon [svgIcon]="'heroicons_outline:search'"></mat-icon>
+    </button>
+
+    <div
+        class="absolute inset-0 flex items-center flex-shrink-0 z-99 bg-card"
+        *ngIf="opened"
+        @slideInTop
+        @slideOutTop>
+        <mat-icon
+            class="absolute ml-6 sm:ml-8"
+            [svgIcon]="'heroicons_outline:search'"></mat-icon>
+        <input
+            class="w-full h-full px-16 sm:px-18"
+            [formControl]="searchControl"
+            [matAutocomplete]="matAutocomplete"
+            [placeholder]="'Search for a page or a contact'"
+            (keydown)="onKeydown($event)"
+            #barSearchInput>
+        <mat-autocomplete
+            class="max-h-128 border-t rounded-b shadow-md"
+            [disableRipple]="true"
+            #matAutocomplete="matAutocomplete">
+            <mat-option
+                class="h-14 px-6 py-0 sm:px-8 text-md pointer-events-none text-secondary bg-transparent"
+                *ngIf="results && !results.length">
+                No results found!
+            </mat-option>
+            <mat-option
+                class="group relative h-14 px-6 py-0 sm:px-8 text-md"
+                *ngFor="let result of results"
+                [routerLink]="result.link">
+                <ng-container
+                    [ngTemplateOutlet]="searchResult"
+                    [ngTemplateOutletContext]="{$implicit: result}"></ng-container>
+            </mat-option>
+        </mat-autocomplete>
+        <button
+            class="absolute top-1/2 right-5 sm:right-7 flex-shrink-0 w-10 h-10 -mt-5"
+            mat-icon-button
+            (click)="close()">
+            <mat-icon [svgIcon]="'heroicons_outline:x'"></mat-icon>
+        </button>
+    </div>
+</ng-container>
+
+<!-- Basic search -->
+<ng-container *ngIf="appearance === 'basic'">
+    <div class="w-full sm:min-w-80">
+        <mat-form-field class="fuse-mat-no-subscript w-full">
+            <mat-icon
+                matPrefix
+                [svgIcon]="'heroicons_outline:search'"></mat-icon>
+            <input
+                matInput
+                [formControl]="searchControl"
+                [matAutocomplete]="matAutocomplete"
+                [placeholder]="'Search for a page or a contact'"
+                (keydown)="onKeydown($event)">
+        </mat-form-field>
+        <mat-autocomplete
+            class="max-h-128 mt-1 rounded"
+            [disableRipple]="true"
+            #matAutocomplete="matAutocomplete">
+            <mat-option
+                class="h-14 px-5 py-0 text-md pointer-events-none text-secondary bg-transparent"
+                *ngIf="results && !results.length">
+                No results found!
+            </mat-option>
+            <mat-option
+                class="group relative h-14 px-5 py-0 text-md"
+                *ngFor="let result of results"
+                [routerLink]="result.link">
+                <ng-container
+                    [ngTemplateOutlet]="searchResult"
+                    [ngTemplateOutletContext]="{$implicit: result}"></ng-container>
+            </mat-option>
+        </mat-autocomplete>
+    </div>
+</ng-container>
+
+<ng-template
+    #searchResult
+    let-result>
+
+    <!-- Hover indicator -->
+    <div class="absolute inset-y-0 left-0 hidden w-1 bg-primary group-hover:flex"></div>
+
+    <!-- Contact result -->
+    <ng-container *ngIf="result.resultType === 'contact'">
+        <div class="flex items-center">
+            <div class="px-1.5 py-1 mr-4 text-xs font-semibold leading-normal rounded text-indigo-50 bg-indigo-600">Contact</div>
+            <div class="overflow-hidden overflow-ellipsis">
+                <span [innerHTML]="result.title"></span>
+            </div>
+            <div class="flex flex-shrink-0 items-center justify-center w-8 h-8 ml-auto rounded-full overflow-hidden bg-primary-100 dark:bg-black dark:bg-opacity-5">
+                <img
+                    *ngIf="result.avatar"
+                    [src]="result.avatar">
+                <mat-icon
+                    class="m-0 icon-size-5 text-primary"
+                    *ngIf="!result.avatar"
+                    [svgIcon]="'heroicons_outline:user-circle'"></mat-icon>
+            </div>
+        </div>
+    </ng-container>
+
+    <!-- Page result -->
+    <ng-container *ngIf="result.resultType === 'page'">
+        <div class="flex items-center">
+            <div class="px-1.5 py-1 mr-4 text-xs font-semibold leading-normal rounded text-teal-50 bg-teal-600">Page</div>
+            <div class="flex flex-col overflow-hidden overflow-ellipsis">
+                <span
+                    class="overflow-hidden overflow-ellipsis whitespace-nowrap leading-normal"
+                    [innerHTML]="result.title"></span>
+                <span
+                    class="mt-1 text-secondary overflow-hidden overflow-ellipsis whitespace-nowrap leading-normal text-sm no-underline"
+                    [routerLink]="result.link">{{result.link}}</span>
+            </div>
+        </div>
+    </ng-container>
+
+</ng-template>

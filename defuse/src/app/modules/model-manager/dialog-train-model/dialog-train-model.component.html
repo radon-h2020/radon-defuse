@@ -1,0 +1,31 @@
+<h2 mat-dialog-title>Train a new model</h2>
+<mat-dialog-content>
+
+    <div class="flex flex-col mt-4 pt-6 border-t space-y-8">
+
+        <!-- Defect -->
+        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
+            <mat-label>Defect</mat-label>
+            <mat-select [(ngModel)]="selectedDefect" name="defect" required cdkFocusInitial>
+              <mat-option *ngFor="let defect of defects" [value]="defect.value">
+                {{defect.viewValue}}
+              </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <!-- Language -->
+        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
+            <mat-label>Language</mat-label>
+            <mat-select [(ngModel)]="selectedLanguage" name="language" required>
+              <mat-option *ngFor="let language of languages" [value]="language.value">
+                {{language.viewValue}}
+              </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button [mat-dialog-close]="{'defect':selectedDefect, 'language':selectedLanguage}">Add</button>
+</mat-dialog-actions>

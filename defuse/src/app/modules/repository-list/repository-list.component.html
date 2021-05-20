@@ -1,0 +1,107 @@
+<div class="absolute inset-0 flex flex-col min-w-0 bg-white dark:bg-transparent">
+
+    <div class="relative pt-8 px-4 sm:pt-20 sm:pb-28 sm:px-16 overflow-hidden bg-gray-800 dark">
+        <!-- Background - @formatter:off -->
+        <!-- Rings -->
+        <svg class="absolute inset-0 pointer-events-none"
+             viewBox="0 0 960 540" width="100%" height="100%" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+            <g class="text-gray-700 opacity-25" fill="none" stroke="currentColor" stroke-width="100">
+                <circle r="234" cx="196" cy="23"></circle>
+                <circle r="234" cx="790" cy="491"></circle>
+            </g>
+        </svg>
+
+        <!-- @formatter:on -->
+        <div class="z-10 relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6  sm:pt-12 sm:px-10 bg-default dark:bg-transparent border-b">
+            <!-- Title -->
+            <div>
+                <div class="text-4xl font-extrabold tracking-tight leading-none">Repositories</div>
+                <div class="ml-0.5 font-medium text-secondary">
+                    <ng-container *ngIf="repositories.length > 0">
+                        {{repositories.length}}
+                    </ng-container>
+                    {{repositories.length | i18nPlural: {
+                        '=0'   : 'No repositories',
+                        '=1'   : 'repository',
+                        'other': 'repositories'}
+                    }}
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex flex-shrink-0 items-center mt-6 sm:mt-0 sm:ml-4 gap-4">
+                <!-- Search -->
+                <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-50">
+                    <mat-icon matPrefix [svgIcon]="'heroicons_outline:search'"></mat-icon>
+                    <input
+                        matInput
+                        (keyup)="filterRepository($event.target.value)"
+                        [autocomplete]="'off'"
+                        [placeholder]="'Find a repository...'">
+                </mat-form-field>
+
+                <!-- Add repository button -->
+                <button
+                    *ngIf="repositories.length > 0"
+                    class="ml-4"
+                    mat-flat-button
+                    [color]="'primary'"
+                    (click)="openAddDialog()">
+                    <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                    <span class="ml-2 mr-1">Add</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Main -->
+    <div class="w-full max-w-screen-xl mx-auto mt-6">
+        <ng-container *ngIf="repositories.length > 0; else noRepositories" >
+            <mat-tab-group mat-align-tabs="center" class="sm:px-2" [animationDuration]="'0'">
+                <!-- Github -->
+                <mat-tab label="Github" *ngIf="filteredRepositoriesGithub.length > 0">
+                    <div class="flex-col flex-auto mt-2 overflow-x-auto" style="min-width: 800px; max-width: 1000px; margin: auto;">
+                        <mat-list class="mat-list-content">
+                            <mat-list-item class="p-10" *ngFor="let item of filteredRepositoriesGithub; trackBy: trackRepositoryById" style="margin-bottom: 30px;">
+                                <repository-item [item]="item" (deleted)="openDeleteDialog($event)" style="width:100%;"></repository-item>
+                                <mat-divider class="background-divider p-10"></mat-divider>
+                            </mat-list-item>
+                        </mat-list>
+                    </div>
+                </mat-tab>
+
+                <!-- Gitlab -->
+                <mat-tab label="Gitlab" *ngIf="filteredRepositoriesGitlab.length > 0">
+                    <div class="flex-col flex-auto mt-2 overflow-x-auto" style="min-width: 800px; max-width: 1000px; margin: auto;">
+                        <mat-list class="mat-list-content">
+                            <mat-list-item class="p-10" *ngFor="let item of filteredRepositoriesGitlab; trackBy: trackRepositoryById" style="margin-bottom: 30px;">
+                                <repository-item [item]="item" (deleted)="openDeleteDialog($event)" style="width:100%;"></repository-item>
+                                <mat-divider class="background-divider p-10"></mat-divider>
+                            </mat-list-item>
+                        </mat-list>
+                    </div>
+                </mat-tab>
+
+            </mat-tab-group>
+        </ng-container>
+
+        <ng-template #noRepositories>
+            <div class="items-center justify-center sm:p-10">
+                <div class="mt-6 sm:mt-24 text-4xl md:text-7xl font-extrabold tracking-tight leading-tight md:leading-none text-center">You don't have any projects yet.</div>
+                <div class="mt-6 text-center ">
+                    <!-- Add repository button -->
+                    <button
+                        class="ml-4"
+                        mat-flat-button
+                        [color]="'primary'"
+                        (click)="openAddDialog()">
+                        <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                        <span class="ml-2 mr-1">Add</span>
+                    </button>
+                </div>
+            </div>
+        </ng-template>
+    </div>
+
+</div>

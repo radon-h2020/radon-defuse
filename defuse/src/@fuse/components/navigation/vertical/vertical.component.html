@@ -1,0 +1,114 @@
+<div class="fuse-vertical-navigation-wrapper">
+
+    <!-- Header -->
+    <div class="fuse-vertical-navigation-header">
+        <ng-content select="[fuseVerticalNavigationHeader]"></ng-content>
+    </div>
+
+    <!-- Content -->
+    <div
+        class="fuse-vertical-navigation-content"
+        fuseScrollbar
+        [fuseScrollbarOptions]="{wheelPropagation: inner, suppressScrollX: true}"
+        #navigationContent>
+
+        <!-- Content header -->
+        <div class="fuse-vertical-navigation-content-header">
+            <ng-content select="[fuseVerticalNavigationContentHeader]"></ng-content>
+        </div>
+
+        <!-- Items -->
+        <ng-container *ngFor="let item of navigation; trackBy: trackByFn">
+
+            <!-- Skip the hidden items -->
+            <ng-container *ngIf="(item.hidden && !item.hidden(item)) || !item.hidden">
+
+                <!-- Aside -->
+                <fuse-vertical-navigation-aside-item
+                    *ngIf="item.type === 'aside'"
+                    [item]="item"
+                    [name]="name"
+                    [activeItemId]="activeAsideItemId"
+                    [autoCollapse]="autoCollapse"
+                    [skipChildren]="true"
+                    (click)="toggleAside(item)"></fuse-vertical-navigation-aside-item>
+
+                <!-- Basic -->
+                <fuse-vertical-navigation-basic-item
+                    *ngIf="item.type === 'basic'"
+                    [item]="item"
+                    [name]="name"></fuse-vertical-navigation-basic-item>
+
+                <!-- Collapsable -->
+                <fuse-vertical-navigation-collapsable-item
+                    *ngIf="item.type === 'collapsable'"
+                    [item]="item"
+                    [name]="name"
+                    [autoCollapse]="autoCollapse"></fuse-vertical-navigation-collapsable-item>
+
+                <!-- Divider -->
+                <fuse-vertical-navigation-divider-item
+                    *ngIf="item.type === 'divider'"
+                    [item]="item"
+                    [name]="name"></fuse-vertical-navigation-divider-item>
+
+                <!-- Group -->
+                <fuse-vertical-navigation-group-item
+                    *ngIf="item.type === 'group'"
+                    [item]="item"
+                    [name]="name"
+                    [autoCollapse]="autoCollapse"></fuse-vertical-navigation-group-item>
+
+                <!-- Spacer -->
+                <fuse-vertical-navigation-spacer-item
+                    *ngIf="item.type === 'spacer'"
+                    [item]="item"
+                    [name]="name"></fuse-vertical-navigation-spacer-item>
+
+            </ng-container>
+
+        </ng-container>
+
+        <!-- Content footer -->
+        <div class="fuse-vertical-navigation-content-footer">
+            <ng-content select="[fuseVerticalNavigationContentFooter]"></ng-content>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="fuse-vertical-navigation-footer">
+        <ng-content select="[fuseVerticalNavigationFooter]"></ng-content>
+    </div>
+
+</div>
+
+<!-- Aside -->
+<div
+    class="fuse-vertical-navigation-aside-wrapper"
+    *ngIf="activeAsideItemId"
+    fuseScrollbar
+    [fuseScrollbarOptions]="{wheelPropagation: false, suppressScrollX: true}"
+    [@fadeInLeft]="position === 'left'"
+    [@fadeInRight]="position === 'right'"
+    [@fadeOutLeft]="position === 'left'"
+    [@fadeOutRight]="position === 'right'">
+
+    <!-- Items -->
+    <ng-container *ngFor="let item of navigation; trackBy: trackByFn">
+
+        <!-- Skip the hidden items -->
+        <ng-container *ngIf="(item.hidden && !item.hidden(item)) || !item.hidden">
+
+            <!-- Aside -->
+            <fuse-vertical-navigation-aside-item
+                *ngIf="item.type === 'aside' && item.id === activeAsideItemId"
+                [item]="item"
+                [name]="name"
+                [autoCollapse]="autoCollapse"></fuse-vertical-navigation-aside-item>
+
+        </ng-container>
+
+    </ng-container>
+
+</div>

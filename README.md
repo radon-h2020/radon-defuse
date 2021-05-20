@@ -1,65 +1,56 @@
-# Welcome to the Receptor documentation
+<p align="center" width="100%">
+    <img src="./media/logo-text-small.png"> 
+</p>
 
-Modern software relies massively on the use of automation at both development and operations levels, and engineering strategy known as **DevOps**.
-The software code driving such automations is collectively known as Infrastructure-as-Code (IaC).
-
-While IaC represents an ever increasing widely-adopted practice nowadays,little is known how to best mantain, speedily evolve, and continuously improve the code behing the IaC strategy.
-
-<div style="text-align:center"><span style="color:red; font-family:Georgia; font-size:1.25em;">
-As any other source code artifact, IaC blueprints can be defect-prone!
-</span></div>
-
-<br>
-
-**Receptor** represents a step forward towards closing the gap for the implementation of software quality instruments to support DevOps engineers when developing and maintaining infrastructure code.
-It provides functionality for quantifying the characteristic of a IaC blueprint and predicting its defect proneness.
-Although it currently supports only Ansible, it is supposed to be soon extended to the OASIS Topology and Orchestration Specification for Cloud Applications (TOSCA) ecosystem. 
-
-<div style="text-align:center"><span style="color:black; font-family:Georgia; font-size:1.25em;">
-Effective prediction of defect-prone IaC blueprints may enable DevOps to focus on such critical scripts duging Quality Assurance activities, and allocate effort and resources more efficiently!
-</span></div>
-
-<br>
-
-Ultimately, this enables continuous deloyment and accelerates the expected Return on Investment.
+<h1 align="center">The commit annotator and model builder for defusing unsuspecting errors</h1>
 
 
+# How to set up
 
-# How to use
+The application relies on Firebase's [*Firestore Database*]() and [*Storage*](). Therefore, the following steps are mandatory to set it up.
 
-Clone
-```text
-git clone https://github.com/radon-h2020/radon-defect-prediction-api.git
-```
-```text
-cd radon-defect-prediction-api
-```
+* **Step 1:** Clone the repository with `git clone https://github.com/radon-h2020/radon-defect-prediction-api`.
 
-Install requirements
-```text
-pip install -r requirements.txt
+* **Step 2:** [Create](https://firebase.google.com/docs/web/setup#create-firebase-project) a Firebase project. Give it a name of your choice.
+
+* **Step 3**: To initialize Firebase in your app, you need to provide your app's Firebase project configuration. You can [obtain your Firebase config object](https://support.google.com/firebase/answer/7015592) at any time.
+Copy the Firebase configuration object containing keys and identifiers for your app in **defuse/src/environment<.prod>.ts**.
+
+
+![Alt img](./media/firebase-project-configuration.png)
+
+Here's the file **defuse/src/environment.ts** with example values:
+
+```typescript
+export const environment = {
+    production: false,
+    firebase: {
+        apiKey: "AIzaSyDOCAbC123dEf456GhI789jKl01-MnO",
+        authDomain: "myapp-project-123.firebaseapp.com",
+        databaseURL: "https://myapp-project-123.firebaseio.com",
+        projectId: "myapp-project-123",
+        storageBucket: "myapp-project-123.appspot.com",
+        messagingSenderId: "65211879809",
+        appId: "1:65211879909:web:3ae38ef1cdcb2e01fe5f0c",
+        measurementId: "G-8GSGZQ44ST"
+    }
+};
 ```
 
-Create migrations
-```text
-python manage.py makemigrations apis
-python manage.py migrate apis
-```
+**Note**: it is recommended to use different configuration objects for development (**defuse/src/environment.ts**) and production (**defuse/src/environment.prod.ts**) environments.
 
-Export Github and Gitlab access tokens to mine repositories
-```
-export GITHUB_ACCESS_TOKEN=*************************
-export GITLAB_ACCESS_TOKEN=***************
-```
+* **Step 4**: To use *Firebase Storage*, you need to [generate](https://firebase.google.com/docs/admin/setup?authuser=0#initialize-sdk) a private key file for your Firebase service account:
+    - In the Firebase console, open **Settings > Service Accounts**.
+    - Click **Generate New Private Key**, then confirm by clicking **Generate Key**.
+    - Rename the JSON file containing the key as `.key.json` and copy it the folder **backend**.
 
-Run server
-```text
-python manage.py runserver
-```
-
-Open your browser and go to `http://127.0.0.1:8000/web/repositories/` to start using the web-app.
+* **Step 5**: To build the application ensure **docker-compose** is installed on your machine, then run `docker-compose build` in the repository root folder.
 
 
-**Note:** a MongoDB must be installed. A db called `testing_iac_miner` will be created automatically.
+## How to run
 
-**A DETAILED DOCUMENTATION WILL BE AVAILABLE SOON**
+In the repository root folder run `docker-compose up`.
+The application runs on `http://localhost:4200/`.
+
+
+

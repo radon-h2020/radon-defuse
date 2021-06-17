@@ -42,22 +42,22 @@
     </div>
 
     <!-- Main -->
-    <div class="w-full max-w-screen-xl mx-auto mt-6">
+    <div class="w-full max-w-screen-xl mx-auto mt-6 overflow-hidden">
         <ng-container *ngIf="repositories.length > 0; else noRepositories" >
             <mat-tab-group mat-align-tabs="center" class="sm:px-2" [animationDuration]="'0'">
                 <!-- Github -->
                 <mat-tab label="Github" *ngIf="filteredRepositoriesGithub.length > 0">
-                   <div class="divide-y">
-                        <div class="group w-full h-16 select-none"
-                            *ngFor="let item of filteredRepositoriesGithub; trackBy: trackRepositoryById">
-                            <repository-item [item]="item" (deleted)="openDeleteDialog($event)" ></repository-item>
-                        </div>
-                   </div>
+                       <div class="divide-y sm:overflow-y-auto pl-10 pr-10 mt-10" style="max-height: 60%; min-height: 60%;">
+                            <div class="group w-full h-16 select-none"
+                                *ngFor="let item of filteredRepositoriesGithub; trackBy: trackRepositoryById">
+                                <repository-item [item]="item" (deleted)="openDeleteDialog($event)" ></repository-item>
+                            </div>
+                       </div>
                 </mat-tab>
 
                 <!-- Gitlab -->
                 <mat-tab label="Gitlab" *ngIf="filteredRepositoriesGitlab.length > 0">
-                    <div class="divide-y ">
+                   <div class="divide-y sm:overflow-y-auto pl-10 pr-10 mt-10" style="max-height: 60%; min-height: 60%;">
                         <div class="group w-full h-16 select-none"
                             *ngFor="let item of filteredRepositoriesGitlab; trackBy: trackRepositoryById">
                             <repository-item [item]="item" (deleted)="openDeleteDialog($event)" ></repository-item>

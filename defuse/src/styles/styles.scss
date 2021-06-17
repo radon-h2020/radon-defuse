@@ -9,3 +9,15 @@
     color: black !important;
     button {color: primary !important;}
 }
+
+::-webkit-scrollbar {
+    width: 3px;
+    overflow-y: scroll;
+    background: transparent !important;
+    box-shadow: inset 0 0 3px #707070;
+}
+
+::-webkit-scrollbar-thumb {
+    background: blue;
+    border-radius: 10px;
+}

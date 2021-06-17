@@ -33,15 +33,17 @@ export class RepositoryListComponent implements OnInit {
     }
 
     filterRepository(value){
-//         if(!value){
-//           this.assignCopy();
-//         } // when nothing has typed
-//         this.filteredRepositoriesGithub = Object.assign([], this.repositoriesGithub).filter(
-//          item => item.full_name.toLowerCase().indexOf(value.toLowerCase()) > -1
-//         )
-//         this.filteredRepositoriesGitlab = Object.assign([], this.repositoriesGitlab).filter(
-//          item => item.full_name.toLowerCase().indexOf(value.toLowerCase()) > -1
-//         )
+        if(!value){  // when nothing has typed
+            this.filteredRepositoriesGithub = this.repositories.filter(item => item.url.includes('github.com'));
+            this.filteredRepositoriesGitlab = this.repositories.filter(item => item.url.includes('gitlab.com'));
+        }else{
+            this.filteredRepositoriesGithub = Object.assign([], this.repositories).filter(
+                item => item.full_name.toLowerCase().indexOf(value.toLowerCase()) > -1
+            )
+            this.filteredRepositoriesGitlab = Object.assign([], this.repositories).filter(
+                item => item.full_name.toLowerCase().indexOf(value.toLowerCase()) > -1
+            )
+        }
     }
 
     onAdd(url: string, token: string){

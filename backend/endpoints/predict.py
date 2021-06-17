@@ -1,7 +1,7 @@
 import time
 
 from flask import jsonify, make_response
-from flask_restful import Resource, Api, reqparse
+from flask_restful import Resource, reqparse
 
 
 class Predict(Resource):

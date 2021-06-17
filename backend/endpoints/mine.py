@@ -4,7 +4,8 @@ import time
 import threading
 
 from flask import jsonify, make_response
-from flask_restful import Resource, Api, reqparse
+from flask_restful import Resource, reqparse
+from pydriller.repository_mining import GitRepository, RepositoryMining
 from repominer.mining.ansible import AnsibleMiner
 from repominer.mining.tosca import ToscaMiner
 
@@ -53,9 +54,9 @@ class Mine(Resource):
             else:
                 return jsonify({'error': 'Language not supported. Select ansible or tosca'}), 403
 
-            for hash, defects in miner.get_fixing_commits().items():
+            for commit_hash, defects in miner.get_fixing_commits().items():
 
-                commit_ref = self.db.collection('commits').document(hash)
+                commit_ref = self.db.collection('commits').document(commit_hash)
                 commit_doc = commit_ref.get()
 
                 if commit_doc.exists:
@@ -68,7 +69,7 @@ class Mine(Resource):
                         })
                 else:
                     commit_ref.set({
-                        'hash': hash,
+                        'hash': commit_hash,
                         'is_valid': True,
                         'repository_id': int(self.args.get('id')),
                         'defects': defects,
@@ -76,9 +77,10 @@ class Mine(Resource):
                     })
 
             existing_files = [
-                doc.to_dict() for doc in self.db.collection('fixed-files') \
-                    .where('repository_id', '==', self.args.get('id')) \
-                    .where('language', '==', self.args.get('language')).stream()
+                doc.to_dict() for doc in self.db.collection('fixed-files')
+                    .where('repository_id', '==', self.args.get('id'))
+                    .where('language', '==', self.args.get('language'))
+                    .stream()
             ]
 
             for file in miner.get_fixed_files():

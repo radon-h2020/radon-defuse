@@ -4,14 +4,14 @@ import time
 import threading
 
 from flask import jsonify, make_response
-from flask_restful import Resource, Api, reqparse
+from flask_restful import Resource, reqparse
 
 from radondp.predictors import DefectPredictor
 from repominer.mining.ansible import AnsibleMiner
 from repominer.mining.tosca import ToscaMiner
 from repominer.metrics.ansible import AnsibleMetricsExtractor
 from repominer.metrics.tosca import ToscaMetricsExtractor
-from repominer.files import FixedFileDecoder, FixedFileEncoder, FailureProneFileEncoder
+from repominer.files import FixedFileDecoder
 
 
 class Train(Resource):
@@ -98,7 +98,7 @@ class Train(Resource):
             if not trained:
                 status = 'failed'
 
-        except Exception as e:
+        except Exception:
             status = 'failed'
         finally:
             shutil.rmtree(clone_repo_to)

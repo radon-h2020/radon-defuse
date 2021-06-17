@@ -81,11 +81,6 @@ export class CenteredLayoutComponent implements OnInit, OnDestroy
         this.navigation[1].link = '/repository/' + id + '/models'
         this.navigation[2].link = '/repository/' + id + '/tasks'
 
-        // Subscribe to the resolved route mock-api
-//         this._activatedRoute.data.subscribe((data: Data) => {
-//             this.data = data.initialData;
-//         });
-
         // Subscribe to media changes
         this._fuseMediaWatcherService.onMediaChange$
             .pipe(takeUntil(this._unsubscribeAll))

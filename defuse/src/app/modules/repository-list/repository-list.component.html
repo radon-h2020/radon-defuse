@@ -47,28 +47,23 @@
             <mat-tab-group mat-align-tabs="center" class="sm:px-2" [animationDuration]="'0'">
                 <!-- Github -->
                 <mat-tab label="Github" *ngIf="filteredRepositoriesGithub.length > 0">
-                    <div class="flex-col flex-auto mt-2 overflow-x-auto" style="min-width: 800px; max-width: 1000px; margin: auto;">
-                        <mat-list class="mat-list-content">
-                            <mat-list-item class="p-10" *ngFor="let item of filteredRepositoriesGithub; trackBy: trackRepositoryById" style="margin-bottom: 30px;">
-                                <repository-item [item]="item" (deleted)="openDeleteDialog($event)" style="width:100%;"></repository-item>
-                                <mat-divider class="background-divider p-10"></mat-divider>
-                            </mat-list-item>
-                        </mat-list>
-                    </div>
+                   <div class="divide-y">
+                        <div class="group w-full h-16 select-none"
+                            *ngFor="let item of filteredRepositoriesGithub; trackBy: trackRepositoryById">
+                            <repository-item [item]="item" (deleted)="openDeleteDialog($event)" ></repository-item>
+                        </div>
+                   </div>
                 </mat-tab>
 
                 <!-- Gitlab -->
                 <mat-tab label="Gitlab" *ngIf="filteredRepositoriesGitlab.length > 0">
-                    <div class="flex-col flex-auto mt-2 overflow-x-auto" style="min-width: 800px; max-width: 1000px; margin: auto;">
-                        <mat-list class="mat-list-content">
-                            <mat-list-item class="p-10" *ngFor="let item of filteredRepositoriesGitlab; trackBy: trackRepositoryById" style="margin-bottom: 30px;">
-                                <repository-item [item]="item" (deleted)="openDeleteDialog($event)" style="width:100%;"></repository-item>
-                                <mat-divider class="background-divider p-10"></mat-divider>
-                            </mat-list-item>
-                        </mat-list>
-                    </div>
+                    <div class="divide-y ">
+                        <div class="group w-full h-16 select-none"
+                            *ngFor="let item of filteredRepositoriesGitlab; trackBy: trackRepositoryById">
+                            <repository-item [item]="item" (deleted)="openDeleteDialog($event)" ></repository-item>
+                        </div>
+                   </div>
                 </mat-tab>
-
             </mat-tab-group>
         </ng-container>
 

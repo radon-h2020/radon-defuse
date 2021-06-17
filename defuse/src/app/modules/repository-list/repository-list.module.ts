@@ -8,7 +8,6 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatListModule } from '@angular/material/list';
 import { MatTabsModule } from '@angular/material/tabs';
 
 import { DialogAddRepositoryComponent } from './dialog-add-repository/dialog-add-repository.component';
@@ -33,7 +32,6 @@ const modules = [
         MatFormFieldModule,
         MatIconModule,
         MatInputModule,
-        MatListModule,
         MatTabsModule
 ];
 

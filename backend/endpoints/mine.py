@@ -44,6 +44,7 @@ class Mine(Resource):
 
         try:
             repo_doc = self.db.collection('repositories').document(str(self.args.get('id'))).get().to_dict()
+            full_name = repo_doc.get('full_name')
             url = repo_doc.get('url')
             default_branch = repo_doc.get('default_branch')
 
@@ -53,6 +54,11 @@ class Mine(Resource):
                 miner = ToscaMiner(url, default_branch, clone_repo_to)
             else:
                 return jsonify({'error': 'Language not supported. Select ansible or tosca'}), 403
+
+            hash_msg = {}
+            path_to_local_repo = os.path.join(clone_repo_to, full_name.split('/')[1])
+            for commit in RepositoryMining(path_to_repo=path_to_local_repo).traverse_commits():
+                hash_msg[commit.hash] = commit.msg
 
             for commit_hash, defects in miner.get_fixing_commits().items():
 
@@ -70,6 +76,7 @@ class Mine(Resource):
                 else:
                     commit_ref.set({
                         'hash': commit_hash,
+                        'msg': hash_msg.pop(commit_hash, '')[:200],  # Limit message to 200 characters
                         'is_valid': True,
                         'repository_id': int(self.args.get('id')),
                         'defects': defects,

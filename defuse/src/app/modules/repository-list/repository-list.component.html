@@ -1,58 +1,44 @@
 <div class="absolute inset-0 flex flex-col min-w-0 bg-white dark:bg-transparent">
 
-    <div class="relative pt-8 px-4 sm:pt-20 sm:pb-28 sm:px-16 overflow-hidden bg-gray-800 dark">
-        <!-- Background - @formatter:off -->
-        <!-- Rings -->
-        <svg class="absolute inset-0 pointer-events-none"
-             viewBox="0 0 960 540" width="100%" height="100%" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
-            <g class="text-gray-700 opacity-25" fill="none" stroke="currentColor" stroke-width="100">
-                <circle r="234" cx="196" cy="23"></circle>
-                <circle r="234" cx="790" cy="491"></circle>
-            </g>
-        </svg>
-
-        <!-- @formatter:on -->
-        <div class="z-10 relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6  sm:pt-12 sm:px-10 bg-default dark:bg-transparent border-b">
-            <!-- Title -->
-            <div>
-                <div class="text-4xl font-extrabold tracking-tight leading-none">Repositories</div>
-                <div class="ml-0.5 font-medium text-secondary">
-                    <ng-container *ngIf="repositories.length > 0">
-                        {{repositories.length}}
-                    </ng-container>
-                    {{repositories.length | i18nPlural: {
-                        '=0'   : 'No repositories',
-                        '=1'   : 'repository',
-                        'other': 'repositories'}
-                    }}
-                </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="flex flex-shrink-0 items-center mt-6 sm:mt-0 sm:ml-4 gap-4">
-                <!-- Search -->
-                <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-50">
-                    <mat-icon matPrefix [svgIcon]="'heroicons_outline:search'"></mat-icon>
-                    <input
-                        matInput
-                        (keyup)="filterRepository($event.target.value)"
-                        [autocomplete]="'off'"
-                        [placeholder]="'Find a repository...'">
-                </mat-form-field>
-
-                <!-- Add repository button -->
-                <button
-                    *ngIf="repositories.length > 0"
-                    class="ml-4"
-                    mat-flat-button
-                    [color]="'primary'"
-                    (click)="openAddDialog()">
-                    <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                    <span class="ml-2 mr-1">Add</span>
-                </button>
+    <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6  sm:pt-12 sm:px-10 bg-default dark:bg-transparent border-b">
+        <!-- Title -->
+        <div>
+            <div class="text-4xl font-extrabold tracking-tight leading-none">Repositories</div>
+            <div class="ml-0.5 font-medium text-secondary">
+                <ng-container *ngIf="repositories.length > 0">
+                    {{repositories.length}}
+                </ng-container>
+                {{repositories.length | i18nPlural: {
+                    '=0'   : 'No repositories',
+                    '=1'   : 'repository',
+                    'other': 'repositories'}
+                }}
             </div>
         </div>
 
+        <!-- Actions -->
+        <div class="flex flex-shrink-0 items-center mt-6 sm:mt-0 sm:ml-4 gap-4">
+            <!-- Search -->
+            <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-50">
+                <mat-icon matPrefix [svgIcon]="'heroicons_outline:search'"></mat-icon>
+                <input
+                    matInput
+                    (keyup)="filterRepository($event.target.value)"
+                    [autocomplete]="'off'"
+                    [placeholder]="'Find a repository...'">
+            </mat-form-field>
+
+            <!-- Add repository button -->
+            <button
+                *ngIf="repositories.length > 0"
+                class="ml-4"
+                mat-flat-button
+                [color]="'primary'"
+                (click)="openAddDialog()">
+                <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                <span class="ml-2 mr-1">Add</span>
+            </button>
+        </div>
     </div>
 
     <!-- Main -->

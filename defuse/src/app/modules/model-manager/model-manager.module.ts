@@ -13,19 +13,24 @@ import { SharedModule } from 'app/shared/shared.module';
 
 import { DialogTrainModelComponent } from './dialog-train-model/dialog-train-model.component';
 import { ModelManagerComponent } from './model-manager.component';
-
+import { ModelManagerDetailsComponent } from './details/details.component';
 
 export const modelManagerRoutes: Route[] = [
     {
         path     : '',
-        component: ModelManagerComponent
+        component: ModelManagerComponent,
+//         children: [{
+//             path     : ':folder',
+//             component: ModelManagerComponent
+//         }]
     }
 ];
 
 @NgModule({
     declarations: [
         DialogTrainModelComponent,
-        ModelManagerComponent
+        ModelManagerComponent,
+        ModelManagerDetailsComponent
     ],
     imports     : [
         RouterModule.forChild(modelManagerRoutes),

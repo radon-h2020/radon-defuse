@@ -1,8 +1,12 @@
 import { AfterViewInit, Component, OnInit, ViewChild, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
+
+// Dialog
+import { DialogMineRepositoryComponent } from './dialogs/dialog-mine-repository.component';
 
 // Models
 import { CommitModel } from 'app/models/commit.model';
@@ -37,6 +41,7 @@ export class DashboardComponent implements OnInit {
     constructor(private _activatedRoute: ActivatedRoute,
                 private _cdr: ChangeDetectorRef,
                 private _commitsService: CommitsService,
+                private _dialog: MatDialog,
                 private _filesService: FixedFilesService,
                 private _tasksService: TasksService,
                 private _snackBar: MatSnackBar) {
@@ -99,8 +104,17 @@ export class DashboardComponent implements OnInit {
       this.dataSourceFiles.filter = filterValue.trim().toLowerCase();
     }
 
-    onMine(){
-        this._tasksService.mine('ansible').subscribe(response => {
+    onOpenMineDialog(){
+        let dialogRef = this._dialog.open(DialogMineRepositoryComponent);
+        dialogRef.afterClosed().subscribe(result => {
+            if(result && result.language !== null){
+                this.onMine(result.language)
+            }
+        })
+    }
+
+    onMine(language: string){
+        this._tasksService.mine(language).subscribe(response => {
 
             let message = ''
 

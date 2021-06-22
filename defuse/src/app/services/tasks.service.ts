@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators'
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore'
 
@@ -44,6 +44,12 @@ export class TasksService {
                     } as TaskModel
                 })
             }))
+    }
+
+    deleteTask(id: string): Observable<boolean>{
+        this.taskDoc = this.store.doc(`tasks/${id}`);
+        this.taskDoc.delete();
+        return of(true)
     }
 
     getAll(): Observable<TaskModel[]>{

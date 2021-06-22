@@ -9,21 +9,25 @@ import { TasksService } from 'app/services/tasks.service'
   templateUrl: './task-list.component.html'
 })
 export class TaskListComponent implements OnInit {
-    repositoryId: string
 
+    repositoryId: string;
     tasks: TaskModel[];
     tasksCount: any = {
         completed : 0,
         incomplete: 0
     };
 
-    constructor(private activatedRoute: ActivatedRoute,
-                private tasksService: TasksService) {
+    constructor(
+        private _activatedRoute: ActivatedRoute,
+        private _tasksService: TasksService
+    ) {}
 
-        this.repositoryId = this.activatedRoute.snapshot.paramMap.get("id");
-        this.tasksService.initializeTasks(this.repositoryId)
+    ngOnInit(): void {
+        this.repositoryId = this._activatedRoute.snapshot.paramMap.get("id");
+        this._tasksService.initializeTasks(this.repositoryId)
 
-        this.tasksService.getAll().subscribe(tasks => {
+        this._tasksService.getAll().subscribe(tasks => {
+
             // Sort by ascending started_at date
             tasks.sort(function(item1, item2) {
               return item2['started_at'] - item1['started_at'];
@@ -40,7 +44,13 @@ export class TaskListComponent implements OnInit {
         });
     }
 
-    ngOnInit(): void {
+    /**
+    Remove a task
+    @param id: task id
+    */
+    onDelete(id){
+        this._tasksService.deleteTask(id)
+            .subscribe(deleted => {});
     }
-
+    trackTaskById(index: number, task: TaskModel): string { return task.id; }
 }

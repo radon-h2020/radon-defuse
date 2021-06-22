@@ -1,15 +1,29 @@
 <div class="flex flex-col flex-auto min-w-0">
 
     <!-- Main -->
-    <div class="flex-auto mt-4 sm:mt-6">
-        <button mat-fab color="primary" style="position: fixed; right: 16px; bottom: 24px; z-index: 100;"
-                #tooltip="matTooltip"
-                matTooltip="Mine repository"
-                matTooltipPosition="left"
-                (click)="startMining()">
-            <mat-icon>power_settings_new</mat-icon>
-        </button>
+    <div class="flex-auto">
 
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between p-6 sm:py-8 md:px-8 border-b bg-card dark:bg-transparent">
+            <!-- Title -->
+            <div>
+                <div class="text-4xl font-extrabold tracking-tight leading-none">Dashboard</div>
+                <div class="flex items-center mt-0.5 font-medium text-secondary">
+                    {{commits.length}} commits, {{files.length}} files
+                </div>
+            </div>
+            <!-- Actions -->
+            <div class="mt-4 sm:mt-0">
+                <!-- Upload button -->
+                <button
+                    mat-flat-button
+                    [color]="'primary'"
+                    (click)="onMine()">
+                    <mat-icon>power_settings_new</mat-icon>
+                    <span class="ml-2 mr-1">Mine repository</span>
+                </button>
+            </div>
+        </div>
 
         <div *ngIf="commits.length > 0; else noCommits" class="w-full max-w-screen-xl mx-auto">
 
@@ -75,7 +89,7 @@
                                     <mat-form-field appearance="legacy">
                                         <input
                                             matInput
-                                            (keyup)="searchCommits($event.target.value)"
+                                            (keyup)="onFilterCommits($event.target.value)"
                                             placeholder="Filter"
                                         />
                                         <mat-icon matSuffix>search</mat-icon>
@@ -135,7 +149,7 @@
                                 <mat-form-field appearance="legacy">
                                     <input
                                         matInput
-                                        (keyup)="searchFiles($event.target.value)"
+                                        (keyup)="onFilterFiles($event.target.value)"
                                         placeholder="Filter"
                                     />
                                     <mat-icon matSuffix>search</mat-icon>
@@ -152,17 +166,6 @@
         <ng-template #noCommits>
             <div class="items-center justify-center sm:p-10">
                 <div class="mt-6 sm:mt-24 text-4xl md:text-7xl font-extrabold tracking-tight leading-tight md:leading-none text-center">There aren't commits yet.</div>
-                <div class="mt-6 text-center ">
-                    <!-- Add repository button -->
-                    <button
-                        class="ml-4"
-                        mat-flat-button
-                        [color]="'primary'"
-                        (click)="startMining()">
-                        <mat-icon>power_settings_new</mat-icon>
-                        <span class="ml-2 mr-1">Mine</span>
-                    </button>
-                </div>
             </div>
         </ng-template>
 

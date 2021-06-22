@@ -13,6 +13,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 import { DashboardComponent } from './dashboard.component';
 
@@ -38,6 +39,7 @@ const dashboardRoutes: Route[] = [
         MatIconModule,
         MatInputModule,
         MatPaginatorModule,
+        MatProgressSpinnerModule,
         MatSnackBarModule,
         MatTableModule,
         MatTabsModule,

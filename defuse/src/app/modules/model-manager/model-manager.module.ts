@@ -19,10 +19,6 @@ export const modelManagerRoutes: Route[] = [
     {
         path     : '',
         component: ModelManagerComponent,
-//         children: [{
-//             path     : ':folder',
-//             component: ModelManagerComponent
-//         }]
     }
 ];
 

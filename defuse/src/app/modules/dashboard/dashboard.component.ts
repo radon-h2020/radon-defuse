@@ -18,7 +18,7 @@ import { TasksService } from 'app/services/tasks.service';
   templateUrl: './dashboard.component.html',
   encapsulation: ViewEncapsulation.None,
 })
-export class DashboardComponent implements OnInit, AfterViewInit {
+export class DashboardComponent implements OnInit {
 
     repositoryId: string
 
@@ -34,46 +34,41 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     displayedColumnsTableFiles: string[] = ['hash_fix', 'hash_bic', 'filepath'];
     @ViewChild('PaginatorFiles') paginatorFiles: MatPaginator;
 
-    constructor(private activatedRoute: ActivatedRoute,
-                private cdr: ChangeDetectorRef,
-                private commitsService: CommitsService,
-                private filesService: FixedFilesService,
-                private tasksService: TasksService,
+    constructor(private _activatedRoute: ActivatedRoute,
+                private _cdr: ChangeDetectorRef,
+                private _commitsService: CommitsService,
+                private _filesService: FixedFilesService,
+                private _tasksService: TasksService,
                 private _snackBar: MatSnackBar) {
 
-        this.repositoryId = this.activatedRoute.snapshot.paramMap.get("id");
-        this.commitsService.initializeCommits(this.repositoryId)
-        this.filesService.initializeFiles(this.repositoryId)
-        this.tasksService.initializeTasks(this.repositoryId)
+    }
 
-        this.commitsService.getAll().subscribe(commits => {
+    ngOnInit(): void {
+        this.repositoryId = this._activatedRoute.snapshot.paramMap.get("id");
+        this.dataSourceCommits = new MatTableDataSource<CommitModel>(this.commits);
+        this.dataSourceFiles = new MatTableDataSource<FixedFileModel>(this.files);
+
+        this._commitsService.initializeCommits(this.repositoryId)
+        this._filesService.initializeFiles(this.repositoryId)
+        this._tasksService.initializeTasks(this.repositoryId)
+
+        this._commitsService.getAll().subscribe(commits => {
             this.commits = commits
             this.dataSourceCommits = new MatTableDataSource<CommitModel>(this.commits);
-            this.cdr.detectChanges();
+            this._cdr.detectChanges();
             this.dataSourceCommits.paginator = this.paginatorCommits;
         });
 
-        this.filesService.getAll().subscribe(files => {
+        this._filesService.getAll().subscribe(files => {
             this.files = files
             this.dataSourceFiles = new MatTableDataSource<FixedFileModel>(this.files);
-            this.cdr.detectChanges();
+            this._cdr.detectChanges();
             this.dataSourceFiles.paginator = this.paginatorFiles;
         });
     }
 
-    ngOnInit(): void {
-        this.repositoryId = this.activatedRoute.snapshot.paramMap.get("id");
-        this.dataSourceCommits = new MatTableDataSource<CommitModel>(this.commits);
-        this.dataSourceFiles = new MatTableDataSource<FixedFileModel>(this.files);
-    }
-
-    ngAfterViewInit() {
-      this.dataSourceCommits.paginator = this.paginatorCommits;
-      this.dataSourceFiles.paginator = this.paginatorFiles;
-    }
-
     patchCommit(commit: CommitModel) {
-        this.commitsService.patchIsValid(commit)
+        this._commitsService.patchIsValid(commit)
             .subscribe(patched => {
                 if(!patched) {
                     console.log('TO SHOW ERROR THROUGH MESSAGE')
@@ -90,22 +85,22 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     }
 
     patchFile(file: FixedFileModel) {
-        this.filesService.patchIsValid(file)
+        this._filesService.patchIsValid(file)
             .subscribe(patched => {
               if(!patched) console.log('TO SHOW ERROR THROUGH MESSAGE')
             });
     }
 
-    searchCommits(filterValue: string) {
+    onFilterCommits(filterValue: string) {
       this.dataSourceCommits.filter = filterValue.trim().toLowerCase();
     }
 
-    searchFiles(filterValue: string) {
+    onFilterFiles(filterValue: string) {
       this.dataSourceFiles.filter = filterValue.trim().toLowerCase();
     }
 
-    startMining(){
-        this.tasksService.mine('ansible').subscribe(response => {
+    onMine(){
+        this._tasksService.mine('ansible').subscribe(response => {
 
             let message = ''
 

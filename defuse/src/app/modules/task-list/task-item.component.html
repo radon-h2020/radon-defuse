@@ -60,7 +60,18 @@
 
             <span class="text-sm text-center font-medium min-w-20 flex-shrink-0 items-center">
                 <ng-container *ngIf="task.completed">Completed</ng-container>
-                <ng-container *ngIf="task.failed">Failed</ng-container>
+                <ng-container *ngIf="task.failed">
+                    <span class="absolute top-0 right-0 left-0 flex items-center justify-end h-3">
+<!--                        <span class="flex items-center justify-center flex-shrink-0 min-w-4 h-4 px-1 ml-4 mt-3 rounded-full bg-gray-600 text-indigo-50 text-xs font-medium">-->
+                        <mat-icon
+                          (click)="onVisualizeLog()"
+                          #tooltip="matTooltip"
+                          matTooltip="Visualize log"
+                          class="flex items-center justify-center px-1 ml-4 mt-3"
+                          style="transform: scale(0.75); cursor: pointer;">info</mat-icon>
+                    </span>
+                    Failed
+                </ng-container>
                 <ng-container *ngIf="task.in_progress">
                     In progress
                 </ng-container>

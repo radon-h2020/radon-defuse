@@ -9,8 +9,13 @@ import { ViewEncapsulation } from '@angular/core';
 export class TaskItemComponent{
   @Input() task;
   @Output() deleted = new EventEmitter<string>();
+  @Output() log = new EventEmitter<string>();
 
   onDelete(){
     this.deleted.emit(this.task.id);
+  }
+
+  onVisualizeLog(){
+    this.log.emit(this.task.id);
   }
 }

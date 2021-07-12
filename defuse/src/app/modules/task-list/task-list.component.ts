@@ -60,17 +60,15 @@ export class TaskListComponent implements OnInit {
     Visualize task's log
     @param id: task id
     */
-    onVisualizeLog(id){
-//         this._tasksService.getLog(id)
-//             .subscribe(log => {
-//              // TODO: open Dialog for log
-//         });
-
-        // Open Log Dialog
-        let dialogRef = this._dialog.open(TaskLogDialogComponent, {
-            width: '100%',
-            height: '90%',
-            data: { log: 'TODO: log here' }
+    onVisualizeLog(taskId){
+        this._tasksService.getLog(taskId)
+            .subscribe(log => {
+                // Open Dialog and show log
+                let dialogRef = this._dialog.open(TaskLogDialogComponent, {
+                    width: '100%',
+                    height: '90%',
+                    data: { log: log }
+                });
         });
     }
 

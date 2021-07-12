@@ -3,6 +3,7 @@ from firebase_admin import credentials, firestore, initialize_app, storage
 from flask import Flask
 from flask_restful import Api
 
+from endpoints.log import Log
 from endpoints.mine import Mine
 from endpoints.model import Model
 from endpoints.train import Train
@@ -20,6 +21,7 @@ bucket = storage.bucket(fb_storage_path)
 app = Flask(__name__)
 api = Api(app)
 
+api.add_resource(Log, '/log', resource_class_kwargs={'db': db, 'bucket': bucket})
 api.add_resource(Mine, '/mine', resource_class_kwargs={'db': db})
 api.add_resource(Model, '/model', resource_class_kwargs={'db': db, 'bucket': bucket})
 api.add_resource(Train, '/train', resource_class_kwargs={'db': db, 'bucket': bucket})

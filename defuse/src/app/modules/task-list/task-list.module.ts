@@ -1,11 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 import { TaskListComponent } from './task-list.component';
 import { TaskItemComponent } from './task-item.component';
+import { TaskLogDialogComponent } from './dialog-log/dialog-log.component';
 
 
 const taskListRoutes: Route[] = [
@@ -18,13 +21,16 @@ const taskListRoutes: Route[] = [
 @NgModule({
     declarations: [
         TaskListComponent,
-        TaskItemComponent
+        TaskItemComponent,
+        TaskLogDialogComponent
     ],
     imports     : [
         RouterModule.forChild(taskListRoutes),
         CommonModule,
+        MatDialogModule,
         MatIconModule,
-        MatTooltipModule
+        MatTooltipModule,
+        ScrollingModule
     ]
 })
 export class TaskListModule

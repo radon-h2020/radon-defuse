@@ -1,4 +1,3 @@
-import io
 import json
 import numpy as np
 import pandas as pd
@@ -23,7 +22,7 @@ def walk_forward_release(X, y, releases):
     :param releases : array-like of shape (n_samples,)
         Group labels for the samples used while splitting the dataset into
         train/test set.
-        Must be an ordered list of integer, i.e., [1, 1, 1, 2, 2, 3, 4, 4, etc.].
+        Must be a list of integer, i.e., [1, 1, 1, 2, 2, 3, 4, 4, etc.].
         Each integer denotes a release. Files within the same release have the same group id.
     """
     X, _, releases = indexable(X, y, releases)
@@ -85,16 +84,6 @@ class DefectPredictor:
         # Make sure the data is sorted by commit time (ascending)
         data.sort_values(by=['committed_at'], ascending=True)
         data = data.reset_index(drop=True)
-
-        # last_commit = None
-        # group_id = 0
-        #
-        # for idx, row in data.iterrows():
-        #     if not last_commit or row['commit'] != last_commit:
-        #         last_commit = row['commit']
-        #         group_id += 1
-        #
-        #     data.loc[idx, 'group'] = group_id
 
         # Remove metadata
         data.drop(['commit', 'committed_at', 'filepath'], axis=1, inplace=True)

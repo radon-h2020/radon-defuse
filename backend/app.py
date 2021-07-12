@@ -27,13 +27,6 @@ api.add_resource(Model, '/model', resource_class_kwargs={'db': db, 'bucket': buc
 api.add_resource(Train, '/train', resource_class_kwargs={'db': db, 'bucket': bucket})
 api.add_resource(Predict, '/predict', resource_class_kwargs={'db': db, 'bucket': bucket})
 
-#
-# @app.route('/')
-# def hello_world():
-#     return 'Hello, World!'
-#
-#
-
 
 if __name__ == "__main__":
     app.run(host=os.getenv('FLASK_HOST'), port=os.getenv('FLASK_PORT'), debug=True)

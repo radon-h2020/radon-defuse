@@ -1,7 +1,6 @@
 import joblib
 import os
 import shutil
-import sys
 import time
 import threading
 

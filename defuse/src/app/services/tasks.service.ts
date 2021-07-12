@@ -16,7 +16,8 @@ export class TasksService {
     tasks: Observable<TaskModel[]>;
     taskDoc: AngularFirestoreDocument<TaskModel>;
 
-    constructor(private httpClient: HttpClient, private store: AngularFirestore){}
+    constructor(private httpClient: HttpClient,
+                private store: AngularFirestore){}
 
     initializeTasks(repositoryId: string){
 
@@ -46,9 +47,12 @@ export class TasksService {
             }))
     }
 
-    deleteTask(id: string): Observable<boolean>{
-        this.taskDoc = this.store.doc(`tasks/${id}`);
+    deleteTask(taskId: string): Observable<boolean>{
+        this.taskDoc = this.store.doc(`tasks/${taskId}`);
         this.taskDoc.delete();
+
+        const URL = `/api/log?task_id=${taskId}`;
+        return this.httpClient.delete<boolean>(URL)
         return of(true)
     }
 

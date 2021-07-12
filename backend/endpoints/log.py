@@ -21,3 +21,15 @@ class Log(Resource):
 
         except NotFound:
             return make_response({}, 404)
+
+    def delete(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('task_id', type=str, required=True)
+        task_id = parser.parse_args().get('task_id')
+
+        try:
+            blob = self.bucket.blob(f'logs/{task_id}.log')
+            blob.delete()
+            return make_response({}, 204)
+        except NotFound:
+            return make_response({}, 404)

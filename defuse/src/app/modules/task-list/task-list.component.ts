@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 
+import { TaskLogDialogComponent } from './dialog-log/dialog-log.component'
 import { TaskModel } from 'app/models/task.model'
 import { TasksService } from 'app/services/tasks.service'
 
@@ -19,6 +21,7 @@ export class TaskListComponent implements OnInit {
 
     constructor(
         private _activatedRoute: ActivatedRoute,
+        private _dialog: MatDialog,
         private _tasksService: TasksService
     ) {}
 
@@ -52,5 +55,24 @@ export class TaskListComponent implements OnInit {
         this._tasksService.deleteTask(id)
             .subscribe(deleted => {});
     }
+
+    /**
+    Visualize task's log
+    @param id: task id
+    */
+    onVisualizeLog(id){
+//         this._tasksService.getLog(id)
+//             .subscribe(log => {
+//              // TODO: open Dialog for log
+//         });
+
+        // Open Log Dialog
+        let dialogRef = this._dialog.open(TaskLogDialogComponent, {
+            width: '100%',
+            height: '90%',
+            data: { log: 'TODO: log here' }
+        });
+    }
+
     trackTaskById(index: number, task: TaskModel): string { return task.id; }
 }

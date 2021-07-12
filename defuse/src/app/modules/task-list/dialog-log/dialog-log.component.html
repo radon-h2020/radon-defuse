@@ -1,0 +1,13 @@
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>
+      <mat-icon [svgIcon]="'heroicons_outline:x'"></mat-icon>
+  </button>
+</mat-dialog-actions>
+
+<!-- Terminal-->
+<cdk-virtual-scroll-viewport itemSize="1" class="terminal overflow-x-auto sm:overflow-y-auto mt-10">
+    <pre></pre>
+    <pre></pre>
+    <pre>{{data.log}}</pre>
+</cdk-virtual-scroll-viewport>
+

@@ -30,7 +30,10 @@ export class ModelsService {
                         id: item.payload.doc.id,
                         defect: data['defect'],
                         language: data['language'],
-                        createdAt: data['created_at']
+                        averagePrecision: data['average_precision'],
+                        mcc: data['mcc'],
+                        //
+                        createdAt: data['created_at'],
                     } as PredictiveModel
                 })
             }))

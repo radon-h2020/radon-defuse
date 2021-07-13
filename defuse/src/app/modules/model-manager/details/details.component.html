@@ -13,55 +13,74 @@
     <!-- Name & Type -->
     <div *ngIf="item" class="flex flex-col items-start mt-8">
         <div class="text-xl font-medium">{{item.content.defect|titlecase}}</div>
-        <div class="mt-1 px-1.5 rounded text-sm font-semibold leading-5 text-white bg-green-600">{{item.content.language.toUpperCase()}}</div>
+
+        <div class="flex flex-shrink-0 items-center gap-2 mt-1">
+<!--            <div class="px-1.5 rounded text-sm font-semibold leading-5 text-white bg-gray-600">{{item.content.language.toUpperCase()}}</div>-->
+            <div class="px-1.5 rounded text-sm font-semibold leading-5 text-white bg-gray-600">
+                <span class="flex items-center gap-2">
+                    <span>
+                        <!-- Low -->
+                        <span
+                            class="flex items-end w-1 h-4 bg-red-200 rounded overflow-hidden"
+                            *ngIf="item.content.averagePrecision < 0.30">
+                            <span class="flex w-full h-1/3 bg-red-600"></span>
+                        </span>
+                        <!-- Medium -->
+                        <span
+                            class="flex items-end w-1 h-4 bg-orange-200 rounded overflow-hidden"
+                            *ngIf="item.content.averagePrecision >= 0.30 && item.content.averagePrecision < 0.80">
+                            <span class="flex w-full h-2/4 bg-orange-400"></span>
+                        </span>
+                        <!-- High -->
+                        <span
+                            class="flex items-end w-1 h-4 bg-green-100 rounded overflow-hidden"
+                            *ngIf="item.content.averagePrecision >= 0.80">
+                            <span class="flex w-full h-full bg-green-400"></span>
+                        </span>
+                    </span>
+                    <span>PR-ROC: {{item.content.averagePrecision}}</span>
+                </span>
+            </div>
+            <div class="px-1.5 rounded text-sm font-semibold leading-5 text-white bg-gray-600">
+                <span class="flex items-center gap-2">
+                    <span>
+                        <!-- Low -->
+                        <span
+                            class="flex items-end w-1 h-4 bg-red-200 rounded overflow-hidden"
+                            *ngIf="item.content.mcc < 0.30">
+                            <span class="flex w-full h-1/3 bg-red-600"></span>
+                        </span>
+                        <!-- Medium -->
+                        <span
+                            class="flex items-end w-1 h-4 bg-orange-200 rounded overflow-hidden"
+                            *ngIf="item.content.mcc >= 0.30 && item.content.mcc < 0.80">
+                            <span class="flex w-full h-2/4 bg-orange-400"></span>
+                        </span>
+                        <!-- High -->
+                        <span
+                            class="flex items-end w-1 h-4 bg-green-100 rounded overflow-hidden"
+                            *ngIf="item.content.mcc >= 0.80">
+                            <span class="flex w-full h-full bg-green-400"></span>
+                        </span>
+                    </span>
+                    <span>MCC: {{item.content.mcc}}</span>
+                </span>
+            </div>
+        </div>
     </div>
 
     <!-- Information -->
-<!--    <div class="text-lg font-medium mt-8">Information</div>-->
-<!--    <div class="flex flex-col mt-4 border-t border-b divide-y font-medium">-->
-<!--        <div class="flex items-center justify-between py-3">-->
-<!--            <div class="text-secondary">Created By</div>-->
-<!--            <div>item.createdBy</div>-->
-<!--        </div>-->
-<!--        <div class="flex items-center justify-between py-3">-->
-<!--            <div class="text-secondary">Created At</div>-->
-<!--            <div> item.createdAt </div>-->
-<!--        </div>-->
-<!--        <div class="flex items-center justify-between py-3">-->
-<!--            <div class="text-secondary">Modified At</div>-->
-<!--            <div>item.modifiedAt</div>-->
-<!--        </div>-->
-<!--        <div class="flex items-center justify-between py-3">-->
-<!--            <div class="text-secondary">Size</div>-->
-<!--            <div>item.size</div>-->
-<!--        </div>-->
-<!--        <ng-container *ngIf="item.contents">-->
-<!--            <div class="flex items-center justify-between py-3">-->
-<!--                <div class="text-secondary">Contents</div>-->
-<!--                <div>item.contents</div>-->
-<!--            </div>-->
-<!--        </ng-container>-->
-<!--    </div>-->
-
-<!--    &lt;!&ndash; Description &ndash;&gt;-->
-<!--    <div class="flex items-center justify-between mt-8">-->
-<!--        <div class="text-lg font-medium">Description</div>-->
-<!--        <button mat-icon-button>-->
-<!--            <mat-icon-->
-<!--                class="icon-size-5"-->
-<!--                [svgIcon]="'heroicons_solid:pencil'"></mat-icon>-->
-<!--        </button>-->
-<!--    </div>-->
-<!--    <div class="flex mt-2 border-t">-->
-<!--        <div class="py-3">-->
-<!--            <ng-container *ngIf="item.description">-->
-<!--                <div>item.description</div>-->
-<!--            </ng-container>-->
-<!--            <ng-container *ngIf="!item.description">-->
-<!--                <div class="italic text-secondary">Click here to add a description</div>-->
-<!--            </ng-container>-->
-<!--        </div>-->
-<!--    </div>-->
+    <div class="text-lg font-medium mt-8">Information</div>
+    <div class="flex flex-col mt-4 border-t border-b divide-y font-medium">
+        <div class="flex items-center justify-between py-3">
+            <div class="text-secondary">Created At</div>
+            <div> {{item.content.createdAt * 1000 | date:'LLL dd HH:mm'}} </div>
+        </div>
+        <div class="flex items-center justify-between py-3">
+            <div class="text-secondary">Sklearn version</div>
+            <div>1.24.5</div>
+        </div>
+    </div>
 
     <!-- Actions -->
     <div class="grid grid-cols-2 gap-4 w-full mt-8">

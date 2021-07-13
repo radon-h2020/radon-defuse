@@ -16,7 +16,7 @@ class Model(Resource):
         headers = {"Content-Disposition": "attachment; filename=%s.joblib" % model_id}
 
         try:
-            blob = self.bucket.blob(f'{model_id}.joblib')
+            blob = self.bucket.blob(f'models/{model_id}.joblib')
             b_model = blob.download_as_bytes()
             return make_response((b_model, headers))
 
@@ -29,7 +29,7 @@ class Model(Resource):
         model_id = parser.parse_args().get('id')
 
         try:
-            blob = self.bucket.blob(f'{model_id}.joblib')
+            blob = self.bucket.blob(f'models/{model_id}.joblib')
             blob.delete()
 
             self.db.collection('models').document(model_id).delete()

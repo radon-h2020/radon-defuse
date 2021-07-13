@@ -154,7 +154,7 @@ class Train(Resource):
         b_model = buf.getvalue()
         buf.close()
 
-        blob = self.bucket.blob(f'{model_id}.joblib')
+        blob = self.bucket.blob(f'models/{model_id}.joblib')
         blob.upload_from_string(b_model)
 
         self.status = Status.COMPLETED

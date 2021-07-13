@@ -11,6 +11,15 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SharedModule } from 'app/shared/shared.module';
 
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTableModule } from '@angular/material/table';
+import { NgApexchartsModule } from 'ng-apexcharts';
+
+
+import { DialogAnalyticsComponent } from './dialog-analytics/dialog-analytics.component';
 import { DialogTrainModelComponent } from './dialog-train-model/dialog-train-model.component';
 import { ModelManagerComponent } from './model-manager.component';
 import { ModelManagerDetailsComponent } from './details/details.component';
@@ -24,6 +33,7 @@ export const modelManagerRoutes: Route[] = [
 
 @NgModule({
     declarations: [
+        DialogAnalyticsComponent,
         DialogTrainModelComponent,
         ModelManagerComponent,
         ModelManagerDetailsComponent
@@ -39,7 +49,15 @@ export const modelManagerRoutes: Route[] = [
         MatSelectModule,
         MatSnackBarModule,
         MatTooltipModule,
-        SharedModule
+        SharedModule,
+
+        //
+        MatButtonToggleModule,
+        MatDividerModule,
+        MatMenuModule,
+        MatProgressBarModule,
+        MatTableModule,
+        NgApexchartsModule,
     ]
 })
 export class ModelManagerModule

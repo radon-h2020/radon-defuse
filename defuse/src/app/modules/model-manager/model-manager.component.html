@@ -12,10 +12,13 @@
             [position]="'end'"
             [disableClose]="true"
             #matDrawer>
-            <model-manager-details [item]="selectedItem"
-                                   (delete)="onDelete()"
-                                   (dismiss)="onCloseDrawer()"
-                                   (download)="onDownload()"></model-manager-details>
+            <model-manager-details
+                *ngIf="selectedItem"
+                [item]="selectedItem"
+                (chart)="openAnalyticsDialog($event)"
+                (delete)="onDelete()"
+                (dismiss)="onCloseDrawer()"
+                (download)="onDownload()"></model-manager-details>
         </mat-drawer>
 
         <mat-drawer-content class="flex flex-col bg-gray-100 dark:bg-transparent">

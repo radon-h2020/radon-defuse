@@ -4,6 +4,7 @@ import { MatDrawer } from '@angular/material/sidenav';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
+import { DialogAnalyticsComponent } from './dialog-analytics/dialog-analytics.component';
 import { DialogTrainModelComponent } from './dialog-train-model/dialog-train-model.component';
 import { PredictiveModel } from 'app/models/predictive-model.model';
 
@@ -54,6 +55,7 @@ export class ModelManagerComponent implements OnInit {
                 private _modelsService: ModelsService,
                 private _tasksService: TasksService,
                 private _dialog: MatDialog,
+                private _dialog_analytics: MatDialog,
                 private _router: Router,
                 private _snackBar: MatSnackBar) {
 
@@ -164,7 +166,6 @@ export class ModelManagerComponent implements OnInit {
         this._changeDetectorRef.markForCheck();
     }
 
-
     onDelete(){
         this._modelsService.deleteModel(this.selectedItem.content.id).subscribe(response => {
             this.onCloseDrawer()
@@ -172,7 +173,6 @@ export class ModelManagerComponent implements OnInit {
     }
 
     onDownload(){
-
         const id = this.selectedItem.content.id
         const defect = this.selectedItem.content.defect
         const language = this.selectedItem.content.language
@@ -202,6 +202,18 @@ export class ModelManagerComponent implements OnInit {
         })
     }
 
+    openAnalyticsDialog(modelId: string){
+        this._modelsService.getReport(this.selectedItem.content.id).subscribe(report => {
+
+            // Open Dialog and show log
+            this._dialog_analytics.open(DialogAnalyticsComponent, {
+                width: '100%',
+                height: '85%',
+                data: report //{ data: report }
+            });
+        })
+    }
+
     openTrainDialog(){
         let dialogRef = this._dialog.open(DialogTrainModelComponent);
         dialogRef.afterClosed().subscribe(result => {
@@ -210,5 +222,4 @@ export class ModelManagerComponent implements OnInit {
             }
         })
     }
-
 }

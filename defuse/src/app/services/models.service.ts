@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators'
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore'
 
@@ -41,6 +41,32 @@ export class ModelsService {
 
     getAll(): Observable<PredictiveModel[]>{
         return this.models;
+    }
+
+    getReport(modelId: string): Observable<any>{
+        const URL = `/api/report?model_id=${modelId}`;
+        return this.httpClient.get<any>(URL, {observe:'response'}).pipe(
+                map(response => {
+                    const body = response['body']
+
+                    let series = {}
+
+                    for (let evaluationMeasure in body) {
+                        let data = []
+                        Object.entries(body[evaluationMeasure]).forEach(([key,value]) => {
+                            const roundedValue = Math.round(+value * Math.pow(10, 2)) / Math.pow(10, 2);
+                            data.push({x: +key+1, y: roundedValue})
+                        })
+
+                        series[evaluationMeasure] = [{
+                            name: evaluationMeasure,
+                            data: data
+                        }]
+                    }
+
+                    return {performance: {series}}
+                })
+           );
     }
 
     deleteModel(id: string): Observable<any>{

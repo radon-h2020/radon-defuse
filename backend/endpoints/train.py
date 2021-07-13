@@ -145,7 +145,8 @@ class Train(Resource):
             'language': self.args.get('language'),
             'defect': self.args.get('defect'),
             'created_at': time.time(),
-            # 'average_precision': round(dp.best_estimator_average_precision, 4)
+            'average_precision': round(dp.model['report']['mean_test_average_precision'], 2),
+            'mcc': round(dp.model['report']['mean_test_mcc'], 2),
         })[1].id
 
         buf = BytesIO()

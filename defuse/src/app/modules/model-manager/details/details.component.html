@@ -15,7 +15,6 @@
         <div class="text-xl font-medium">{{item.content.defect|titlecase}}</div>
 
         <div class="flex flex-shrink-0 items-center gap-2 mt-1">
-<!--            <div class="px-1.5 rounded text-sm font-semibold leading-5 text-white bg-gray-600">{{item.content.language.toUpperCase()}}</div>-->
             <div class="px-1.5 rounded text-sm font-semibold leading-5 text-white bg-gray-600">
                 <span class="flex items-center gap-2">
                     <span>
@@ -66,6 +65,13 @@
                     <span>MCC: {{item.content.mcc}}</span>
                 </span>
             </div>
+
+            <mat-icon
+                (click)="onVisualizePerformance()"
+                #tooltip="matTooltip"
+                matTooltip="Visualize performance"
+                style="cursor: pointer;"
+                [svgIcon]="'heroicons_outline:presentation-chart-line'"></mat-icon>
         </div>
     </div>
 

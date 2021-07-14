@@ -35,15 +35,15 @@ export class RepositoryListComponent implements OnInit {
 
 
     constructor(private _cdr: ChangeDetectorRef,
-                private repositoryListService: RepositoryListService,
-                public dialog: MatDialog,
+                public _dialog: MatDialog,
+                private _repositoryListService: RepositoryListService,
                 private _snackBar: MatSnackBar) { }
 
     ngOnInit(): void {
         this.dataSourceGithub = new MatTableDataSource<RepositoryModel>(this.filteredRepositoriesGithub);
         this.dataSourceGitlab = new MatTableDataSource<RepositoryModel>(this.filteredRepositoriesGitlab);
 
-        this.repositoryListService.getAll().subscribe(repositories => {
+        this._repositoryListService.getAll().subscribe(repositories => {
             this.repositories = repositories
 
             // Populate table Github
@@ -61,7 +61,7 @@ export class RepositoryListComponent implements OnInit {
     }
 
     onAdd(url: string, token: string){
-        this.repositoryListService.addRepository(url, token)
+        this._repositoryListService.addRepository(url, token)
             .subscribe(added => {
                 this._snackBar.open('Repository added!', 'Dismiss', {
                     duration: 5000,
@@ -71,11 +71,11 @@ export class RepositoryListComponent implements OnInit {
     }
 
     /**
-    Remove a repository
+    Delete a repository
     @param id: repository id
     */
     onDelete(id){
-        this.repositoryListService.deleteRepository(id)
+        this._repositoryListService.deleteRepository(id)
             .subscribe(deleted => {
                 this._snackBar.open('Repository deleted!', 'Dismiss', {
                     duration: 5000,
@@ -86,7 +86,7 @@ export class RepositoryListComponent implements OnInit {
     }
 
     openAddDialog(){
-        let dialogRef = this.dialog.open(DialogAddRepositoryComponent);
+        let dialogRef = this._dialog.open(DialogAddRepositoryComponent);
         dialogRef.afterClosed().subscribe(result => {
             if(result.url != undefined){
                 this.onAdd(result.url, result.token)
@@ -98,7 +98,7 @@ export class RepositoryListComponent implements OnInit {
 
         const repoToDelete = this.repositories.filter(item => item.id == id)[0]
 
-        let dialogRef = this.dialog.open(DialogDeleteRepositoryComponent, {data: {full_name: repoToDelete.full_name}});
+        let dialogRef = this._dialog.open(DialogDeleteRepositoryComponent, {data: {full_name: repoToDelete.full_name}});
         dialogRef.afterClosed().subscribe(confirmDelete => {
             if(confirmDelete){
                 this.onDelete(repoToDelete.id)

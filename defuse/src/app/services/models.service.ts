@@ -49,14 +49,21 @@ export class ModelsService {
                 map(response => {
                     const body = response['body']
 
+                    let overall = {}
                     let series = {}
 
                     for (let evaluationMeasure in body) {
                         let data = []
-                        Object.entries(body[evaluationMeasure]).forEach(([key,value]) => {
-                            const roundedValue = Math.round(+value * Math.pow(10, 2)) / Math.pow(10, 2);
-                            data.push({x: +key+1, y: roundedValue})
-                        })
+
+                        if(evaluationMeasure == 'auc-pr' || evaluationMeasure == 'mcc' || evaluationMeasure == 'precision' || evaluationMeasure == 'recall'){
+                            Object.entries(body[evaluationMeasure]).forEach(([key,value]) => {
+                                    const roundedValue = Math.round(+value * Math.pow(10, 2)) / Math.pow(10, 2);
+                                    data.push({x: +key+1, y: roundedValue})
+                            })
+                        }else{
+                            const roundedValue = Math.round(+body[evaluationMeasure] * Math.pow(10, 2)) / Math.pow(10, 2);
+                            overall[evaluationMeasure] = roundedValue
+                        }
 
                         series[evaluationMeasure] = [{
                             name: evaluationMeasure,
@@ -64,7 +71,7 @@ export class ModelsService {
                         }]
                     }
 
-                    return {performance: {series}}
+                    return {performance: {series, overall}}
                 })
            );
     }

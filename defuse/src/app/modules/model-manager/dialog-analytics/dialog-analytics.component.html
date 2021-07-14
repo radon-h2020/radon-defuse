@@ -42,7 +42,13 @@
                             [svgIcon]="'heroicons_solid:information-circle'"
                             [matTooltip]="'Average Precision is the description here'"></mat-icon>
                     </div>
-                    <div class="flex items-start mt-2 text-4xl font-bold tracking-tight leading-none">100%</div>
+                    <div class="flex items-start mt-2">
+                        <div class="text-4xl font-bold tracking-tight leading-none">{{data.performance.overall.mean_test_auc_pr}}</div>
+                        <div class="flex items-center ml-2">
+                            <span>&#177;</span>
+                            <div class="ml-1 text-md font-medium">{{data.performance.overall.std_test_auc_pr}}</div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Mean MCC -->
@@ -54,7 +60,13 @@
                             [svgIcon]="'heroicons_solid:information-circle'"
                             [matTooltip]="'Matthew Correlation Coefficient (MCC) is the description here'"></mat-icon>
                     </div>
-                    <div class="flex items-start mt-2 text-4xl font-bold tracking-tight leading-none">95%</div>
+                    <div class="flex items-start mt-2">
+                        <div class="text-4xl font-bold tracking-tight leading-none">{{data.performance.overall.mean_test_mcc}}</div>
+                        <div class="flex items-center ml-2">
+                            <span>&#177;</span>
+                            <div class="ml-1 text-md font-medium">{{data.performance.overall.std_test_mcc}}</div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Mean Precision -->
@@ -66,7 +78,13 @@
                             [svgIcon]="'heroicons_solid:information-circle'"
                             [matTooltip]="'Precision is defined as ...'"></mat-icon>
                     </div>
-                    <div class="flex items-start mt-2 text-4xl font-bold tracking-tight leading-none">60%</div>
+                    <div class="flex items-start mt-2">
+                        <div class="text-4xl font-bold tracking-tight leading-none">{{data.performance.overall.mean_test_precision}}</div>
+                        <div class="flex items-center ml-2">
+                            <span>&#177;</span>
+                            <div class="ml-1 text-md font-medium">{{data.performance.overall.std_test_precision}}</div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Mean Recall -->
@@ -78,7 +96,13 @@
                             [svgIcon]="'heroicons_solid:information-circle'"
                             [matTooltip]="'Recall is defined as ...'"></mat-icon>
                     </div>
-                    <div class="flex items-start mt-2 text-4xl font-bold tracking-tight leading-none">75%</div>
+                    <div class="flex items-start mt-2">
+                        <div class="text-4xl font-bold tracking-tight leading-none">{{data.performance.overall.mean_test_recall}}</div>
+                        <div class="flex items-center ml-2">
+                            <span>&#177;</span>
+                            <div class="ml-1 text-md font-medium">{{data.performance.overall.std_test_recall}}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

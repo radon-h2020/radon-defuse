@@ -30,7 +30,7 @@ class Report(Resource):
 
             splits = [key for key in model['report'].keys() if 'split' in key]
             splits.sort()
-            print(splits)
+
             n_releases = int(re.match(r'split(\d+)', splits[-1]).groups()[0]) + 1
 
             for i in range(n_releases):
@@ -43,7 +43,15 @@ class Report(Resource):
                 'auc-pr': auc_pr,
                 'mcc': mcc,
                 'precision': precision,
-                'recall': recall
+                'recall': recall,
+                'mean_test_auc_pr': model['report']['mean_test_average_precision'],
+                'std_test_auc_pr': model['report']['std_test_average_precision'],
+                'mean_test_mcc': model['report']['mean_test_mcc'],
+                'std_test_mcc': model['report']['std_test_mcc'],
+                'mean_test_precision': model['report']['mean_test_precision'],
+                'std_test_precision': model['report']['std_test_precision'],
+                'mean_test_recall': model['report']['mean_test_recall'],
+                'std_test_recall': model['report']['std_test_recall'],
             }
 
             return make_response(report, 200)

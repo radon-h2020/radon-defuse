@@ -12,7 +12,7 @@ import { TasksService } from 'app/services/tasks.service'
 })
 export class TaskListComponent implements OnInit {
 
-    repositoryId: string;
+    repositoryId: number;
     tasks: TaskModel[];
     tasksCount: any = {
         completed : 0,
@@ -26,7 +26,7 @@ export class TaskListComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.repositoryId = this._activatedRoute.snapshot.paramMap.get("id");
+        this.repositoryId = +this._activatedRoute.snapshot.paramMap.get("id");
         this._tasksService.initializeTasks(this.repositoryId)
 
         this._tasksService.getAll().subscribe(tasks => {

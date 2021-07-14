@@ -19,13 +19,13 @@ export class TasksService {
     constructor(private httpClient: HttpClient,
                 private store: AngularFirestore){}
 
-    initializeTasks(repositoryId: string){
+    initializeTasks(repositoryId: number){
 
-        if(this.repositoryId === +repositoryId){
+        if(this.repositoryId === repositoryId){
             return
         }
 
-        this.repositoryId = +repositoryId // to number
+        this.repositoryId = repositoryId
 
         this.tasks = this.store.collection('tasks', ref => ref.where('repository_id', '==', this.repositoryId))
             .snapshotChanges().pipe(map(changes => {

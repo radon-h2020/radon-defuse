@@ -17,10 +17,9 @@ export class CommitsService {
 
     constructor(private httpClient: HttpClient, private store: AngularFirestore){}
 
-    initializeCommits(repositoryId: string){
-        const id = +repositoryId // to number
+    initializeCommits(repositoryId: number){
 
-        this.commits = this.store.collection('commits', ref => ref.where('repository_id', '==', id))
+        this.commits = this.store.collection('commits', ref => ref.where('repository_id', '==', repositoryId))
             .snapshotChanges().pipe(map(changes => {
                 return changes.map(item => {
                     const data = item.payload.doc.data();

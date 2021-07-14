@@ -36,7 +36,7 @@ export interface Items
 export class ModelManagerComponent implements OnInit {
     drawerMode: 'side' | 'over';
 
-    repositoryId: string;
+    repositoryId: number;
     folder: string;
 
     models: PredictiveModel[];
@@ -59,7 +59,7 @@ export class ModelManagerComponent implements OnInit {
                 private _router: Router,
                 private _snackBar: MatSnackBar) {
 
-        this.repositoryId = this._activatedRoute.snapshot.paramMap.get("id");
+        this.repositoryId = +this._activatedRoute.snapshot.paramMap.get("id");
 
         this._activatedRoute.queryParams.subscribe(params => {
             if(params.folder){

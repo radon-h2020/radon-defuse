@@ -18,10 +18,9 @@ export class FixedFilesService {
 
     constructor(private httpClient: HttpClient, private store: AngularFirestore){}
 
-    initializeFiles(repositoryId: string){
-        const id = +repositoryId // to number
+    initializeFiles(repositoryId: number){
 
-        this.files = this.store.collection('fixed-files', ref => ref.where('repository_id', '==', id))
+        this.files = this.store.collection('fixed-files', ref => ref.where('repository_id', '==', repositoryId))
             .snapshotChanges().pipe(map(changes => {
                 return changes.map(item => {
                     const data = item.payload.doc.data();

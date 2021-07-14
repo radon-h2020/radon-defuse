@@ -18,8 +18,8 @@ export class ModelsService {
 
     constructor(private httpClient: HttpClient, private store: AngularFirestore){}
 
-    initializeModels(repositoryId: string){
-        this.repositoryId = +repositoryId // to number
+    initializeModels(repositoryId: number){
+        this.repositoryId = repositoryId
 
         this.models = this.store.collection('models', ref => ref.where('repository_id', '==', this.repositoryId))
             .snapshotChanges().pipe(map(changes => {

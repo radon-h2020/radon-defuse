@@ -1,6 +1,8 @@
 import { Route } from '@angular/router';
 import { LayoutComponent } from 'app/layout/layout.component';
 
+import { RepositoryResolver } from 'app/resolvers/repository.resolver';
+
 // @formatter:off
 // tslint:disable:max-line-length
 export const appRoutes: Route[] = [
@@ -14,7 +16,6 @@ export const appRoutes: Route[] = [
             layout: 'empty'
         }
     },
-
     {
         path: 'repositories',
         component: LayoutComponent,
@@ -23,10 +24,10 @@ export const appRoutes: Route[] = [
         },
         loadChildren: () => import('app/modules/repository-list/repository-list.module').then(m => m.RepositoryListModule),
     },
-
     {
         path       : 'repository/:id/dashboard',
         component  : LayoutComponent,
+        resolve: { repository: RepositoryResolver },
         loadChildren: () => import('app/modules/dashboard/dashboard.module').then(m => m.DashboardModule),
         data: {
             layout: 'centered'
@@ -48,18 +49,5 @@ export const appRoutes: Route[] = [
             layout: 'centered'
         }
     },
-
-//     {
-//         path       : 'repository/:id',
-//         component  : LayoutComponent,
-//         //loadChildren: () => import('app/modules/dashboard/dashboard.module').then(m => m.DashboardModule),
-//         data: {
-//             layout: 'centered'
-//         },
-//         children   : [
-//             {path: 'dashboard', loadChildren: () => import('app/modules/dashboard/dashboard.module').then(m => m.DashboardModule)},
-//             {path: 'models', loadChildren: () => import('app/modules/dashboard/dashboard.module').then(m => m.DashboardModule)},
-//         ]
-//     },
 ];
 

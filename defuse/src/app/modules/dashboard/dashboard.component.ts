@@ -11,6 +11,7 @@ import { DialogMineRepositoryComponent } from './dialogs/dialog-mine-repository.
 // Models
 import { CommitModel } from 'app/models/commit.model';
 import { FixedFileModel } from 'app/models/fixed-file.model';
+import { RepositoryModel } from 'app/models/repository.model';
 
 // Services
 import { CommitsService } from 'app/services/commits.service';
@@ -24,7 +25,7 @@ import { TasksService } from 'app/services/tasks.service';
 })
 export class DashboardComponent implements OnInit {
 
-    repositoryId: string
+    repository: RepositoryModel
 
     // Commits
     commits: CommitModel[] = [];
@@ -49,13 +50,15 @@ export class DashboardComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.repositoryId = this._activatedRoute.snapshot.paramMap.get("id");
+
+        this.repository = this._activatedRoute.snapshot.data["repository"];
+
         this.dataSourceCommits = new MatTableDataSource<CommitModel>(this.commits);
         this.dataSourceFiles = new MatTableDataSource<FixedFileModel>(this.files);
 
-        this._commitsService.initializeCommits(this.repositoryId)
-        this._filesService.initializeFiles(this.repositoryId)
-        this._tasksService.initializeTasks(this.repositoryId)
+        this._commitsService.initializeCommits(this.repository.id)
+        this._filesService.initializeFiles(this.repository.id)
+        this._tasksService.initializeTasks(this.repository.id)
 
         this._commitsService.getAll().subscribe(commits => {
             this.commits = commits

@@ -51,7 +51,11 @@
                                         [matTooltip]="commit.is_valid ? 'Exclude commit' : 'Include commit'"
                                         matTooltipPosition="below"
                                         style="cursor: pointer;"></span>
-                                    <span class="ml-3 leading-4" style="font-size: 12px;">{{commit.hash.substring(0,8)}}</span>
+                                    <span class="ml-3 leading-4" style="font-size: 12px;">
+                                        <a href="{{repository.url}}/commit/{{commit.hash}}" target="_blank">
+                                           {{commit.hash.substring(0,8)}}
+                                        </a>
+                                    </span>
                                 </span>
                             </td>
                             </ng-container>
@@ -123,14 +127,22 @@
                                         [matTooltip]="file.is_valid ? 'Exclude file' : 'Include file'"
                                         matTooltipPosition="below"
                                         style="cursor: pointer;"></span>
-                                    <span class="ml-3 leading-4" style="font-size: 12px;">{{file.hash_fix.substring(0,8)}}</span>
+                                    <span class="ml-3 leading-4" style="font-size: 12px;">
+                                        <a href="{{repository.url}}/commit/{{file.hash_fix}}" target="_blank">
+                                           {{file.hash_fix.substring(0,8)}}
+                                        </a>
+                                    </span>
                                 </span>
                                 </td>
                             </ng-container>
 
                             <ng-container matColumnDef="hash_bic">
                                 <th mat-header-cell *matHeaderCellDef> Bug introducing commit </th>
-                                <td mat-cell *matCellDef="let file" style="font-size: 12px;"> {{file.hash_bic.substring(0,8)}}</td>
+                                <td mat-cell *matCellDef="let file" style="font-size: 12px;">
+                                    <a href="{{repository.url}}/commit/{{file.hash_bic}}" target="_blank">
+                                       {{file.hash_bic.substring(0,8)}}
+                                    </a>
+                                </td>
                             </ng-container>
 
                             <ng-container matColumnDef="filepath">

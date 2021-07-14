@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog'
-
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { DialogAddRepositoryComponent } from './dialog-add-repository/dialog-add-repository.component';
@@ -36,7 +36,8 @@ export class RepositoryListComponent implements OnInit {
 
     constructor(private _cdr: ChangeDetectorRef,
                 private repositoryListService: RepositoryListService,
-                public dialog: MatDialog) { }
+                public dialog: MatDialog,
+                private _snackBar: MatSnackBar) { }
 
     ngOnInit(): void {
         this.dataSourceGithub = new MatTableDataSource<RepositoryModel>(this.filteredRepositoriesGithub);
@@ -62,8 +63,10 @@ export class RepositoryListComponent implements OnInit {
     onAdd(url: string, token: string){
         this.repositoryListService.addRepository(url, token)
             .subscribe(added => {
-                console.log(added)
-                // Notify user with notification or snackbar
+                this._snackBar.open('Repository added!', 'Dismiss', {
+                    duration: 5000,
+                    panelClass: ['custom-snack-bar']
+                });
             });
     }
 
@@ -74,8 +77,10 @@ export class RepositoryListComponent implements OnInit {
     onDelete(id){
         this.repositoryListService.deleteRepository(id)
             .subscribe(deleted => {
-                console.log(deleted)
-                // Notify user with notification or snackbar
+                this._snackBar.open('Repository deleted!', 'Dismiss', {
+                    duration: 5000,
+                    panelClass: ['custom-snack-bar']
+                });
             });
 
     }

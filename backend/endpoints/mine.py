@@ -76,7 +76,7 @@ class Mine(Resource):
                 else:
                     commit_ref.set({
                         'hash': commit_hash,
-                        'msg': hash_msg.pop(commit_hash, '')[:200],  # Limit message to 200 characters
+                        'msg': hash_msg.pop(commit_hash, ''),
                         'is_valid': True,
                         'repository_id': int(self.args.get('id')),
                         'defects': defects,

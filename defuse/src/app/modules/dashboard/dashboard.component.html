@@ -59,7 +59,12 @@
                             <!-- Message Column -->
                             <ng-container matColumnDef="msg">
                                 <th mat-header-cell *matHeaderCellDef> Message </th>
-                                <td mat-cell *matCellDef="let commit" style="font-size: 12px;"> {{commit.msg.substring(0,100)}} </td>
+                                <td mat-cell
+                                    *matCellDef="let commit"
+                                    #tooltip="matTooltip"
+                                    [matTooltip]="commit.msg"
+                                    matTooltipPosition="below"
+                                    style="font-size: 12px;"> {{commit.msg.substring(0,100)}} </td>
                             </ng-container>
 
                             <!-- Defects Column -->

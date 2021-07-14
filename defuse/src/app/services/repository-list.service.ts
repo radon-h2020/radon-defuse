@@ -40,6 +40,12 @@ export class RepositoryListService {
         return this.repositories;
     }
 
+    get(id: number): Observable<any>{
+        return this.store.collection('repositories', ref => ref.where('id', '==', id)).get().pipe(map(snapshot => {
+            const item = snapshot.docs[0]
+            return item.data() as RepositoryModel
+        }))
+    }
 
     addRepository(url: string, token: string): Observable<boolean>{
 

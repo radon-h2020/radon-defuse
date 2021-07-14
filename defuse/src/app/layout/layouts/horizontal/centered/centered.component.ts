@@ -40,6 +40,7 @@ export let horizontalNavigation: FuseNavigationItem[] = [
 })
 export class CenteredLayoutComponent implements OnInit, OnDestroy
 {
+//     repository: any
     isScreenSmall: boolean;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     navigation: FuseNavigationItem[] = horizontalNavigation
@@ -76,6 +77,9 @@ export class CenteredLayoutComponent implements OnInit, OnDestroy
     ngOnInit(): void
     {
         const id = this._activatedRoute.snapshot.paramMap.get("id");
+
+//         this.repository = this._activatedRoute.snapshot.data["repository"];
+
         this.navigation[0].link = '/repository/' + id + '/dashboard'
         this.navigation[1].link = '/repository/' + id + '/models'
         this.navigation[2].link = '/repository/' + id + '/tasks'

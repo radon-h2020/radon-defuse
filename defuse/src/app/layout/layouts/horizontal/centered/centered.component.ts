@@ -4,7 +4,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { FuseNavigationItem, FuseNavigationService } from '@fuse/components/navigation';
-import { InitialData } from 'app/app.types';
+
+import { RepositoryModel } from 'app/models/repository.model';
+import { RepositoryListService } from 'app/services/repository-list.service';
 
 export let horizontalNavigation: FuseNavigationItem[] = [
     {
@@ -38,7 +40,6 @@ export let horizontalNavigation: FuseNavigationItem[] = [
 })
 export class CenteredLayoutComponent implements OnInit, OnDestroy
 {
-    data: InitialData;
     isScreenSmall: boolean;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     navigation: FuseNavigationItem[] = horizontalNavigation
@@ -50,9 +51,7 @@ export class CenteredLayoutComponent implements OnInit, OnDestroy
         private _activatedRoute: ActivatedRoute,
         private _router: Router,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
-        private _fuseNavigationService: FuseNavigationService
-    )
-    {
+        private _fuseNavigationService: FuseNavigationService){
     }
 
     // -----------------------------------------------------------------------------------------------------

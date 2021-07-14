@@ -1,25 +1,5 @@
 <div class="flex flex-auto justify-center w-full sm:p-4 md:p-8 bg-gray-200 dark:bg-card">
 
-    <!-- Navigation -->
-    <ng-container *ngIf="isScreenSmall">
-        <fuse-vertical-navigation
-            class="dark bg-gray-900 print:hidden"
-            [mode]="'over'"
-            [name]="'mainNavigation'"
-            [navigation]="data.navigation.default"
-            [opened]="false">
-            <!-- Navigation header hook -->
-            <ng-container fuseVerticalNavigationContentHeader>
-                <!-- Logo -->
-                <div class="flex items-center h-20 pt-6 px-8">
-                    <img
-                        class="w-30"
-                        src="assets/images/logo/logo-text-on-dark.svg">
-                </div>
-            </ng-container>
-        </fuse-vertical-navigation>
-    </ng-container>
-
     <!-- Wrapper -->
     <div class="flex flex-col items-center flex-auto min-w-0 max-w-360 sm:rounded-xl shadow-2xl dark:shadow-none overflow-hidden">
 

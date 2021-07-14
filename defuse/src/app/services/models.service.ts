@@ -52,23 +52,23 @@ export class ModelsService {
                     let overall = {}
                     let series = {}
 
-                    for (let evaluationMeasure in body) {
-                        let data = []
+                    for (let evaluationMeasure in body['splits']) {
+                            let data = []
 
-                        if(evaluationMeasure == 'auc-pr' || evaluationMeasure == 'mcc' || evaluationMeasure == 'precision' || evaluationMeasure == 'recall'){
-                            Object.entries(body[evaluationMeasure]).forEach(([key,value]) => {
-                                    const roundedValue = Math.round(+value * Math.pow(10, 2)) / Math.pow(10, 2);
-                                    data.push({x: +key+1, y: roundedValue})
+                            Object.entries(body['splits'][evaluationMeasure]).forEach(([key,value]) => {
+                                const roundedValue = Math.round(+value * Math.pow(10, 2)) / Math.pow(10, 2);
+                                data.push({x: +key+1, y: roundedValue})
                             })
-                        }else{
-                            const roundedValue = Math.round(+body[evaluationMeasure] * Math.pow(10, 2)) / Math.pow(10, 2);
-                            overall[evaluationMeasure] = roundedValue
-                        }
 
-                        series[evaluationMeasure] = [{
-                            name: evaluationMeasure,
-                            data: data
-                        }]
+                            series[evaluationMeasure] = [{
+                                name: evaluationMeasure,
+                                data: data
+                            }]
+                    }
+
+                    for (let evaluationMeasure in body['overall']) {
+                        const roundedValue = Math.round(+body['overall'][evaluationMeasure] * Math.pow(10, 2)) / Math.pow(10, 2);
+                        overall[evaluationMeasure] = roundedValue
                     }
 
                     return {performance: {series, overall}}

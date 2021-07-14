@@ -184,7 +184,12 @@ export class DialogAnalyticsComponent implements OnInit, OnDestroy
                 min       : 0,
                 max       : 1,
                 tickAmount: 5,
-                show      : false
+                show      : true,
+                labels    : {
+                    style  : {
+                        colors: '#CBD5E1'
+                    }
+                },
             }
         };
 

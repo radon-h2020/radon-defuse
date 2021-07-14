@@ -23,10 +23,17 @@ class Report(Resource):
             with blob.open("rb") as f:
                 model = joblib.load(f)
 
+            # Mean
             auc_pr = {}
             mcc = {}
             precision = {}
             recall = {}
+
+            # Std
+            auc_pr_std = {}
+            mcc_std = {}
+            precision_std = {}
+            recall_std = {}
 
             splits = [key for key in model['report'].keys() if 'split' in key]
             splits.sort()
@@ -40,18 +47,22 @@ class Report(Resource):
                 recall[i] = model['report'][f'split{i}_test_recall']
 
             report = {
-                'auc-pr': auc_pr,
-                'mcc': mcc,
-                'precision': precision,
-                'recall': recall,
-                'mean_test_auc_pr': model['report']['mean_test_average_precision'],
-                'std_test_auc_pr': model['report']['std_test_average_precision'],
-                'mean_test_mcc': model['report']['mean_test_mcc'],
-                'std_test_mcc': model['report']['std_test_mcc'],
-                'mean_test_precision': model['report']['mean_test_precision'],
-                'std_test_precision': model['report']['std_test_precision'],
-                'mean_test_recall': model['report']['mean_test_recall'],
-                'std_test_recall': model['report']['std_test_recall'],
+                'splits': {
+                    'auc-pr': auc_pr,
+                    'mcc': mcc,
+                    'precision': precision,
+                    'recall': recall
+                },
+                'overall': {
+                    'mean_test_auc_pr': model['report']['mean_test_average_precision'],
+                    'std_test_auc_pr': model['report']['std_test_average_precision'],
+                    'mean_test_mcc': model['report']['mean_test_mcc'],
+                    'std_test_mcc': model['report']['std_test_mcc'],
+                    'mean_test_precision': model['report']['mean_test_precision'],
+                    'std_test_precision': model['report']['std_test_precision'],
+                    'mean_test_recall': model['report']['mean_test_recall'],
+                    'std_test_recall': model['report']['std_test_recall']
+                }
             }
 
             return make_response(report, 200)

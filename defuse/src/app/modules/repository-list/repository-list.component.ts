@@ -1,5 +1,8 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog'
+
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 
 import { DialogAddRepositoryComponent } from './dialog-add-repository/dialog-add-repository.component';
 import { DialogDeleteRepositoryComponent } from './dialog-delete-repository/dialog-delete-repository.component';
@@ -16,34 +19,44 @@ import { AngularFirestore } from '@angular/fire/firestore'
 export class RepositoryListComponent implements OnInit {
 
     repositories: RepositoryModel[] = []
+
+    // Github
+    dataSourceGithub: MatTableDataSource<RepositoryModel>;
     filteredRepositoriesGithub: RepositoryModel[] = []
+    @ViewChild('PaginatorGithub') paginatorGithub: MatPaginator;
+
+    // Gitlab
+    dataSourceGitlab: MatTableDataSource<RepositoryModel>;
     filteredRepositoriesGitlab: RepositoryModel[] = []
+    @ViewChild('PaginatorGitlab') paginatorGitlab: MatPaginator;
 
-    constructor(private repositoryListService: RepositoryListService, public dialog: MatDialog) {
+    // Common
+    displayedColumns: string[] = ['repository'];
 
-        // Initialize list of repositories
-        this.repositoryListService.getAll().subscribe(repositories => {
-            this.repositories = repositories
-            this.filteredRepositoriesGithub = this.repositories.filter(item => item.url.includes('github.com'));
-            this.filteredRepositoriesGitlab = this.repositories.filter(item => item.url.includes('gitlab.com'));
-        });
-    }
+
+    constructor(private _cdr: ChangeDetectorRef,
+                private repositoryListService: RepositoryListService,
+                public dialog: MatDialog) { }
 
     ngOnInit(): void {
-    }
+        this.dataSourceGithub = new MatTableDataSource<RepositoryModel>(this.filteredRepositoriesGithub);
+        this.dataSourceGitlab = new MatTableDataSource<RepositoryModel>(this.filteredRepositoriesGitlab);
 
-    filterRepository(value){
-        if(!value){  // when nothing has typed
+        this.repositoryListService.getAll().subscribe(repositories => {
+            this.repositories = repositories
+
+            // Populate table Github
             this.filteredRepositoriesGithub = this.repositories.filter(item => item.url.includes('github.com'));
+            this.dataSourceGithub = new MatTableDataSource<RepositoryModel>(this.filteredRepositoriesGithub);
+
+            // Populate table Gitlab
             this.filteredRepositoriesGitlab = this.repositories.filter(item => item.url.includes('gitlab.com'));
-        }else{
-            this.filteredRepositoriesGithub = Object.assign([], this.repositories).filter(
-                item => item.full_name.toLowerCase().indexOf(value.toLowerCase()) > -1
-            )
-            this.filteredRepositoriesGitlab = Object.assign([], this.repositories).filter(
-                item => item.full_name.toLowerCase().indexOf(value.toLowerCase()) > -1
-            )
-        }
+            this.dataSourceGitlab = new MatTableDataSource<RepositoryModel>(this.filteredRepositoriesGitlab);
+
+            this._cdr.detectChanges();
+            this.dataSourceGithub.paginator = this.paginatorGithub;
+            this.dataSourceGitlab.paginator = this.paginatorGitlab;
+        });
     }
 
     onAdd(url: string, token: string){
@@ -86,6 +99,14 @@ export class RepositoryListComponent implements OnInit {
                 this.onDelete(repoToDelete.id)
             }
         })
+    }
+
+    onFilterGithub(filterValue: string) {
+      this.dataSourceGithub.filter = filterValue.trim().toLowerCase();
+    }
+
+    onFilterGitlab(filterValue: string) {
+      this.dataSourceGitlab.filter = filterValue.trim().toLowerCase();
     }
 
     trackRepositoryById(index: number, repo: RepositoryModel): number { return repo.id; }

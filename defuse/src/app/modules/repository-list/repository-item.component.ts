@@ -1,5 +1,5 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { ViewEncapsulation } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'repository-item',
@@ -7,10 +7,15 @@ import { ViewEncapsulation } from '@angular/core';
   encapsulation: ViewEncapsulation.None
 })
 export class RepositoryItemComponent{
-  @Input() item;
-  @Output() deleted = new EventEmitter<string>();
+    @Input() item;
+    @Output() deleted = new EventEmitter<string>();
 
-  onDelete(){
-    this.deleted.emit(this.item.id);
-  }
+    constructor(
+        private _activatedRoute: ActivatedRoute,
+        private _router: Router
+    ){ }
+
+    onDelete(){
+        this.deleted.emit(this.item.id);
+    }
 }

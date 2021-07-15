@@ -147,25 +147,6 @@ export class ModelManagerComponent implements OnInit {
         this._changeDetectorRef.markForCheck();
     }
 
-    /**
-     * On backdrop clicked
-     */
-    onBackdropClicked(): void
-    {
-        // Get the current activated route
-        let route = this._activatedRoute;
-        while ( route.firstChild )
-        {
-            route = route.firstChild;
-        }
-
-        // Go back to the parent route
-        this._router.navigate(['../'], {relativeTo: route});
-
-        // Mark for check
-        this._changeDetectorRef.markForCheck();
-    }
-
     onDelete(){
         this._modelsService.deleteModel(this.selectedItem.content.id).subscribe(response => {
             this.onCloseDrawer()

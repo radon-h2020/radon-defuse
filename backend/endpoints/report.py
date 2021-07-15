@@ -23,17 +23,10 @@ class Report(Resource):
             with blob.open("rb") as f:
                 model = joblib.load(f)
 
-            # Mean
             auc_pr = {}
             mcc = {}
             precision = {}
             recall = {}
-
-            # Std
-            auc_pr_std = {}
-            mcc_std = {}
-            precision_std = {}
-            recall_std = {}
 
             splits = [key for key in model['report'].keys() if 'split' in key]
             splits.sort()

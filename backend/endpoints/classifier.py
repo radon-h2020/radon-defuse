@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 
 from sklearn.pipeline import Pipeline
+from sklearn.feature_selection import SelectFromModel
 from sklearn.metrics import make_scorer, matthews_corrcoef
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.preprocessing import MinMaxScaler
@@ -101,9 +102,14 @@ class DefectPredictor:
             cv_report = pd.DataFrame(search.cv_results_).iloc[[search.best_index_]]  # Take best estimator's scores
             cv_parsed = json.loads(cv_report.to_json(orient='records'))[0]
 
+            sfm = SelectFromModel(search.best_estimator_.named_steps['classification'], prefit=True)
+            selected_features_indices = sfm.get_support()
+            selected_features = self.X.iloc[:, selected_features_indices].columns.tolist()
+
             self.model = {
                 'estimator': search.best_estimator_,
-                'report': cv_parsed
+                'report': cv_parsed,
+                'features': selected_features
             }
 
         except Exception as e:

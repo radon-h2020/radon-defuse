@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 from sklearn.pipeline import Pipeline
-from sklearn.feature_selection import SelectFromModel
+from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.metrics import make_scorer, matthews_corrcoef
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.preprocessing import MinMaxScaler
@@ -54,6 +54,7 @@ scoring = dict(
 
 pipe = Pipeline([
     ('normalization', MinMaxScaler()),
+    ('feature_selection', SelectKBest(chi2, k=2)),
     ('classification', DecisionTreeClassifier())
 ])
 
@@ -69,6 +70,69 @@ class DefectPredictor:
 
     def __init__(self):
         self.model = None
+
+    def load(self, estimator: Pipeline, features: list):
+        self.model = {
+            'estimator': estimator,
+            'features': features
+        }
+
+    def train(self, data: pd.DataFrame):
+
+        X, y = self.prepare_training_data(data)
+        releases = X.group.astype(int).tolist()
+        X.drop(['group'], axis=1, inplace=True)
+
+        search_params['feature_selection__k'] = np.linspace(start=1, stop=X.shape[1], num=10, dtype=int)
+        search = RandomizedSearchCV(pipe, search_params, cv=walk_forward_release(X, y, releases), scoring=scoring,
+                                    refit='average_precision', verbose=10)
+
+        try:
+            search.fit(X, y)
+            cv_report = pd.DataFrame(search.cv_results_).iloc[[search.best_index_]]  # Take best estimator's scores
+            cv_parsed = json.loads(cv_report.to_json(orient='records'))[0]
+
+            selected_features_indices = search.best_estimator_.named_steps['feature_selection'].fit(X, y).get_support(indices=True)
+            selected_features = X.iloc[:, selected_features_indices].columns.tolist()
+
+            # Update normalizer
+            new_normalizer = search.best_estimator_.named_steps['normalization'].fit_transform(X[selected_features])
+            search.best_estimator_.named_steps['normalization'] = new_normalizer
+
+            self.model = {
+                'estimator': search.best_estimator_,
+                'report': cv_parsed,
+                'features': selected_features
+            }
+
+        except Exception as e:
+            print(e)
+
+    def predict(self, unseen_data: pd.DataFrame) -> bool:
+        """
+        Predict an unseen instance as failure-prone or clean.
+        :param unseen_data: pandas DataFrame containing the observation to predict
+        :return: True if failure-prone. False, otherwise.
+        """
+        if not self.model['estimator'] and not self.model['features']:
+            raise Exception('No model loaded yet. Please, load a model using instance.load(estimator, features)')
+
+        # Set missing features in unseen_data to zero
+        for feature_name in self.model['features']:
+            if feature_name not in unseen_data:
+                unseen_data[feature_name] = 0
+
+        # Select same model features
+        unseen_data = unseen_data[np.intersect1d(unseen_data.columns, self.model['features'])]
+
+        # Perform pre-process if any
+        if self.model['estimator'].named_steps['normalization']:
+            unseen_data = pd.DataFrame(self.model['estimator'].named_steps['normalization'].transform(unseen_data))
+
+        clf = self.model['estimator'].named_steps['classification']
+        prediction = bool(clf.predict(unseen_data)[0])
+
+        return prediction
 
     @staticmethod
     def prepare_training_data(data):
@@ -90,30 +154,3 @@ class DefectPredictor:
         data.drop(['commit', 'committed_at', 'filepath'], axis=1, inplace=True)
         X, y = data.drop(['failure_prone'], axis=1), data.failure_prone.values.ravel()
         return X, y
-
-    def train(self, data: pd.DataFrame):
-
-        X, y = self.prepare_training_data(data)
-        releases = X.group.astype(int).tolist()
-        X.drop(['group'], axis=1, inplace=True)
-
-        search = RandomizedSearchCV(pipe, search_params, cv=walk_forward_release(X, y, releases), scoring=scoring,
-                                    refit='average_precision', verbose=10)
-
-        try:
-            search.fit(X, y)
-            cv_report = pd.DataFrame(search.cv_results_).iloc[[search.best_index_]]  # Take best estimator's scores
-            cv_parsed = json.loads(cv_report.to_json(orient='records'))[0]
-
-            sfm = SelectFromModel(search.best_estimator_.named_steps['classification'], prefit=True)
-            selected_features_indices = sfm.get_support()
-            selected_features = X.iloc[:, selected_features_indices].columns.tolist()
-
-            self.model = {
-                'estimator': search.best_estimator_,
-                'report': cv_parsed,
-                'features': selected_features
-            }
-
-        except Exception as e:
-            print(e)

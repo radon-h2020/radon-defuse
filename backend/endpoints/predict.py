@@ -1,7 +1,11 @@
-import time
+import joblib
+import pandas as pd
 
 from flask import jsonify, make_response
 from flask_restful import Resource, reqparse
+from google.cloud.exceptions import NotFound
+
+from .classifier import DefectPredictor
 
 
 class Predict(Resource):
@@ -12,27 +16,25 @@ class Predict(Resource):
 
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('id', type=str, required=True)  # Model id
-        self.args = parser.parse_args()  # parse arguments to dictionary
+        parser.add_argument('model_id', type=str, required=True)
+        parser.add_argument('metrics', type=dict, required=True)
 
-        # Create Task
-        task_id = self.db.collection('tasks').add({
-            'name': 'predict',
-            'repository_id': self.args.get('id'),
-            'status': 'progress',
-            'started_at': time.time()
-        })[1].id
+        model_id = parser.parse_args().get('model_id')
+        metrics = parser.parse_args().get('metrics')
 
-        # Predict
-        # blob = self.bucket.blob(f'{self.args.get("id")}.joblib')
-        # b_model = blob.download_as_bytes()
+        try:
+            blob = self.bucket.blob(f'models/{model_id}.joblib')
 
-        # Save prediction in collection "predictions"?
+            with blob.open("rb") as f:
+                model = joblib.load(f)
 
-        doc_ref = self.db.collection('tasks').document(task_id)
-        doc_ref.update({
-            'status': 'completed',
-            'ended_at': time.time()
-        })
+            dp = DefectPredictor()
+            dp.load(estimator=model['estimator'], features=model['features'])
 
-        return make_response(jsonify({"failure-prone": True}), 200)
+            unseen_data = pd.DataFrame(metrics)
+            prediction = dp.predict(unseen_data)
+
+            return make_response(prediction, 200)
+
+        except NotFound:
+            return make_response({}, 404)

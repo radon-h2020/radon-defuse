@@ -108,11 +108,11 @@ class DefectPredictor:
         except Exception as e:
             print(e)
 
-    def predict(self, unseen_data: pd.DataFrame) -> bool:
+    def predict(self, unseen_data: pd.DataFrame) -> dict:
         """
         Predict an unseen instance as failure-prone or clean.
         :param unseen_data: pandas DataFrame containing the observation to predict
-        :return: True if failure-prone. False, otherwise.
+        :return: A dictionary with the prediction value and an explanation, if any
         """
         if not self.model['estimator'] and not self.model['features']:
             raise Exception('No model loaded yet. Please, load a model using instance.load(estimator, features)')
@@ -125,12 +125,42 @@ class DefectPredictor:
         # Select same model features
         unseen_data = unseen_data[np.intersect1d(unseen_data.columns, self.model['features'])]
 
-        # Perform pre-process if any
-        if self.model['estimator'].named_steps['normalization']:
-            unseen_data = pd.DataFrame(self.model['estimator'].named_steps['normalization'].transform(unseen_data))
+        column_names = unseen_data.columns.to_list()
 
-        clf = self.model['estimator'].named_steps['classification']
-        prediction = bool(clf.predict(unseen_data)[0])
+        # Pre-process
+        unseen_data_local = pd.DataFrame(self.model['estimator'].named_steps['normalization'].transform(unseen_data))
+
+        tree_clf = self.model['estimator'].named_steps['classification']
+        failure_prone = bool(tree_clf.predict(unseen_data_local)[0])
+
+        prediction = {
+            'failure_prone': failure_prone,
+            'explanation': []
+        }
+
+        if not failure_prone:
+            decision = []
+            decision_path = tree_clf.decision_path(unseen_data_local)
+            level_length = len(decision_path.indices)
+            i = 1
+            for node_id in decision_path.indices:
+                # Ignore last level because it is the last node without decision criteria or rule
+                if i < level_length:
+                    col_idx = tree_clf.tree_.feature[node_id]
+                    col_name = column_names[col_idx]
+                    threshold_value = round(tree_clf.tree_.threshold[node_id], 2)
+                    original_value = unseen_data[col_name].loc[0]
+                    normalized_value = unseen_data_local[col_idx].loc[0]
+
+                    # Inverse normalize threshold to make it more comprehensible to the final user
+                    threshold_value *= original_value / normalized_value
+                    threshold_value = int(threshold_value)
+
+                    decision.append((col_name, '<=' if original_value <= threshold_value else '>', threshold_value))
+
+                i += 1
+
+            prediction['decision'] = decision
 
         return prediction
 

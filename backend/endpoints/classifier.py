@@ -67,11 +67,11 @@ search_params = dict(
 
 class DefectPredictor:
 
-    def __init__(self, data: pd.DataFrame):
-        self.prepare_training_data(data)
+    def __init__(self):
         self.model = None
 
-    def prepare_training_data(self, data):
+    @staticmethod
+    def prepare_training_data(data):
         assert 'failure_prone' in data.columns
         assert 'commit' in data.columns
         assert 'committed_at' in data.columns
@@ -88,23 +88,26 @@ class DefectPredictor:
 
         # Remove metadata
         data.drop(['commit', 'committed_at', 'filepath'], axis=1, inplace=True)
-        self.X, self.y = data.drop(['failure_prone'], axis=1), data.failure_prone.values.ravel()
+        X, y = data.drop(['failure_prone'], axis=1), data.failure_prone.values.ravel()
+        return X, y
 
-    def train(self):
-        releases = self.X.group.astype(int).tolist()
-        self.X = self.X.drop(['group'], axis=1)
+    def train(self, data: pd.DataFrame):
 
-        search = RandomizedSearchCV(pipe, search_params, cv=walk_forward_release(self.X, self.y, releases),
-                                    scoring=scoring, refit='average_precision', verbose=10)
+        X, y = self.prepare_training_data(data)
+        releases = X.group.astype(int).tolist()
+        X.drop(['group'], axis=1, inplace=True)
+
+        search = RandomizedSearchCV(pipe, search_params, cv=walk_forward_release(X, y, releases), scoring=scoring,
+                                    refit='average_precision', verbose=10)
 
         try:
-            search.fit(self.X, self.y)
+            search.fit(X, y)
             cv_report = pd.DataFrame(search.cv_results_).iloc[[search.best_index_]]  # Take best estimator's scores
             cv_parsed = json.loads(cv_report.to_json(orient='records'))[0]
 
             sfm = SelectFromModel(search.best_estimator_.named_steps['classification'], prefit=True)
             selected_features_indices = sfm.get_support()
-            selected_features = self.X.iloc[:, selected_features_indices].columns.tolist()
+            selected_features = X.iloc[:, selected_features_indices].columns.tolist()
 
             self.model = {
                 'estimator': search.best_estimator_,

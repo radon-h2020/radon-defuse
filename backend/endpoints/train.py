@@ -127,10 +127,10 @@ class Train(Resource):
                 indices = data[data.commit == commit].index
                 data.drop(indices, inplace=True)
 
-        dp = DefectPredictor(data)
+        dp = DefectPredictor()
 
         with StringIO() as buf, redirect_stdout(buf):
-            dp.train()
+            dp.train(data)
             output = buf.getvalue()
 
             if not dp.model:

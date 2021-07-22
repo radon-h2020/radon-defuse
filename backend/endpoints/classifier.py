@@ -153,7 +153,7 @@ class DefectPredictor:
                     normalized_value = unseen_data_local[col_idx].loc[0]
 
                     # Inverse normalize threshold to make it more comprehensible to the final user
-                    threshold_value *= original_value / normalized_value
+                    threshold_value *= (original_value / normalized_value) if normalized_value != 0 else 1
                     threshold_value = int(threshold_value)
 
                     decision.append((col_name, '<=' if original_value <= threshold_value else '>', threshold_value))

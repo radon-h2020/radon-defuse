@@ -25,5 +25,12 @@ api.add_resource(endpoints.Predict, '/predict', resource_class_kwargs={'db': db,
 api.add_resource(endpoints.Report, '/report', resource_class_kwargs={'db': db, 'bucket': bucket})
 
 
+@app.route('/')
+def hello_world():
+    return 'Welcome to DEFUSE\'s APIs'
+
+
 if __name__ == "__main__":
-    app.run(host=os.getenv('FLASK_HOST'), port=os.getenv('FLASK_PORT'), debug=True)
+    FLASK_HOST = os.getenv('FLASK_HOST') if os.getenv('FLASK_HOST') else '0.0.0.0'
+    FLASK_PORT = os.getenv('FLASK_PORT') if os.getenv('FLASK_PORT') else '5000'
+    app.run(host=FLASK_HOST, port=FLASK_PORT, debug=True)

@@ -9,7 +9,7 @@
 
 The application relies on Firebase's [*Firestore Database*]() and [*Storage*](). Therefore, the following steps are mandatory to set it up.
 
-* **Step 1:** Clone the repository with `git clone https://github.com/radon-h2020/radon-defect-prediction-api`.
+* **Step 1:** Clone the repository with `git clone https://github.com/radon-h2020/radon-defuse`.
 
 * **Step 2:** [Create](https://firebase.google.com/docs/web/setup#create-firebase-project) a Firebase project. Give it a name of your choice.
 

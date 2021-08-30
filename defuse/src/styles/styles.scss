@@ -10,6 +10,18 @@
     button {color: primary !important;}
 }
 
+.custom-success-snack-bar {
+    background-color: #99cc33 !important;
+    color: black !important;
+    button {color: primary !important;}
+}
+
+.custom-warning-snack-bar {
+    background-color: #ffcc00 !important;
+    color: black !important;
+    button {color: primary !important;}
+}
+
 ::-webkit-scrollbar {
     width: 3px;
     overflow-y: scroll;

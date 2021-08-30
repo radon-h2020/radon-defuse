@@ -61,13 +61,21 @@ export class RepositoryListComponent implements OnInit {
     }
 
     onAdd(url: string, token: string){
-        this._repositoryListService.addRepository(url, token)
+
+        if(url.startsWith('https')){
+            this._repositoryListService.addRepository(url, token)
             .subscribe(added => {
                 this._snackBar.open('Repository added!', 'Dismiss', {
                     duration: 5000,
-                    panelClass: ['custom-snack-bar']
+                    panelClass: ['custom-success-snack-bar']
                 });
             });
+        }else{
+            this._snackBar.open('Please insert a valid URL. For example https://github.com/radon-h2020/radon-defuse', 'Dismiss', {
+                duration: 5000,
+                panelClass: ['custom-warning-snack-bar']
+            });
+        }
     }
 
     /**

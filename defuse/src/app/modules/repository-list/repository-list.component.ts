@@ -83,7 +83,7 @@ export class RepositoryListComponent implements OnInit {
     @param id: repository id
     */
     onDelete(id){
-        this._repositoryListService.deleteRepository(id)
+        this._repositoryListService.delete(id)
             .subscribe(deleted => {
                 this._snackBar.open('Repository deleted!', 'Dismiss', {
                     duration: 5000,

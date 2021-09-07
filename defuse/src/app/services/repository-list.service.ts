@@ -84,10 +84,9 @@ export class RepositoryListService {
         }
     }
 
-    deleteRepository(id: number): Observable<boolean>{
-        this.repositoryDoc = this.store.doc(`repositories/${id.toString()}`);
-        this.repositoryDoc.delete();
-        return of(true)
+    delete(id: number): Observable<any>{
+        const URL = `/api/repository?id=${id}`;
+        return this.httpClient.delete<any>(URL, {observe:'response'});
     }
 
 }

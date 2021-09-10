@@ -13,6 +13,7 @@
     <!-- Name & Type -->
     <div *ngIf="item" class="flex flex-col items-start mt-8">
         <div class="text-xl font-medium">{{item.content.defect|titlecase}}</div>
+        <div class="text-l font-medium">ID: {{item.content.id}}</div>
 
         <div class="flex flex-shrink-0 items-center gap-2 mt-1">
             <div class="px-1.5 rounded text-sm font-semibold leading-5 text-white bg-gray-600">

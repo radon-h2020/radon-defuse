@@ -73,7 +73,7 @@ class Repository(Resource):
         parser.add_argument('token', type=str, required=False)
         args = parser.parse_args()
 
-        regex = 'https:\/\/(github|gitlab)\.com\/([\w\W]+)\/?'
+        regex = r'https:\/\/(github|gitlab)\.com\/([\w\W]+)\/?'
         match = re.findall(regex, args.get('url'))
 
         if not match:

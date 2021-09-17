@@ -27,8 +27,6 @@ export class RepositoryListService {
                     url: data.url,
                     full_name: data.full_name,
                     default_branch: data.default_branch,
-                    language: data.language
-//                     size?: number;
                 } as RepositoryModel
 
                 return repo
@@ -47,46 +45,14 @@ export class RepositoryListService {
         }))
     }
 
-    addRepository(url: string, token: string): Observable<boolean>{
-
-        const regex = /(github|gitlab)\.com\/([\w\W]+)/
-        const matches = regex.exec(url)
-        if(matches){
-            const host = matches[1]
-            const fullName = matches[2]
-            const API_URL = host == 'github' ?
-                `https://api.github.com/repos/${fullName}` :
-                `https://gitlab.com/api/v4/projects/${encodeURIComponent(fullName)}`
-
-//             let headers = {}
-//             if(token){
-//             const key = host == 'github' ? 'Authorization' : 'PRIVATE-TOKEN'
-//             const value = host == 'github' ? `token ${token}` : token
-//             let headers = new HttpHeaders({key: value})
-//             }
-
-            return this.httpClient.get<any>(API_URL)
-                       .pipe(
-                            switchMap(response => {
-                                const repo = {
-                                    id: response['id'],
-                                    full_name: `${fullName}`,
-                                    url: url,
-                                    default_branch: response['default_branch'],
-                                    language: 'unknown'} as RepositoryModel
-
-                                this.repositoriesCollection.doc(repo.id.toString()).set(repo)
-                                return of(true)
-                            })
-                       );
-        }else{
-           return of(undefined);
-        }
+    addRepository(url: string, token: string): Observable<any>{
+        let api_url = `/api/repository?url=${url}`;
+        if(token) api_url += `&token=${token}`;
+        return this.httpClient.post<any>(api_url, {observe:'response'});
     }
 
     delete(id: number): Observable<any>{
         const URL = `/api/repository?id=${id}`;
         return this.httpClient.delete<any>(URL, {observe:'response'});
     }
-
 }

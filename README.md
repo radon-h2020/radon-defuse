@@ -5,6 +5,8 @@
 <h1 align="center">The commit annotator and model builder for defusing unsuspecting errors</h1>
 
 
+Video demo: https://www.youtube.com/watch?v=yMKJkPABSLU
+
 # How to set up
 
 The application relies on Firebase's [*Firestore Database*]() and [*Storage*](). Therefore, the following steps are mandatory to set it up.

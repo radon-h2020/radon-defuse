@@ -22,5 +22,7 @@ services:
     container_name: defuse-ui
     ports:
       - 4200:4200
+    expose:
+      - 4200
     volumes:
       - ./defuse:/app

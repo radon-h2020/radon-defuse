@@ -1,4 +1,7 @@
 build:
   docker:
-    backend: backend/Dockerfile
-    web: defuse/Dockerfile
+    defuse-backend: backend/Dockerfile
+    defuse-ui: defuse/Dockerfile
+  config:
+    FLASK_HOST: 0.0.0.0
+    FLASK_PORT: 5000

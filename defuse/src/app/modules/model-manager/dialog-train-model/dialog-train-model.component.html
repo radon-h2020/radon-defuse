@@ -6,7 +6,7 @@
         <!-- Language -->
         <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
             <mat-label>Language</mat-label>
-            <mat-select [(ngModel)]="selectedLanguage" name="language" required cdkFocusInitial>
+            <mat-select [(ngModel)]="selectedLanguage" name="language" cdkFocusInitial>
               <mat-option *ngFor="let language of languages" [value]="language.value">
                 {{language.viewValue}}
               </mat-option>
@@ -16,17 +16,26 @@
         <!-- Defect -->
         <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
             <mat-label>Defect</mat-label>
-            <mat-select [(ngModel)]="selectedDefect" name="defect" required>
+            <mat-select [(ngModel)]="selectedDefect" name="defect">
               <mat-option *ngFor="let defect of defects" [value]="defect.value">
                 {{defect.viewValue}}
               </mat-option>
             </mat-select>
         </mat-form-field>
 
+        <!-- Validation -->
+        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
+            <mat-label>Validate</mat-label>
+            <mat-select [(ngModel)]="selectedValidation" name="validation">
+              <mat-option *ngFor="let validation of validations" [value]="validation.value">
+                {{validation.viewValue}}
+              </mat-option>
+            </mat-select>
+        </mat-form-field>
     </div>
 
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close>Cancel</button>
-  <button mat-button [mat-dialog-close]="{'defect':selectedDefect, 'language':selectedLanguage}">Add</button>
+  <button mat-button [mat-dialog-close]="{'defect':selectedDefect, 'language':selectedLanguage, 'validation':selectedValidation}">Add</button>
 </mat-dialog-actions>

@@ -37,7 +37,9 @@
             <ng-container *ngIf="task.defect">
                 <span>&nbsp;{{task.defect}}</span>
             </ng-container>
-
+            <ng-container *ngIf="task.validation">
+                <span>&nbsp;per {{task.validation}}</span>
+            </ng-container>
         </div>
     </div>
 

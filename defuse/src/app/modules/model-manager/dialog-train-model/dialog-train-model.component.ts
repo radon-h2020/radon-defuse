@@ -22,12 +22,19 @@ export class DialogTrainModelComponent implements OnInit {
         {value: 'tosca', viewValue: 'Tosca'}
     ]
 
+    validations = [
+        {value: 'release', viewValue: 'per release'},
+        {value: 'commit', viewValue: 'per commit'}
+    ]
+
     selectedDefect: string;
     selectedLanguage: string;
+    selectedValidation: string;
 
     constructor() {
-        this.selectedDefect = undefined;
-        this.selectedLanguage = undefined;
+        this.selectedDefect = this.defects[0].value;
+        this.selectedLanguage = this.languages[0].value;
+        this.selectedValidation = this.validations[0].value;
     }
 
     ngOnInit(): void {

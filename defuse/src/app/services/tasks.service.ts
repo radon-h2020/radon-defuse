@@ -37,6 +37,7 @@ export class TasksService {
                         name: data['name'],
                         language: data['language'],
                         defect: data['defect'] ? data['defect'] : undefined,
+                        validation: data['validation'] ? data['validation'] : undefined,
                         started_at: Math.ceil(data['started_at']),
                         ended_at: data['ended_at'],
                         completed: data['status'] == 'completed',
@@ -70,8 +71,8 @@ export class TasksService {
         return this.httpClient.get<any>(URL, {observe:'response'})
     }
 
-    train(defect: string, language: string): Observable<any> {
-        const URL = `/api/train?id=${this.repositoryId}&defect=${defect}&language=${language}`;
+    train(defect: string, language: string, validation: string): Observable<any> {
+        const URL = `/api/train?id=${this.repositoryId}&defect=${defect}&language=${language}&validation=${validation}`;
         return this.httpClient.get<any>(URL, {observe:'response'})
     }
 }

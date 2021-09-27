@@ -70,11 +70,11 @@ class Train(Resource):
         default_branch = repo_doc.get('default_branch')
 
         if self.args.get('language').lower() == 'ansible':
-            miner = AnsibleMiner(url, default_branch, clone_repo_to)
-            metrics_extractor = AnsibleMetricsExtractor(url, 'release', clone_repo_to)
+            miner = AnsibleMiner(url_to_repo=url, clone_repo_to=clone_repo_to, branch=default_branch)
+            metrics_extractor = AnsibleMetricsExtractor(path_to_repo=url, clone_repo_to=clone_repo_to, at='release')
         elif self.args.get('language').lower() == 'tosca':
-            miner = ToscaMiner(url, default_branch, clone_repo_to)
-            metrics_extractor = ToscaMetricsExtractor(url, 'release', clone_repo_to)
+            miner = ToscaMiner(url_to_repo=url, clone_repo_to=clone_repo_to, branch=default_branch)
+            metrics_extractor = ToscaMetricsExtractor(path_to_repo=url, clone_repo_to=clone_repo_to, at='commit')
 
         # Get valid fixing-commits for the repository, language, and defect
         commits = self.db.collection('commits') \
@@ -105,10 +105,14 @@ class Train(Resource):
                 miner.fixed_files.append(decoder.to_object(doc))
 
         failure_prone_files = [file for file in miner.label()]
-        metrics_extractor.extract(failure_prone_files, product=True, process=False, delta=False)
 
         try:
+            metrics_extractor.extract(failure_prone_files, product=True, process=False, delta=False)
             self.train_model(metrics_extractor.dataset)
+        except TypeError:
+            self.status = Status.FAILED
+            blob = self.bucket.blob(f'logs/{self.task_id}.log')
+            blob.upload_from_string('Not enough data. Please provide more failure-prone files.')
         finally:
             shutil.rmtree(clone_repo_to)
 

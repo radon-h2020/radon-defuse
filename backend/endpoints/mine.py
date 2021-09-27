@@ -49,9 +49,9 @@ class Mine(Resource):
             default_branch = repo_doc.get('default_branch')
 
             if self.args.get('language').lower() == 'ansible':
-                miner = AnsibleMiner(url, default_branch, clone_repo_to)
+                miner = AnsibleMiner(url_to_repo=url, clone_repo_to=clone_repo_to, branch=default_branch)
             elif self.args.get('language').lower() == 'tosca':
-                miner = ToscaMiner(url, default_branch, clone_repo_to)
+                miner = ToscaMiner(url_to_repo=url, clone_repo_to=clone_repo_to, branch=default_branch)
             else:
                 return jsonify({'error': 'Language not supported. Select ansible or tosca'}), 403
 

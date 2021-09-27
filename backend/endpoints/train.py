@@ -32,6 +32,7 @@ class Train(Resource):
     def __init__(self, **kwargs):
         self.db = kwargs['db']
         self.bucket = kwargs['bucket']
+        self.args = None
         self.task_id = None
         self.status = None
 
@@ -39,6 +40,7 @@ class Train(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, required=True)
         parser.add_argument('language', type=str, required=True, choices=('ansible', 'tosca'))
+        parser.add_argument('validation', type=str, required=True, choices=('commit', 'release'))
         parser.add_argument('defect', type=str, required=True,
                             choices=('conditional', 'configuration_data', 'dependency', 'documentation', 'idempotency',
                                      'security', 'service', 'syntax'))
@@ -51,6 +53,7 @@ class Train(Resource):
             'repository_id': self.args.get('id'),
             'language': self.args.get('language'),
             'defect': self.args.get('defect'),
+            'validation': self.args.get('validation'),
             'status': 'progress',
             'started_at': time.time()
         })[1].id
@@ -71,10 +74,10 @@ class Train(Resource):
 
         if self.args.get('language').lower() == 'ansible':
             miner = AnsibleMiner(url_to_repo=url, clone_repo_to=clone_repo_to, branch=default_branch)
-            metrics_extractor = AnsibleMetricsExtractor(path_to_repo=url, clone_repo_to=clone_repo_to, at='release')
+            metrics_extractor = AnsibleMetricsExtractor(path_to_repo=url, clone_repo_to=clone_repo_to, at=self.args.get('validation'))
         elif self.args.get('language').lower() == 'tosca':
             miner = ToscaMiner(url_to_repo=url, clone_repo_to=clone_repo_to, branch=default_branch)
-            metrics_extractor = ToscaMetricsExtractor(path_to_repo=url, clone_repo_to=clone_repo_to, at='commit')
+            metrics_extractor = ToscaMetricsExtractor(path_to_repo=url, clone_repo_to=clone_repo_to, at=self.args.get('validation'))
 
         # Get valid fixing-commits for the repository, language, and defect
         commits = self.db.collection('commits') \

@@ -166,8 +166,8 @@ export class ModelManagerComponent implements OnInit {
         hiddenElement.click();
     }
 
-    onTrain(defect: string, language: string, validation: string){
-        this._tasksService.train(defect, language, validation).subscribe(response => {
+    onTrain(defect: string, language: string, validation: string, metrics: string){
+        this._tasksService.train(defect, language, validation, metrics).subscribe(response => {
             let message = ''
 
             if(response.status === 202){
@@ -199,7 +199,7 @@ export class ModelManagerComponent implements OnInit {
         let dialogRef = this._dialog.open(DialogTrainModelComponent);
         dialogRef.afterClosed().subscribe(result => {
             if(result && result.defect !== undefined && result.language !== undefined){
-                this.onTrain(result.defect, result.language, result.validation)
+                this.onTrain(result.defect, result.language, result.validation, result.metrics)
             }
         })
     }

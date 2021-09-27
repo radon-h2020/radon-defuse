@@ -40,10 +40,17 @@ class Train(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('id', type=int, required=True)
         parser.add_argument('language', type=str, required=True, choices=('ansible', 'tosca'))
+        parser.add_argument('metrics', type=str, required=True, choices=('product', 'process'))
         parser.add_argument('validation', type=str, required=True, choices=('commit', 'release'))
         parser.add_argument('defect', type=str, required=True,
-                            choices=('conditional', 'configuration_data', 'dependency', 'documentation', 'idempotency',
-                                     'security', 'service', 'syntax'))
+                            choices=('conditional',
+                                     'configuration_data',
+                                     'dependency',
+                                     'documentation',
+                                     'idempotency',
+                                     'security',
+                                     'service',
+                                     'syntax'))
 
         self.args = parser.parse_args()  # parse arguments to dictionary
 
@@ -53,6 +60,7 @@ class Train(Resource):
             'repository_id': self.args.get('id'),
             'language': self.args.get('language'),
             'defect': self.args.get('defect'),
+            'metrics': self.args.get('metrics'),
             'validation': self.args.get('validation'),
             'status': 'progress',
             'started_at': time.time()
@@ -110,9 +118,13 @@ class Train(Resource):
         failure_prone_files = [file for file in miner.label()]
 
         try:
-            metrics_extractor.extract(failure_prone_files, product=True, process=False, delta=False)
+            metrics_extractor.extract(failure_prone_files,
+                                      product=(self.args.get('metrics') == 'product'),
+                                      process=(self.args.get('metrics') == 'process'),
+                                      delta=False)
+
             self.train_model(metrics_extractor.dataset)
-        except TypeError:
+        except (TypeError, AttributeError):
             self.status = Status.FAILED
             blob = self.bucket.blob(f'logs/{self.task_id}.log')
             blob.upload_from_string('Not enough data. Please provide more failure-prone files.')
@@ -127,7 +139,7 @@ class Train(Resource):
         })
 
     def train_model(self, data):
-        # Remove releases with only failure_prone equal 0 or 1
+        # Remove releases or commits with only failure_prone equal 0 or 1
         for commit in data.commit.unique():
             tmp = data[data.commit == commit]
             if tmp.failure_prone.to_list().count(0) == 0 or tmp.failure_prone.to_list().count(1) == 0:

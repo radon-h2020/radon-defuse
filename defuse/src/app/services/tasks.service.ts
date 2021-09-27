@@ -52,8 +52,8 @@ export class TasksService {
         this.taskDoc = this.store.doc(`tasks/${taskId}`);
         this.taskDoc.delete();
 
-        const URL = `/api/log?task_id=${taskId}`;
-        return this.httpClient.delete<boolean>(URL)
+        // TODO delete only if task's status is failed
+        return this.httpClient.delete<boolean>(`/api/log?task_id=${taskId}`)
         return of(true)
     }
 
@@ -71,8 +71,8 @@ export class TasksService {
         return this.httpClient.get<any>(URL, {observe:'response'})
     }
 
-    train(defect: string, language: string, validation: string): Observable<any> {
-        const URL = `/api/train?id=${this.repositoryId}&defect=${defect}&language=${language}&validation=${validation}`;
+    train(defect: string, language: string, validation: string, metrics: string): Observable<any> {
+        const URL = `/api/train?id=${this.repositoryId}&defect=${defect}&language=${language}&validation=${validation}&metrics=${metrics}`;
         return this.httpClient.get<any>(URL, {observe:'response'})
     }
 }

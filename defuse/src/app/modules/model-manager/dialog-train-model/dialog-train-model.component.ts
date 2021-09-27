@@ -22,18 +22,25 @@ export class DialogTrainModelComponent implements OnInit {
         {value: 'tosca', viewValue: 'Tosca'}
     ]
 
+    metrics = [
+        {value: 'product', viewValue: 'Product'},
+        {value: 'process', viewValue: 'Process'}
+    ]
+
     validations = [
-        {value: 'release', viewValue: 'per release'},
-        {value: 'commit', viewValue: 'per commit'}
+        {value: 'release', viewValue: 'Per release'},
+        {value: 'commit', viewValue: 'Per commit'}
     ]
 
     selectedDefect: string;
     selectedLanguage: string;
+    selectedMetrics: string;
     selectedValidation: string;
 
     constructor() {
         this.selectedDefect = this.defects[0].value;
         this.selectedLanguage = this.languages[0].value;
+        this.selectedMetrics = this.metrics[0].value;
         this.selectedValidation = this.validations[0].value;
     }
 

@@ -32,10 +32,24 @@
               </mat-option>
             </mat-select>
         </mat-form-field>
+
+        <!-- Metrics -->
+        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
+            <mat-label>Metrics</mat-label>
+            <mat-select [(ngModel)]="selectedMetrics" name="metric">
+              <mat-option *ngFor="let metric of metrics" [value]="metric.value">
+                {{metric.viewValue}}
+              </mat-option>
+            </mat-select>
+        </mat-form-field>
     </div>
 
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close>Cancel</button>
-  <button mat-button [mat-dialog-close]="{'defect':selectedDefect, 'language':selectedLanguage, 'validation':selectedValidation}">Add</button>
+  <button mat-button [mat-dialog-close]="
+    {'defect': selectedDefect,
+     'language': selectedLanguage,
+     'validation': selectedValidation,
+     'metrics': selectedMetrics}">Start</button>
 </mat-dialog-actions>

@@ -74,6 +74,11 @@
                     Failed
                 </ng-container>
                 <ng-container *ngIf="task.in_progress">
+                    <span class="absolute top-0 right-0 left-0 flex items-center justify-end h-3">
+                        <mat-icon
+                            class="flex items-center justify-center px-1 ml-4 mt-3 animate-spin-slow"
+                            [svgIcon]="'heroicons_solid:cog'"></mat-icon>
+                    </span>
                     In progress
                 </ng-container>
             </span>

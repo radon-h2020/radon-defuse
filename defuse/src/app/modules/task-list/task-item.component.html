@@ -96,7 +96,7 @@
     <div class="col-span-1 flex flex-col items-start justify-center">
         <ng-container *ngIf="task.ended_at">
             <div class="text-sm whitespace-nowrap text-secondary ml-4">
-                {{task.ended_at * 1000 | date:'LLL dd HH:mm:ss'}}
+            {{ task.ended_at * 1000 | date:'LLL dd HH:mm:ss'}}
             </div>
         </ng-container>
     </div>

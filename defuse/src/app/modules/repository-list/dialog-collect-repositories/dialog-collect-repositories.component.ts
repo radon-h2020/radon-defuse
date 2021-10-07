@@ -26,14 +26,14 @@ export class DialogCollectRepositoriesComponent implements OnInit {
     constructor() {
         this.data = {
             dateRange: new FormGroup({
-                start: new FormControl(),
-                end: new FormControl(),
+                start: new FormControl(new Date()),
+                end: new FormControl(new Date()),
             }),
-            language: undefined,
+            language: this.languages[0].value,
             minReleases: 0,
             minStars: 0,
             minWatchers: 0,
-            pushedAfter: undefined
+            pushedAfter: new FormControl(new Date()).value
         }
     }
 

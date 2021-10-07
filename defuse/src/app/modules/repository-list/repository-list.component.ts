@@ -79,8 +79,15 @@ export class RepositoryListComponent implements OnInit {
         }
     }
 
-    onCollectRepositories(url: string, token: string){
+    onCollectRepositories(start: string, end: string, pushedAfter: string, language: string, minStars: number, minReleases: number){
 
+        this._repositoryListService.collectRepositories(start, end, pushedAfter, language, minStars, minReleases)
+            .subscribe(started => {
+                this._snackBar.open('Repository collection started!', 'Dismiss', {
+                    duration: 5000,
+                    panelClass: ['custom-success-snack-bar']
+            });
+        });
     }
 
     /**
@@ -110,8 +117,13 @@ export class RepositoryListComponent implements OnInit {
     openCollectRepositoriesDialog(){
         let dialogRef = this._dialog.open(DialogCollectRepositoriesComponent);
         dialogRef.afterClosed().subscribe(result => {
-            if(result.url != undefined){
-                this.onCollectRepositories(result.url, result.token)
+            if(result.start != undefined && result.end != undefined && result.language != undefined){
+                this.onCollectRepositories(result.start,
+                                           result.end,
+                                           result.pushedAfter,
+                                           result.language,
+                                           result.minStars,
+                                           result.minReleases)
             }
         })
     }

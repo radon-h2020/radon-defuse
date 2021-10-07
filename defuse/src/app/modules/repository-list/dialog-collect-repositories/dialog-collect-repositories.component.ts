@@ -7,7 +7,8 @@ export interface DialogCollectRepositoriesComponentData{
     minReleases?: number
     minStars?: number
     minWatchers?: number
-    pushedAfter?: string
+    pushedAfter?: string,
+    token: string,
 }
 
 @Component({
@@ -34,7 +35,8 @@ export class DialogCollectRepositoriesComponent implements OnInit {
             minReleases: 0,
             minStars: 0,
             minWatchers: 0,
-            pushedAfter: new FormControl(new Date()).value
+            pushedAfter: new FormControl(new Date()).value,
+            token: undefined
         }
     }
 

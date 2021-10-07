@@ -79,9 +79,9 @@ export class RepositoryListComponent implements OnInit {
         }
     }
 
-    onCollectRepositories(start: string, end: string, pushedAfter: string, language: string, minStars: number, minReleases: number){
+    onCollectRepositories(token: string, start: string, end: string, pushedAfter: string, language: string, minStars: number, minReleases: number){
 
-        this._repositoryListService.collectRepositories(start, end, pushedAfter, language, minStars, minReleases)
+        this._repositoryListService.collectRepositories(token, start, end, pushedAfter, language, minStars, minReleases)
             .subscribe(started => {
                 this._snackBar.open('Repository collection started!', 'Dismiss', {
                     duration: 5000,
@@ -118,12 +118,15 @@ export class RepositoryListComponent implements OnInit {
         let dialogRef = this._dialog.open(DialogCollectRepositoriesComponent);
         dialogRef.afterClosed().subscribe(result => {
             if(result.start != undefined && result.end != undefined && result.language != undefined){
-                this.onCollectRepositories(result.start,
-                                           result.end,
-                                           result.pushedAfter,
-                                           result.language,
-                                           result.minStars,
-                                           result.minReleases)
+                this.onCollectRepositories(
+                    result.token,
+                    result.start,
+                    result.end,
+                    result.pushedAfter,
+                    result.language,
+                    result.minStars,
+                    result.minReleases
+                )
             }
         })
     }

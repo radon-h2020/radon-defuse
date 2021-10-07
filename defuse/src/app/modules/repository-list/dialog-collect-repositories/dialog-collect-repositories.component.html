@@ -43,13 +43,24 @@
               </mat-option>
             </mat-select>
         </mat-form-field>
+
+        <!-- Token (compulsory) -->
+        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
+            <mat-icon matPrefix [svgIcon]="'heroicons_outline:key'"></mat-icon>
+            <input
+                matInput
+                [(ngModel)]="data.token"
+                [autocomplete]="'off'"
+                [placeholder]="'APIs token'">
+        </mat-form-field>
     </div>
 
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close>Cancel</button>
   <button mat-button
-          [mat-dialog-close]="{'start':data.dateRange.value.start,
+          [mat-dialog-close]="{'token':data.token,
+                               'start':data.dateRange.value.start,
                                'end': data.dateRange.value.end,
                                'pushedAfter': data.pushedAfter,
                                'minStars': data.minStars,

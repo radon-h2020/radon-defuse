@@ -48,5 +48,11 @@
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close>Cancel</button>
-  <button mat-button [mat-dialog-close]="{'url':'data.url', 'token':'data.token'}">Start</button>
+  <button mat-button
+          [mat-dialog-close]="{'start':'data.dateRange.start',
+                               'end':'data.dateRange.end',
+                               'pushedAfter': data.pushedAfter,
+                               'minStars': data.stars,
+                               'minReleases': data.minReleases,
+                               'language': data.language}">Start</button>
 </mat-dialog-actions>

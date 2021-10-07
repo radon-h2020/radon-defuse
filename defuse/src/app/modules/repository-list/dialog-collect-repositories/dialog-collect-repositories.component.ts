@@ -20,6 +20,7 @@ export class DialogCollectRepositoriesComponent implements OnInit {
     data: DialogCollectRepositoriesComponentData
     languages = [
         {value: 'ansible', viewValue: 'Ansible'},
+        {value: 'python', viewValue: 'Python'},
         {value: 'tosca', viewValue: 'Tosca'}
     ]
 

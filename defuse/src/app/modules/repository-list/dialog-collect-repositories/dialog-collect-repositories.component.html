@@ -17,7 +17,7 @@
 
         <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
           <mat-label>Last push after</mat-label>
-          <input matInput [(ngModel)]="data.pushedAfter" [matDatepicker]="pickerPushedAfter">
+          <input matInput [(ngModel)]="data.pushedAfter" [matDatepicker]="pickerPushedAfter" placeholder="Pushed after this dategi">
           <mat-datepicker-toggle matSuffix [for]="pickerPushedAfter"></mat-datepicker-toggle>
           <mat-datepicker #pickerPushedAfter></mat-datepicker>
         </mat-form-field>

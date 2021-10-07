@@ -19,6 +19,17 @@
         <!-- Actions -->
         <div class="flex mt-6 sm:mt-0">
 
+            <!-- Crawl repositories button -->
+            <button
+                *ngIf="repositories.length > 0"
+                class="ml-4"
+                mat-flat-button
+                [color]="'primary'"
+                (click)="openCollectRepositoriesDialog()">
+                <mat-icon [svgIcon]="'heroicons_outline:cog'"></mat-icon>
+                <span class="ml-2 mr-1">Crawl</span>
+            </button>
+
             <!-- Add repository button -->
             <button
                 *ngIf="repositories.length > 0"

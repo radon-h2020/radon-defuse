@@ -5,6 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { DialogAddRepositoryComponent } from './dialog-add-repository/dialog-add-repository.component';
+import { DialogCollectRepositoriesComponent } from './dialog-collect-repositories/dialog-collect-repositories.component';
 import { DialogDeleteRepositoryComponent } from './dialog-delete-repository/dialog-delete-repository.component';
 import { RepositoryModel } from 'app/models/repository.model'
 import { RepositoryListService } from 'app/services/repository-list.service'
@@ -78,6 +79,10 @@ export class RepositoryListComponent implements OnInit {
         }
     }
 
+    onCollectRepositories(url: string, token: string){
+
+    }
+
     /**
     Delete a repository
     @param id: repository id
@@ -98,6 +103,15 @@ export class RepositoryListComponent implements OnInit {
         dialogRef.afterClosed().subscribe(result => {
             if(result.url != undefined){
                 this.onAdd(result.url, result.token)
+            }
+        })
+    }
+
+    openCollectRepositoriesDialog(){
+        let dialogRef = this._dialog.open(DialogCollectRepositoriesComponent);
+        dialogRef.afterClosed().subscribe(result => {
+            if(result.url != undefined){
+                this.onCollectRepositories(result.url, result.token)
             }
         })
     }

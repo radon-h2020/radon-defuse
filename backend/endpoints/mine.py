@@ -5,7 +5,7 @@ import threading
 
 from flask import jsonify, make_response
 from flask_restful import Resource, reqparse
-from pydriller.repository_mining import GitRepository, RepositoryMining
+from pydriller.repository import Repository
 from repominer.mining.ansible import AnsibleMiner
 from repominer.mining.tosca import ToscaMiner
 
@@ -57,7 +57,7 @@ class Mine(Resource):
 
             hash_msg = {}
             path_to_local_repo = os.path.join(clone_repo_to, full_name.split('/')[1])
-            for commit in RepositoryMining(path_to_repo=path_to_local_repo).traverse_commits():
+            for commit in Repository(path_to_repo=path_to_local_repo).traverse_commits():
                 hash_msg[commit.hash] = commit.msg
 
             for commit_hash, defects in miner.get_fixing_commits().items():

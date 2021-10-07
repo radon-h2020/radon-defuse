@@ -24,6 +24,7 @@ api.add_resource(endpoints.Train, '/train', resource_class_kwargs={'db': db, 'bu
 api.add_resource(endpoints.Predict, '/predict', resource_class_kwargs={'db': db, 'bucket': bucket})
 api.add_resource(endpoints.Report, '/report', resource_class_kwargs={'db': db, 'bucket': bucket})
 api.add_resource(endpoints.Repository, '/repository', resource_class_kwargs={'db': db, 'bucket': bucket})
+api.add_resource(endpoints.Repositories, '/repositories', resource_class_kwargs={'db': db})
 
 
 @app.route('/')

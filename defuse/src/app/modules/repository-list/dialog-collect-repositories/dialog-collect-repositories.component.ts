@@ -18,6 +18,10 @@ export interface DialogCollectRepositoriesComponentData{
 export class DialogCollectRepositoriesComponent implements OnInit {
 
     data: DialogCollectRepositoriesComponentData
+    languages = [
+        {value: 'ansible', viewValue: 'Ansible'},
+        {value: 'tosca', viewValue: 'Tosca'}
+    ]
 
     constructor() {
         this.data = {

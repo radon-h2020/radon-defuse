@@ -33,6 +33,16 @@
           <mat-label>Minimum number of releases</mat-label>
           <input matInput [(ngModel)]="data.minReleases" type="number" value="0" min="0">
         </mat-form-field>
+
+        <!-- Language -->
+        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
+            <mat-label>Language</mat-label>
+            <mat-select [(ngModel)]="data.language" name="language">
+              <mat-option *ngFor="let language of languages" [value]="language.value">
+                {{language.viewValue}}
+              </mat-option>
+            </mat-select>
+        </mat-form-field>
     </div>
 
 </mat-dialog-content>

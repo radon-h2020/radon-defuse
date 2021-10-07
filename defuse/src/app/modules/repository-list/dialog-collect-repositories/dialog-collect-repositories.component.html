@@ -21,6 +21,12 @@
           <mat-datepicker-toggle matSuffix [for]="pickerPushedAfter"></mat-datepicker-toggle>
           <mat-datepicker #pickerPushedAfter></mat-datepicker>
         </mat-form-field>
+
+        <!-- Min number of stars -->
+        <mat-form-field appearance="fill">
+          <mat-label>Minimum number of stars</mat-label>
+          <input matInput type="number" value="0" min="0">
+        </mat-form-field>
     </div>
 
 </mat-dialog-content>

@@ -27,6 +27,12 @@
           <mat-label>Minimum number of stars</mat-label>
           <input matInput [(ngModel)]="data.minStars" type="number" value="0" min="0">
         </mat-form-field>
+
+        <!-- Min number of releases -->
+        <mat-form-field appearance="fill">
+          <mat-label>Minimum number of releases</mat-label>
+          <input matInput [(ngModel)]="data.minReleases" type="number" value="0" min="0">
+        </mat-form-field>
     </div>
 
 </mat-dialog-content>

@@ -21,7 +21,6 @@
 
             <!-- Crawl repositories button -->
             <button
-                *ngIf="repositories.length > 0"
                 class="ml-4"
                 mat-flat-button
                 [color]="'primary'"
@@ -32,7 +31,6 @@
 
             <!-- Add repository button -->
             <button
-                *ngIf="repositories.length > 0"
                 class="ml-4"
                 mat-flat-button
                 [color]="'primary'"
@@ -134,17 +132,6 @@
         <ng-template #noRepositories>
             <div class="items-center justify-center sm:p-10">
                 <div class="mt-6 sm:mt-24 text-4xl md:text-7xl font-extrabold tracking-tight leading-tight md:leading-none text-center">You don't have any projects yet.</div>
-                <div class="mt-6 text-center ">
-                    <!-- Add repository button -->
-                    <button
-                        class="ml-4"
-                        mat-flat-button
-                        [color]="'primary'"
-                        (click)="openAddDialog()">
-                        <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                        <span class="ml-2 mr-1">Add</span>
-                    </button>
-                </div>
             </div>
         </ng-template>
     </div>

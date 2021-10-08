@@ -1,6 +1,7 @@
 import datetime
 import pandas as pd
 import re
+import threading
 
 from flask import make_response, send_file
 from flask_restful import Resource, reqparse
@@ -49,7 +50,6 @@ class Repositories(Resource):
         response.headers["Content-Type"] = "text/csv"
         return response
 
-
     def post(self):
         """ Collect repositories from GitHub based on search criteria """
         parser = reqparse.RequestParser()
@@ -63,6 +63,12 @@ class Repositories(Resource):
         parser.add_argument('min_releases', type=int, required=False)
         args = parser.parse_args()
 
+        thread = threading.Thread(target=self.run_task, name="collect", args=(args,))
+        thread.start()
+
+        return make_response({}, 202)
+
+    def run_task(self, args: dict):
         # Converting Mon Oct 04 2021 00:00:00 GMT 0200 (Central European Summer Time) to Oct 04 2021
         since = re.findall(r'(\w+\s\d{2}\s\d{4})\s00:00:00', args.get('start'))[0]
         until = re.findall(r'(\w+\s\d{2}\s\d{4})\s00:00:00', args.get('end'))[0]
@@ -103,6 +109,3 @@ class Repositories(Resource):
                     })
 
             since += datetime.timedelta(days=1)
-
-        return make_response({}, 204)
-

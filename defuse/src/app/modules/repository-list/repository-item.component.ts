@@ -9,6 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class RepositoryItemComponent{
     @Input() item;
     @Output() deleted = new EventEmitter<string>();
+    @Output() score = new EventEmitter<string>();
 
     constructor(
         private _activatedRoute: ActivatedRoute,
@@ -17,5 +18,9 @@ export class RepositoryItemComponent{
 
     onDelete(){
         this.deleted.emit(this.item.id);
+    }
+
+    onScore(){
+        this.score.emit(this.item.id);
     }
 }

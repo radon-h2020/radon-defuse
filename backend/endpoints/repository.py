@@ -1,8 +1,14 @@
+import git
+import os
 import re
 import requests
+import shutil
+import time
+import threading
 
 from flask import make_response
 from flask_restful import Resource, reqparse
+from reposcorer.scorer import score_repository
 
 
 class Repository(Resource):
@@ -114,3 +120,65 @@ class Repository(Resource):
         repo_ref.set(repo)
 
         return make_response({}, 204)
+
+    def patch(self):
+        """ Compute scores for repository """
+        parser = reqparse.RequestParser()
+        parser.add_argument('id', type=int, required=True)
+        self.args = parser.parse_args()
+
+        # Create Task
+        task_id = self.db.collection('tasks').add({
+            'name': 'score',
+            'repository_id': self.args.get('id'),
+            'language': self.args.get('language'),
+            'status': 'progress',
+            'started_at': time.time()
+        })[1].id
+
+        # thread = threading.Thread(target=self.run_task, name="miner", args=(task_id,))
+        # thread.start()
+
+        status = 'completed'
+
+        clone_repo_to = os.path.join('/tmp', task_id)
+        os.makedirs(clone_repo_to)
+
+        try:
+            repo_doc = self.db.collection('repositories').document(str(self.args.get('id'))).get().to_dict()
+            full_name = repo_doc.get('full_name')
+
+            git.Repo.clone_from(repo_doc.get('url'), clone_repo_to)
+
+            scores = score_repository(
+                path_to_repo=clone_repo_to,
+                full_name=full_name,
+                host='github' if 'github.com' in repo_doc.get('url') else 'gitlab',
+                calculate_comments_ratio=True,
+                calculate_commit_frequency=True,
+                calculate_core_contributors=True,
+                calculate_has_ci=True,
+                calculate_has_license=True,
+                calculate_iac_ratio=True,
+                calculate_issue_frequency=False,
+                calculate_repository_size=True)
+
+            doc_ref = self.db.collection('repositories').document(str(repo_doc.get('id')))
+            doc_ref.update({
+                'scores': scores
+            })
+
+        except Exception as e:
+            status = 'failed'
+            print(e)
+
+        finally:
+            shutil.rmtree(clone_repo_to)
+
+        doc_ref = self.db.collection('tasks').document(task_id)
+        doc_ref.update({
+            'status': status,
+            'ended_at': time.time()
+        })
+
+        return make_response({}, 202)

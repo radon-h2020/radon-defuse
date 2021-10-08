@@ -60,4 +60,9 @@ export class RepositoryListService {
         const URL = `/api/repository?id=${id}`;
         return this.httpClient.delete<any>(URL, {observe:'response'});
     }
+
+    score(id: number): Observable<any>{
+        const URL = `/api/repository?id=${id}`;
+        return this.httpClient.patch<any>(URL, {observe:'response'});
+    }
 }

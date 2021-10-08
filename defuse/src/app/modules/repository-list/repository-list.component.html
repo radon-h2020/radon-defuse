@@ -56,7 +56,7 @@
                             <ng-container matColumnDef="repository">
                                 <th mat-header-cell *matHeaderCellDef> Repository </th>
                                 <td mat-cell *matCellDef="let repository">
-                                    <repository-item [item]="repository" (deleted)="openDeleteDialog($event)" ></repository-item>
+                                    <repository-item [item]="repository" (deleted)="openDeleteDialog($event)" (score)="onScore($event)"></repository-item>
                                 </td>
                             </ng-container>
 

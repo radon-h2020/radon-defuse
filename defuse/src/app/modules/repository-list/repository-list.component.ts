@@ -102,7 +102,6 @@ export class RepositoryListComponent implements OnInit {
                     panelClass: ['custom-snack-bar']
                 });
             });
-
     }
 
     onExportAsCsv(){
@@ -112,6 +111,16 @@ export class RepositoryListComponent implements OnInit {
         hiddenElement.target = '_blank';
         hiddenElement.download = `repositories.csv`;
         hiddenElement.click();
+    }
+
+    onScore(id: number){
+        this._repositoryListService.score(id)
+            .subscribe(deleted => {
+                this._snackBar.open('Scoring started!', 'Dismiss', {
+                    duration: 5000,
+                    panelClass: ['custom-snack-bar']
+                });
+            });
     }
 
     openAddDialog(){

@@ -1,8 +1,8 @@
 import datetime
+import pandas as pd
 import re
-import requests
 
-from flask import make_response
+from flask import make_response, send_file
 from flask_restful import Resource, reqparse
 from repocollector.github import GithubRepositoriesCollector
 
@@ -35,6 +35,22 @@ class Repositories(Resource):
         self.db = kwargs['db']
 
     def get(self):
+        repos_df = pd.DataFrame()
+        repositories = self.db.collection('repositories').stream()
+
+        for repo in repositories:
+            repos_df = repos_df.append({
+                'full_name': repo.to_dict()['full_name'],
+                'id': repo.to_dict()['id']
+            }, ignore_index=True)
+
+        response = make_response(repos_df.to_csv(index=False))
+        response.headers["Content-Disposition"] = "attachment; filename=repositories.csv"
+        response.headers["Content-Type"] = "text/csv"
+        return response
+
+
+    def post(self):
         """ Collect repositories from GitHub based on search criteria """
         parser = reqparse.RequestParser()
         parser.add_argument('token', type=str, required=True)

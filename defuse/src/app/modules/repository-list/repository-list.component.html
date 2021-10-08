@@ -66,22 +66,27 @@
                         </table>
 
                         <!-- Table footer (paginator + search filter)-->
-                        <div class="grid grid-cols-1 sm:grid-cols-6 gap-6 w-full min-w-0" style="padding-top: 10px">
-                            <div class="sm:col-span-3 lg:col-span-4 flex flex-col flex-auto">
+                        <div class="grid grid-cols-8 sm:grid-cols-8 gap-6 w-full min-w-0" style="padding-top: 10px">
+                            <div class="sm:col-span-4 lg:col-span-4 flex flex-col flex-auto">
                                 <mat-paginator
                                     #PaginatorGithub="matPaginator"
                                     [pageSize]="10"
                                     [pageSizeOptions]="[5, 10]"
                                     showFirstLastButtons></mat-paginator>
                             </div>
-                            <div class="sm:col-span-3 lg:col-span-2 flex flex-col flex-auto">
+                            <div class="sm:col-span-3 lg:col-span-3 flex flex-col flex-auto">
                                 <mat-form-field appearance="legacy">
                                     <input
                                         matInput
                                         (keyup)="onFilterGithub($event.target.value)"
                                         placeholder="Filter"/>
                                     <mat-icon matSuffix>search</mat-icon>
-                                    </mat-form-field>
+                                </mat-form-field>
+                            </div>
+                            <div class="sm:col-span-1 lg:col-span-1 flex flex-col flex-auto" style="margin-left:auto; margin-right:auto">
+                                <button mat-icon-button color="accent" (click)="onExportAsCsv()">
+                                    <mat-icon>download</mat-icon>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -121,7 +126,7 @@
                                         (keyup)="onFilterGitlab($event.target.value)"
                                         placeholder="Filter"/>
                                     <mat-icon matSuffix>search</mat-icon>
-                                    </mat-form-field>
+                                </mat-form-field>
                             </div>
                         </div>
                     </div>

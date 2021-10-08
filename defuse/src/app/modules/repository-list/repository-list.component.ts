@@ -105,6 +105,15 @@ export class RepositoryListComponent implements OnInit {
 
     }
 
+    onExportAsCsv(){
+        const URL = `/api/repositories`;
+        var hiddenElement = document.createElement('a');
+        hiddenElement.href = URL;
+        hiddenElement.target = '_blank';
+        hiddenElement.download = `repositories.csv`;
+        hiddenElement.click();
+    }
+
     openAddDialog(){
         let dialogRef = this._dialog.open(DialogAddRepositoryComponent);
         dialogRef.afterClosed().subscribe(result => {

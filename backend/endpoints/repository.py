@@ -136,9 +136,12 @@ class Repository(Resource):
             'started_at': time.time()
         })[1].id
 
-        # thread = threading.Thread(target=self.run_task, name="miner", args=(task_id,))
-        # thread.start()
+        thread = threading.Thread(target=self.calculate_scores, name="calculate_scores", args=(task_id,))
+        thread.start()
 
+        return make_response({}, 202)
+
+    def calculate_scores(self, task_id: str):
         status = 'completed'
 
         clone_repo_to = os.path.join('/tmp', task_id)
@@ -164,9 +167,7 @@ class Repository(Resource):
                 calculate_repository_size=True)
 
             doc_ref = self.db.collection('repositories').document(str(repo_doc.get('id')))
-            doc_ref.update({
-                'scores': scores
-            })
+            doc_ref.update(scores)
 
         except Exception as e:
             status = 'failed'
@@ -181,4 +182,3 @@ class Repository(Resource):
             'ended_at': time.time()
         })
 
-        return make_response({}, 202)

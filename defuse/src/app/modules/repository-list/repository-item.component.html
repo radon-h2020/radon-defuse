@@ -1,21 +1,84 @@
-<div class="relative flex items-center h-full grid grid-cols-10 gap-4" >
-    <div class="col-span-9 flex flex-col"> <a [routerLink]="['/repository', item.id, 'dashboard']">{{item.full_name}}</a></div>
+<!--<div class="relative flex items-center h-full grid grid-cols-10 gap-4" >-->
 
-    <span class="col-span-1 flex flex-col items-center justify-center">
+<!--        <div class="col-span-9 flex flex-col"> <a [routerLink]="['/repository', item.id, 'dashboard']">{{item.full_name}}</a></div>-->
 
-        <div class="flex flex-shrink-0 items-center sm:ml-4 gap-2">
-            <button mat-icon-button (click)="onScore()">
-                <mat-icon style="transform: scale(0.75);">score</mat-icon>
-            </button>
-            <button mat-icon-button>
-                <a href="{{item.url}}" target="_blank">
-                    <mat-icon style="transform: scale(0.75);">launch</mat-icon>
-                </a>
-            </button>
-            <button mat-icon-button (click)="onDelete()">
-                <mat-icon style="transform: scale(0.75); color: red;">delete_outline</mat-icon>
-            </button>
+<!--        <span class="col-span-1 flex flex-col items-center justify-center">-->
+
+<!--            <div class="flex flex-shrink-0 items-center sm:ml-4 gap-2">-->
+<!--                <button mat-icon-button (click)="onScore()">-->
+<!--                    <mat-icon style="transform: scale(0.75);">score</mat-icon>-->
+<!--                </button>-->
+<!--                <button mat-icon-button>-->
+<!--                    <a href="{{item.url}}" target="_blank">-->
+<!--                        <mat-icon style="transform: scale(0.75);">launch</mat-icon>-->
+<!--                    </a>-->
+<!--                </button>-->
+<!--                <button mat-icon-button (click)="onDelete()">-->
+<!--                    <mat-icon style="transform: scale(0.75); color: red;">delete_outline</mat-icon>-->
+<!--                </button>-->
+<!--            </div>-->
+
+<!--        </span>-->
+
+
+<!--</div>-->
+
+
+<div class="flex flex-row items-center justify-between py-4 px-0.5">
+    <div class="flex flex-col">
+        <div class="font-medium col-span-9 flex flex-col"> <a [routerLink]="['/repository', item.id, 'dashboard']">{{item.full_name}}</a></div>
+        <div class="flex flex-col sm:flex-row sm:items-center -ml-0.5 mt-2 sm:mt-1 space-y-1 sm:space-y-0 sm:space-x-3">
+            <ng-container *ngIf="item.commit_frequency">
+                <div class="flex items-center">
+<!--                    <mat-icon-->
+<!--                        class="icon-size-5 text-hint"-->
+<!--                        [svgIcon]="'heroicons_solid:clock'"></mat-icon>-->
+                    <div class="ml-1.5 text-md text-secondary">Commit frequency: {{item.commit_frequency}}</div>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="item.comments_ratio">
+                <div class="flex items-center">
+                    <div class="ml-1.5 text-md text-secondary">Comments ratio: {{item.comments_ratio}}</div>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="item.core_contributors">
+                <div class="flex items-center">
+                    <div class="ml-1.5 text-md text-secondary">Core contributors: {{item.core_contributors}}</div>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="item.has_ci">
+                <div class="flex items-center">
+                    <div class="ml-1.5 text-md text-secondary">CI/CD: {{item.has_ci}}</div>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="item.has_license">
+                <div class="flex items-center">
+                    <div class="ml-1.5 text-md text-secondary">License: {{item.has_license}}</div>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="item.iac_ratio">
+                <div class="flex items-center">
+                    <div class="ml-1.5 text-md text-secondary">IaC ratio: {{item.iac_ratio}}</div>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="item.size">
+                <div class="flex items-center">
+                    <div class="ml-1.5 text-md text-secondary">Size: {{item.size}}</div>
+                </div>
+            </ng-container>
         </div>
-
-    </span>
+    </div>
+    <div class="flex flex-shrink-0 items-center sm:ml-4 gap-2">
+        <button mat-icon-button (click)="onScore()">
+            <mat-icon>score</mat-icon>
+        </button>
+        <button mat-icon-button (click)="onScore()">
+            <a href="{{item.url}}" target="_blank">
+                <mat-icon>launch</mat-icon>
+            </a>
+        </button>
+        <button mat-icon-button (click)="onDelete()">
+            <mat-icon style="color: red;">delete_outline</mat-icon>
+        </button>
+    </div>
 </div>

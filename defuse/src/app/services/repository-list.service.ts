@@ -27,6 +27,13 @@ export class RepositoryListService {
                     url: data.url,
                     full_name: data.full_name,
                     default_branch: data.default_branch,
+                    comments_ratio: data["comments_ratio"],
+                    commit_frequency: data["commit_frequency"],
+                    core_contributors: data["core_contributors"],
+                    has_ci: data["has_ci"],
+                    has_license: data["has_license"],
+                    iac_ratio: data["iac_ratio"],
+                    size: data["repository_size"],
                 } as RepositoryModel
 
                 return repo

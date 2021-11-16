@@ -90,7 +90,8 @@ class Mine(Resource):
                     .stream()
             ]
 
-            for file in miner.get_fixed_files():
+            miner.get_fixed_files()
+            for file in miner.fixed_files:
 
                 if not any(
                         [doc['hash_fix'] == file.fic and doc['filepath'] == file.filepath] for doc in existing_files):

@@ -1,7 +1,7 @@
 <h2 mat-dialog-title>Collect repositories</h2>
 <mat-dialog-content>
 
-    <div class="flex flex-col mt-4 pt-6 border-t space-y-8">
+    <div class="flex flex-col mt-4 pt-6 border-t space-y-4">
         <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
             <mat-label>Collect repositories created between</mat-label>
             <mat-date-range-input [formGroup]="data.dateRange" [rangePicker]="picker">
@@ -49,6 +49,7 @@
             <mat-icon matPrefix [svgIcon]="'heroicons_outline:key'"></mat-icon>
             <input
                 matInput
+                type="password"
                 [(ngModel)]="data.token"
                 [autocomplete]="'off'"
                 [placeholder]="'APIs token'">

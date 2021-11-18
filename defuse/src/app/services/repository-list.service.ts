@@ -59,8 +59,15 @@ export class RepositoryListService {
     }
 
     collectRepositories(token: string, start: string, end: string, pushedAfter: string, language: string, minStars: number, minReleases: number): Observable<any>{
-        let api_url = `/api/repositories?token=${token}&start=${start}&end=${end}&pushed_after=${pushedAfter}&language=${language}&min_stars=${minStars}&min_releases=${minReleases}&`;
-        return this.httpClient.post<any>(api_url, {observe:'response'});
+        let api_url = '/api/repositories';
+        return this.httpClient.post<any>(api_url, {
+            token: token,
+            start: start,
+            end: end,
+            pushed_after: pushedAfter,
+            language: language,
+            min_stars: minStars,
+            min_releases: minReleases}, {observe:'response'});
     }
 
     delete(id: number): Observable<any>{

@@ -61,6 +61,28 @@ export class TasksService {
         return this.tasks;
     }
 
+    getCrawlingTask(): Observable<any>{
+        return this.store.collection('tasks', ref => ref.where('name', '==', 'crawling').where('status', '==', 'progress'))
+            .snapshotChanges().pipe(map(changes => {
+                return changes.map(item => {
+                    const data = item.payload.doc.data();
+
+                    return {
+                        id: item.payload.doc.id,
+                        name: data['name'],
+                        language: data['language'],
+                        defect: data['defect'] ? data['defect'] : undefined,
+                        validation: data['validation'] ? data['validation'] : undefined,
+                        started_at: Math.ceil(data['started_at']),
+                        ended_at: data['ended_at'],
+                        completed: data['status'] == 'completed',
+                        failed: data['status'] == 'failed',
+                        in_progress: data['status'] == 'progress'
+                    } as TaskModel
+                })
+        }))
+    }
+
     getLog(taskId: string): Observable<string>{
         const URL = `/api/log?task_id=${taskId}`;
         return this.httpClient.get<string>(URL)

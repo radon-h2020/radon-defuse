@@ -9,6 +9,7 @@ import { DialogCollectRepositoriesComponent } from './dialog-collect-repositorie
 import { DialogDeleteRepositoryComponent } from './dialog-delete-repository/dialog-delete-repository.component';
 import { RepositoryModel } from 'app/models/repository.model'
 import { RepositoryListService } from 'app/services/repository-list.service'
+import { TasksService } from 'app/services/tasks.service'
 
 import { AngularFirestore } from '@angular/fire/firestore'
 
@@ -33,11 +34,12 @@ export class RepositoryListComponent implements OnInit {
 
     // Common
     displayedColumns: string[] = ['repository'];
-
+    isProgressBarHidden: boolean = true;
 
     constructor(private _cdr: ChangeDetectorRef,
                 public _dialog: MatDialog,
                 private _repositoryListService: RepositoryListService,
+                private _tasksService: TasksService,
                 private _snackBar: MatSnackBar) { }
 
     ngOnInit(): void {
@@ -58,6 +60,10 @@ export class RepositoryListComponent implements OnInit {
             this._cdr.detectChanges();
             this.dataSourceGithub.paginator = this.paginatorGithub;
             this.dataSourceGitlab.paginator = this.paginatorGitlab;
+        });
+
+        this._tasksService.getCrawlingTask().subscribe(tasks => {
+            this.isProgressBarHidden = tasks.length == 0
         });
     }
 

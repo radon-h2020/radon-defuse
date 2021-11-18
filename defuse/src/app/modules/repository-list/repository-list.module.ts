@@ -23,6 +23,7 @@ import { DialogDeleteRepositoryComponent } from './dialog-delete-repository/dial
 import { RepositoryListComponent } from './repository-list.component';
 import { RepositoryItemComponent } from './repository-item.component';
 
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 const repositoryListRoutes: Route[] = [
     {
@@ -44,6 +45,7 @@ const modules = [
         MatInputModule,
         MatNativeDateModule,
         MatPaginatorModule,
+        MatProgressBarModule,
         MatSelectModule,
         MatSnackBarModule,
         MatTableModule,

@@ -1,6 +1,7 @@
 import datetime
 import pandas as pd
 import re
+import time
 import threading
 
 from flask import make_response, send_file
@@ -63,49 +64,77 @@ class Repositories(Resource):
         parser.add_argument('min_releases', type=int, required=False)
         args = parser.parse_args()
 
-        thread = threading.Thread(target=self.run_task, name="collect", args=(args,))
+        # Create Task
+        task_id = self.db.collection('tasks').add({
+            'name': 'crawling',
+            'language': args.get('language'),
+            'status': 'progress',
+            'started_at': time.time()
+        })[1].id
+
+        print(task_id)
+
+        thread = threading.Thread(target=self.run_task, name="collect-repositories", args=(args, task_id))
         thread.start()
 
         return make_response({}, 202)
 
-    def run_task(self, args: dict):
+    def run_task(self, args: dict, task_id):
+
+        status = 'progress'
+
         # Converting Mon Oct 04 2021 00:00:00 GMT 0200 (Central European Summer Time) to Oct 04 2021
-        since = re.findall(r'(\w+\s\d{2}\s\d{4})\s00:00:00', args.get('start'))[0]
-        until = re.findall(r'(\w+\s\d{2}\s\d{4})\s00:00:00', args.get('end'))[0]
-        pushed_after = re.findall(r'(\w+\s\d{2}\s\d{4})\s00:00:00', args.get('pushed_after'))[0]
+        since = re.findall(r'(\d{4}-\d{2}-\d{2})T.+', args.get('start'))[0]
+        until = re.findall(r'(\d{4}-\d{2}-\d{2})T.+', args.get('end'))[0]
+        pushed_after = re.findall(r'(\d{4}-\d{2}-\d{2})T.+', args.get('pushed_after'))[0]
 
         # and convert to datetime object
-        since = datetime.datetime.strptime(since, '%b %d %Y')
-        until = datetime.datetime.strptime(until, '%b %d %Y')
-        pushed_after = datetime.datetime.strptime(pushed_after, '%b %d %Y')
+        since = datetime.datetime.strptime(since, '%Y-%m-%d')
+        until = datetime.datetime.strptime(until, '%Y-%m-%d')
+        pushed_after = datetime.datetime.strptime(pushed_after, '%Y-%m-%d')
 
-        while since + datetime.timedelta(days=1) < until:
+        try:
 
-            github_crawler = GithubRepositoriesCollector(
-                access_token=args.get('token'),
-                since=since,
-                until=since + datetime.timedelta(days=1),
-                pushed_after=pushed_after,
-                min_issues=0,
-                min_releases=args.get('min_releases', 0),
-                min_stars=args.get('min_stars', 0),
-                min_watchers=0,
-                primary_language=args.get('language') if args.get('language') not in ('ansible', 'tosca') else None
-            )
+            while since <= until:
 
-            for repo in github_crawler.collect_repositories():
+                github_crawler = GithubRepositoriesCollector(
+                    access_token=args.get('token'),
+                    since=since,
+                    until=since + datetime.timedelta(days=1),
+                    pushed_after=pushed_after,
+                    min_issues=0,
+                    min_releases=args.get('min_releases', 0),
+                    min_stars=args.get('min_stars', 0),
+                    min_watchers=0,
+                    primary_language=args.get('language') if args.get('language') not in ('ansible', 'tosca') else None
+                )
 
-                if args.get('language') == 'ansible' and not is_ansible_repository(f'{repo["owner"]}/{repo["name"]}', repo['description'], repo['dirs']):
-                    continue
-                elif args.get('language') == 'tosca':
-                    continue
-                else:
-                    repo_ref = self.db.collection('repositories').document(str(repo['id']))
-                    repo_ref.set({
-                        'id': repo['id'],
-                        'full_name': f'{repo["owner"]}/{repo["name"]}',
-                        'url': repo['url'],
-                        'default_branch': repo['default_branch']
-                    })
+                for repo in github_crawler.collect_repositories():
 
-            since += datetime.timedelta(days=1)
+                    if args.get('language') == 'ansible' and not is_ansible_repository(f'{repo["owner"]}/{repo["name"]}', repo['description'], repo['dirs']):
+                        continue
+                    elif args.get('language') == 'tosca':
+                        continue
+                    else:
+                        repo_ref = self.db.collection('repositories').document(str(repo['id']))
+                        repo_ref.set({
+                            'id': repo['id'],
+                            'full_name': f'{repo["owner"]}/{repo["name"]}',
+                            'url': repo['url'],
+                            'default_branch': repo['default_branch']
+                        })
+
+                since += datetime.timedelta(days=1)
+
+            status = 'completed'
+
+        except Exception as e:
+            status = 'failed'
+            print(e)
+            print(github_crawler.quota, github_crawler.quota_reset_at)
+        finally:
+            doc_ref = self.db.collection('tasks').document(task_id)
+            doc_ref.update({
+                'status': status,
+                'ended_at': time.time()
+            })

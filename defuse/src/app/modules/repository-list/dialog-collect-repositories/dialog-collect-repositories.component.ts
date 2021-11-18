@@ -25,7 +25,13 @@ export class DialogCollectRepositoriesComponent implements OnInit {
         {value: 'tosca', viewValue: 'Tosca'}
     ]
 
+    minDate: Date;
+    maxDate: Date;
+
     constructor() {
+        this.minDate = new Date(2014, 1, 1)
+        this.maxDate = new Date()
+
         this.data = {
             dateRange: new FormGroup({
                 start: new FormControl(new Date()),

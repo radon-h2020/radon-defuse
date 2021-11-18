@@ -4,7 +4,7 @@
     <div class="flex flex-col mt-4 pt-6 border-t space-y-4">
         <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
             <mat-label>Collect repositories created between</mat-label>
-            <mat-date-range-input [formGroup]="data.dateRange" [rangePicker]="picker">
+            <mat-date-range-input [formGroup]="data.dateRange" [rangePicker]="picker" [max]="maxDate" [min]="minDate">
                 <input matStartDate formControlName="start" placeholder="Start date">
                 <input matEndDate formControlName="end" placeholder="End date">
             </mat-date-range-input>
@@ -17,7 +17,7 @@
 
         <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
           <mat-label>Last pushed after</mat-label>
-          <input matInput [(ngModel)]="data.pushedAfter" [matDatepicker]="pickerPushedAfter" placeholder="Pushed after this date">
+          <input matInput [(ngModel)]="data.pushedAfter" [matDatepicker]="pickerPushedAfter" placeholder="Pushed after this date"  [max]="maxDate" [min]="minDate">
           <mat-datepicker-toggle matSuffix [for]="pickerPushedAfter"></mat-datepicker-toggle>
           <mat-datepicker #pickerPushedAfter></mat-datepicker>
         </mat-form-field>

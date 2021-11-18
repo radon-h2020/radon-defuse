@@ -1,117 +1,90 @@
-<div class="flex flex-col flex-auto w-full">
-    <div class="flex flex-wrap w-full max-w-screen-xl mx-auto p-6 md:p-8">
+<h2 mat-dialog-title>Model Overview</h2>
+<div class="font-medium tracking-tight text-secondary">Monitor metrics, check reports and review performance</div>
 
-        <!-- Title and action buttons -->
-        <div class="flex items-center justify-between w-full">
-            <div>
-                <div class="text-3xl font-semibold tracking-tight leading-8">Model Overview</div>
-                <div class="font-medium tracking-tight text-secondary">Monitor metrics, check reports and review performance</div>
-            </div>
-            <div class="flex items-center ml-6">
-                <button
-                    class="hidden sm:inline-flex ml-3"
-                    mat-flat-button
-                    [color]="'primary'">
-                    <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:save'"></mat-icon>
-                    <span class="ml-2">Export</span>
-                </button>
+<mat-dialog-content>
 
-                <!-- Actions menu (visible on xs) -->
-                <div class="sm:hidden">
-                    <button
-                        [matMenuTriggerFor]="actionsMenu"
-                        mat-icon-button>
-                        <mat-icon [svgIcon]="'heroicons_outline:dots-vertical'"></mat-icon>
-                    </button>
-                    <mat-menu #actionsMenu="matMenu">
-                        <button mat-menu-item>Export</button>
-                    </mat-menu>
-                </div>
-            </div>
-        </div>
-        <div class="flex items-center mt-20 mb-10" style="margin: auto">
-            <div class="grid grid-cols-1 sm:grid-cols-4 gap-8 sm:gap-12">
-                <!-- Mean Average Precision -->
-                <div class="flex flex-col ml-5">
-                    <div class="flex items-center">
-                        <div class="font-medium text-secondary leading-5">Mean Average Precision</div>
+    <div class="flex items-center mt-10">
+
+        <div class="container">
+          <div class="row">
+
+              <!-- Mean Average Precision -->
+            <div class="col-md">
+                <div class="flex items-center">
+                    <div class="font-medium text-secondary leading-5">Mean Average Precision</div>
                         <mat-icon
                             class="ml-1.5 icon-size-4 text-hint"
                             [svgIcon]="'heroicons_solid:information-circle'"
                             [matTooltip]="'Average Precision is the description here'"></mat-icon>
                     </div>
                     <div class="flex items-start mt-2">
-                        <div class="text-4xl font-bold tracking-tight leading-none">{{data.performance.overall.mean_test_auc_pr}}</div>
+                        <div class="text-2xl font-bold tracking-tight leading-none">{{data.performance.overall.mean_test_auc_pr}}</div>
                         <div class="flex items-center ml-2">
-                            <span>&#177;</span>
-                            <div class="ml-1 text-md font-medium">{{data.performance.overall.std_test_auc_pr}}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Mean MCC -->
-                <div class="flex flex-col">
-                    <div class="flex items-center">
-                        <div class="font-medium text-secondary leading-5">Mean MCC</div>
-                        <mat-icon
-                            class="ml-1.5 icon-size-4 text-hint"
-                            [svgIcon]="'heroicons_solid:information-circle'"
-                            [matTooltip]="'Matthew Correlation Coefficient (MCC) is the description here'"></mat-icon>
-                    </div>
-                    <div class="flex items-start mt-2">
-                        <div class="text-4xl font-bold tracking-tight leading-none">{{data.performance.overall.mean_test_mcc}}</div>
-                        <div class="flex items-center ml-2">
-                            <span>&#177;</span>
-                            <div class="ml-1 text-md font-medium">{{data.performance.overall.std_test_mcc}}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Mean Precision -->
-                <div class="flex flex-col">
-                    <div class="flex items-center">
-                        <div class="font-medium text-secondary leading-5">Mean Precision</div>
-                        <mat-icon
-                            class="ml-1.5 icon-size-4 text-hint"
-                            [svgIcon]="'heroicons_solid:information-circle'"
-                            [matTooltip]="'Precision is defined as ...'"></mat-icon>
-                    </div>
-                    <div class="flex items-start mt-2">
-                        <div class="text-4xl font-bold tracking-tight leading-none">{{data.performance.overall.mean_test_precision}}</div>
-                        <div class="flex items-center ml-2">
-                            <span>&#177;</span>
-                            <div class="ml-1 text-md font-medium">{{data.performance.overall.std_test_precision}}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Mean Recall -->
-                <div class="flex flex-col">
-                    <div class="flex items-center">
-                        <div class="font-medium text-secondary leading-5">Mean Recall</div>
-                        <mat-icon
-                            class="ml-1.5 icon-size-4 text-hint"
-                            [svgIcon]="'heroicons_solid:information-circle'"
-                            [matTooltip]="'Recall is defined as ...'"></mat-icon>
-                    </div>
-                    <div class="flex items-start mt-2">
-                        <div class="text-4xl font-bold tracking-tight leading-none">{{data.performance.overall.mean_test_recall}}</div>
-                        <div class="flex items-center ml-2">
-                            <span>&#177;</span>
-                            <div class="ml-1 text-md font-medium">{{data.performance.overall.std_test_recall}}</div>
-                        </div>
+                        <span>&#177;</span>
+                        <div class="ml-1 text-md font-medium">{{data.performance.overall.std_test_auc_pr}}</div>
                     </div>
                 </div>
             </div>
+
+
+            <!-- Mean MCC -->
+            <div class="col-md mt-6">
+                <div class="flex items-center">
+                    <div class="font-medium text-secondary leading-5">Mean MCC</div>
+                    <mat-icon
+                        class="ml-1.5 icon-size-4 text-hint"
+                        [svgIcon]="'heroicons_solid:information-circle'"
+                        [matTooltip]="'Matthew Correlation Coefficient (MCC) is the description here'"></mat-icon>
+                </div>
+                <div class="flex items-start mt-2">
+                    <div class="text-2xl font-bold tracking-tight leading-none">{{data.performance.overall.mean_test_mcc}}</div>
+                    <div class="flex items-center ml-2">
+                        <span>&#177;</span>
+                        <div class="ml-1 text-md font-medium">{{data.performance.overall.std_test_mcc}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md mt-6">
+                <!-- Mean Precision -->
+                <div class="flex items-center">
+                    <div class="font-medium text-secondary leading-5">Mean Precision</div>
+                    <mat-icon
+                        class="ml-1.5 icon-size-4 text-hint"
+                        [svgIcon]="'heroicons_solid:information-circle'"
+                        [matTooltip]="'Precision is defined as ...'"></mat-icon>
+                </div>
+                <div class="flex items-start mt-2">
+                    <div class="text-2xl font-bold tracking-tight leading-none">{{data.performance.overall.mean_test_precision}}</div>
+                    <div class="flex items-center ml-2">
+                        <span>&#177;</span>
+                        <div class="ml-1 text-md font-medium">{{data.performance.overall.std_test_precision}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mean Recall -->
+            <div class="col-md mt-6">
+                <div class="flex items-center">
+                    <div class="font-medium text-secondary leading-5">Mean Recall</div>
+                    <mat-icon
+                        class="ml-1.5 icon-size-4 text-hint"
+                        [svgIcon]="'heroicons_solid:information-circle'"
+                        [matTooltip]="'Recall is defined as ...'"></mat-icon>
+                </div>
+                <div class="flex items-start mt-2">
+                    <div class="text-2xl font-bold tracking-tight leading-none">{{data.performance.overall.mean_test_recall}}</div>
+                    <div class="flex items-center ml-2">
+                        <span>&#177;</span>
+                        <div class="ml-1 text-md font-medium">{{data.performance.overall.std_test_recall}}</div>
+                    </div>
+                </div>
+            </div>
+          </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-8">
-            <!-- Performance overview -->
-            <div class="sm:col-span-2 lg:col-span-3 flex flex-col flex-auto dark bg-card shadow rounded-2xl overflow-hidden">
+        <div class="container ml-10">
                 <div class="flex items-center justify-end mt-10 ml-10 mr-6 sm:mr-10">
-
                     <div class="ml-2">
                         <mat-button-toggle-group
                             class="hidden sm:inline-flex border-none space-x-1"
@@ -136,7 +109,7 @@
                         </mat-button-toggle-group>
                     </div>
                 </div>
-                <div class="flex flex-col flex-auto h-80">
+                <div class="flex flex-col flex-auto">
                     <apx-chart
                         class="flex-auto w-full h-full"
                         [chart]="chartPerformance.chart"
@@ -150,12 +123,11 @@
                         [xaxis]="chartPerformance.xaxis"
                         [yaxis]="chartPerformance.yaxis"></apx-chart>
                 </div>
-            </div>
         </div>
-
     </div>
 
-</div>
+</mat-dialog-content>
+
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close>Close</button>
 </mat-dialog-actions>

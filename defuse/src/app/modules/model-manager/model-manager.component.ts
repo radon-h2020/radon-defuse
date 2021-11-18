@@ -188,8 +188,6 @@ export class ModelManagerComponent implements OnInit {
 
             // Open Dialog and show log
             this._dialog_analytics.open(DialogAnalyticsComponent, {
-                width: '100%',
-                height: '95%',
                 data: report
             });
         })

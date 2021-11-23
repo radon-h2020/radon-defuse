@@ -5,7 +5,7 @@
 <h1 align="center">The commit annotator and model builder for defusing unsuspecting errors</h1>
 
 
-Video demo: https://www.youtube.com/watch?v=37mmLdCX3jU
+Video demo: https://youtu.be/37mmLdCX3jU
 
 # How to set up
 

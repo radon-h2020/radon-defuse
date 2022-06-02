@@ -102,11 +102,13 @@ export class RepositoryListComponent implements OnInit {
     */
     onDelete(id){
         this._repositoryListService.delete(id)
-            .subscribe(deleted => {
-                this._snackBar.open('Repository deleted!', 'Dismiss', {
-                    duration: 5000,
-                    panelClass: ['custom-snack-bar']
-                });
+            .subscribe(response => {
+                if (response.status == 204){
+                    this._snackBar.open('Repository deleted!', 'Dismiss', {
+                        duration: 5000,
+                        panelClass: ['custom-snack-bar']
+                    });
+                }
             });
     }
 
@@ -121,11 +123,11 @@ export class RepositoryListComponent implements OnInit {
 
     onScore(id: number){
         this._repositoryListService.score(id)
-            .subscribe(deleted => {
-                this._snackBar.open('Scoring started!', 'Dismiss', {
-                    duration: 5000,
-                    panelClass: ['custom-snack-bar']
-                });
+            .subscribe(response => {
+
+                if (response.status == 200){
+                    this._snackBar.open('Scoring started!', 'Dismiss', {duration: 5000, panelClass: ['custom-snack-bar']});
+                }
             });
     }
 

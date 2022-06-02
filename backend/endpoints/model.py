@@ -11,7 +11,7 @@ class Model(Resource):
 
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('id', type=str, required=True)
+        parser.add_argument('id', type=str, required=True, location='args')
         model_id = parser.parse_args().get('id')
         headers = {"Content-Disposition": "attachment; filename=%s.joblib" % model_id}
 
@@ -25,7 +25,7 @@ class Model(Resource):
 
     def delete(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('id', type=str, required=True)
+        parser.add_argument('id', type=str, required=True, location='args')
         model_id = parser.parse_args().get('id')
 
         try:

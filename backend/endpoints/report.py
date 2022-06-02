@@ -14,7 +14,7 @@ class Report(Resource):
 
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('model_id', type=str, required=True)
+        parser.add_argument('model_id', type=str, required=True, location='args')
         model_id = parser.parse_args().get('model_id')
 
         try:

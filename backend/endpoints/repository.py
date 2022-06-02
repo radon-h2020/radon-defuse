@@ -6,7 +6,7 @@ import shutil
 import time
 import threading
 
-from flask import make_response
+from flask import make_response, jsonify
 from flask_restful import Resource, reqparse
 from reposcorer.scorer import score_repository
 
@@ -59,8 +59,9 @@ class Repository(Resource):
         batch.commit()
 
     def delete(self):
+        """ Delete repository """
         parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, required=True)
+        parser.add_argument('id', type=int, required=True, location='args')
         repo_id = parser.parse_args().get('id')
 
         self.__delete_commits(repo_id)
@@ -75,8 +76,8 @@ class Repository(Resource):
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('url', type=str, required=True)
-        parser.add_argument('token', type=str, required=False)
+        parser.add_argument('url', type=str, required=True, location='args')
+        parser.add_argument('token', type=str, required=False, location='args')
         args = parser.parse_args()
 
         regex = r'https:\/\/(github|gitlab)\.com\/([\w\W]+)\/?'
@@ -124,7 +125,7 @@ class Repository(Resource):
     def patch(self):
         """ Compute scores for repository """
         parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, required=True)
+        parser.add_argument('id', type=int, required=True, location='args')
         self.args = parser.parse_args()
 
         # Create Task
@@ -181,4 +182,3 @@ class Repository(Resource):
             'status': status,
             'ended_at': time.time()
         })
-

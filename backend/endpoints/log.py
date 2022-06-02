@@ -11,7 +11,7 @@ class Log(Resource):
 
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('task_id', type=str, required=True)
+        parser.add_argument('task_id', type=str, required=True, location='args')
         task_id = parser.parse_args().get('task_id')
 
         try:
@@ -24,7 +24,7 @@ class Log(Resource):
 
     def delete(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('task_id', type=str, required=True)
+        parser.add_argument('task_id', type=str, required=True, location='args')
         task_id = parser.parse_args().get('task_id')
 
         try:

@@ -17,8 +17,8 @@ class Mine(Resource):
 
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, required=True)
-        parser.add_argument('language', type=str, required=True)
+        parser.add_argument('id', type=int, required=True, location='args')
+        parser.add_argument('language', type=str, required=True, location='args')
 
         self.args = parser.parse_args()  # parse arguments to dictionary
 

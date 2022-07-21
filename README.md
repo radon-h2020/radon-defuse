@@ -4,8 +4,10 @@
 
 <h1 align="center">The commit annotator and model builder for defusing unsuspecting errors</h1>
 
+# Demo
+[![Alt text](https://img.youtube.com/vi/37mmLdCX3jU/0.jpg)](https://youtu.be/37mmLdCX3jU)
 
-Video demo: https://youtu.be/37mmLdCX3jU
+
 
 # How to set up
 

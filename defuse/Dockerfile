@@ -8,12 +8,9 @@ WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 
 # install and cache app dependencies
-COPY package.json /app/package.json
-RUN npm install -g @angular/cli@11.2.9 @angular-devkit/build-angular@0.1102.9 --force
-RUN npm install
+COPY . .
 
-# add app
-COPY . /app
+RUN npm install --no-package-lock
 
 # start app
 CMD ng serve --host 0.0.0.0 --port 4200

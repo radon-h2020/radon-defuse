@@ -25,4 +25,5 @@ services:
     expose:
       - 4200
     volumes:
+      - /app/node_modules
       - ./defuse:/app

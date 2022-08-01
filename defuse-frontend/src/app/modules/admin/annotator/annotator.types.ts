@@ -3,7 +3,7 @@ export interface Commit {
     msg?: string;
     is_valid: boolean;
     defects: string[];
-    repository_id: number;
+    repository_id: string;
 }
 
 export interface FixedFile {
@@ -12,7 +12,7 @@ export interface FixedFile {
     hash_fix: string;
     hash_bic: string;
     is_valid: boolean;
-    repository_id: number;
+    repository_id: string;
 }
 
 export interface Pagination {

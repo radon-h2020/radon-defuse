@@ -1,23 +1,23 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
-import { BehaviorSubject, filter, find, map, Observable, of, switchMap, take, tap, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { BehaviorSubject, map, Observable, tap } from 'rxjs';
 
 import { Repository } from 'app/modules/admin/repositories/repositories.types';
-import { repositories } from 'app/mock-api/apps/repositories/data';
 
 @Injectable({
     providedIn: 'root'
 })
 export class RepositoriesService
 {
-    private repositories: Observable<Repository[]>;
+    private repositoriesCollection: Observable<Repository[]>;
+    private _repositories: BehaviorSubject<Repository[] | null> = new BehaviorSubject([]);
 
     /**
      * Constructor
      */
     constructor(private _httpClient: HttpClient, private _firestore: AngularFirestore) {
-        this.repositories = _firestore.collection('repositories', ref => ref.orderBy('full_name','asc')).snapshotChanges().pipe(map(changes => {
+        this.repositoriesCollection = _firestore.collection('repositories', ref => ref.orderBy('full_name','asc')).snapshotChanges().pipe(map(changes => {
             return changes.map(item => {
                 const data = item.payload.doc.data() as Repository;
 
@@ -42,54 +42,43 @@ export class RepositoriesService
 
 
     // -----------------------------------------------------------------------------------------------------
+    // @ Accessors
+    // -----------------------------------------------------------------------------------------------------
+    get repositories$(): Observable<Repository[]> {
+        return this._repositories.asObservable();
+    }
+
+    // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
 
     getRepositories(): Observable<Repository[]> {
-        return this.repositories;
+        return this.repositoriesCollection.pipe(
+            tap((repos) => {
+                this._repositories.next(repos);
+            })
+        );
     }
 
     /**
      * Get repository by id
      */
-     getRepository(id: string): Observable<Repository>
-     {
-         return this._firestore.collection('repositories', ref => ref.where('id', '==', id)).get().pipe(map(snapshot => {
-             const item = snapshot.docs[0]
-             return item.data() as Repository
-         }))
- 
-         // return this.repositories.pipe(
-         //     map((repos) => {
-         //         // Find the repository
-         //         const repository = repos.find(repo => repo.id === id) || null;
-         //     })
-         // )
-         // return this._repositories.pipe(
-         //     take(1),
-         //     map((repositories) => {
- 
-         //         // Find the repository
-         //         const repository = repositories.find(item => item.id === id) || null;
- 
-         //         // Update the repository
-         //         this._repository.next(repository);
- 
-         //         // Return the repository
-         //         return repository;
-         //     }),
-         //     switchMap((repository) => {
- 
-         //         if ( !repository )
-         //         {
-         //             return throwError('Could not found repository with id of ' + id + '!');
-         //         }
- 
-         //         return of(repository);
-         //     })
-         // );
-     }
+    getRepository(id: string): Observable<Repository> {
+        return this.repositoriesCollection.pipe(
+            map((repos) => {
+                return repos.find(repo => repo.id === id) || null;
+            })
+        )
+    }
 
+    searchRepositories(query: string): Observable<Repository[]>{
+        return this.repositoriesCollection.pipe(
+            tap((repos) => {
+                const filteredRepos = repos.filter(repo => repo.full_name.toLowerCase().includes(query?.toLowerCase())); 
+                this._repositories.next(filteredRepos);
+            })
+        )
+    }
 
 
 

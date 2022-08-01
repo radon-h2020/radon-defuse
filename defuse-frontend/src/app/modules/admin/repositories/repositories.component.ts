@@ -21,8 +21,8 @@ export class RepositoriesComponent implements OnInit, OnDestroy
 
     drawerMode: 'side' | 'over';
 
-    repositories: Repository[] = [];
-    filteredRepositories: Repository[] = [];
+    repositories$: Observable<Repository[]>
+    repositoriesCount = 0;
 
     selectedRepository: Repository;
     searchInputControl: UntypedFormControl = new UntypedFormControl();
@@ -45,8 +45,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy
         this._repositoriesService.getRepositories()
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((repositories: Repository[]) => {
-                this.repositories = repositories
-                this.filteredRepositories = repositories
+                this.repositoriesCount = repositories.length
                 this._changeDetectorRef.markForCheck();
             });
     }
@@ -55,13 +54,21 @@ export class RepositoriesComponent implements OnInit, OnDestroy
      * On init
      */
     ngOnInit(): void{
+
+        this.repositories$ = this._repositoriesService.repositories$
+        
         // Subscribe to repositories changes
         this.getRepositories()
 
-        // Subscribe to search input field value changes
-        this.searchInputControl.valueChanges.subscribe(value => {
-            this.filteredRepositories = this.repositories.filter(repository => repository.full_name.toLowerCase().includes(value?.toLowerCase())); 
-        });
+        this.searchInputControl.valueChanges
+            .pipe(
+                takeUntil(this._unsubscribeAll),
+                switchMap(query =>
+                    this._repositoriesService.searchRepositories(query)
+                )
+            ).subscribe();
+
+            
 
         // Subscribe to MatDrawer opened change
         this.matDrawer.openedChange.subscribe((opened) => {
@@ -156,8 +163,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy
      * @param index
      * @param item
      */
-    trackByFn(index: number, item: any): any
-    {
+    trackByFn(index: number, item: any): any {
         return item.id || index;
     }
 }

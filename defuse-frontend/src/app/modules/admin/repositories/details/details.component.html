@@ -1,21 +1,19 @@
 <div class="flex flex-col w-full">
 
-    <!-- View mode -->
-    <ng-container *ngIf="repository">
-
-        <!-- Header -->
-        <div class="relative w-full h-20 sm:h-24 px-8 sm:px-12 bg-accent-700 dark:bg-accent-700">
-            <!-- Close button -->
-            <div class="flex items-center justify-end w-full max-w-3xl mx-auto pt-6">
-                <a
-                    mat-icon-button
-                    [matTooltip]="'Close'"
-                    [routerLink]="['../']">
-                    <mat-icon class="text-white" [svgIcon]="'heroicons_outline:x'"></mat-icon>
-                </a>
-            </div>
+    <!-- Header -->
+    <div class="relative w-full h-20 sm:h-24 px-8 sm:px-12 bg-accent-700 dark:bg-accent-700">
+        <!-- Close button -->
+        <div class="flex items-center justify-end w-full max-w-3xl mx-auto pt-6">
+            <a
+                mat-icon-button
+                [matTooltip]="'Close'"
+                [routerLink]="['../']">
+                <mat-icon class="text-white" [svgIcon]="'heroicons_outline:x'"></mat-icon>
+            </a>
         </div>
+    </div>
 
+    <ng-container *ngIf="repository">
         <!-- Repository -->
         <div class="relative flex flex-col flex-auto items-center p-6 pt-0 sm:p-12 sm:pt-0">
             <div class="w-full max-w-3xl">
@@ -151,7 +149,10 @@
                     <div class="flex flex-col">
                         <div class="flex items-center">
                             
-                            <div class="flex items-center justify-center w-14 h-14 rounded bg-red-100 text-red-800 dark:bg-red-600 dark:text-red-50">
+                            <div class="flex items-center justify-center w-14 h-14 rounded"
+                                 [ngClass] = "{ 'bg-red-100 text-red-800 dark:bg-red-600 dark:text-red-50': !repository.has_license,
+                                                'bg-green-100 text-green-800 dark:bg-green-600 dark:text-green-50': repository.has_license}" 
+                                 >
                                 <mat-icon
                                     class="text-current"
                                     [svgIcon]="'mat_outline:copyright'"></mat-icon>
@@ -162,9 +163,8 @@
 
                                 <div class="flex items-baseline whitespace-nowrap">
                                     <div class="mt-2 font-medium text-2xl">
-                                        No
+                                        {{ repository.has_license ? 'Yes' : 'No' }}
                                     </div>
-                                    <!-- <div class="ml-2 text-2xl text-secondary">/ month</div> -->
                                 </div>
                             </div>
                         </div>
@@ -174,7 +174,9 @@
                     <div class="flex flex-col">
                         <div class="flex items-center">
                             
-                            <div class="flex items-center justify-center w-14 h-14 rounded bg-red-100 text-red-800 dark:bg-red-600 dark:text-red-50">
+                            <div class="flex items-center justify-center w-14 h-14 rounded"
+                                 [ngClass] = "{ 'bg-red-100 text-red-800 dark:bg-red-600 dark:text-red-50': !repository.has_ci,
+                                                'bg-green-100 text-green-800 dark:bg-green-600 dark:text-green-50': repository.has_ci}">
                                 <mat-icon
                                     class="text-current"
                                     [svgIcon]="'mat_outline:all_inclusive'"></mat-icon>
@@ -185,7 +187,7 @@
 
                                 <div class="flex items-baseline whitespace-nowrap">
                                     <div class="mt-2 font-medium text-2xl">
-                                        No
+                                        {{ repository.has_ci ? 'Yes' : 'No' }}
                                     </div>
                                     <!-- <div class="ml-2 text-2xl text-secondary">/ month</div> -->
                                 </div>
@@ -196,8 +198,7 @@
                 </div>
             </div>  
         </div>
-
-        <div class="relative flex flex-col flex-auto items-center px-6 sm:px-12" >
+        <div class="bottom-0 flex flex-col flex-auto items-center px-6 sm:px-12" >
             <div class="w-full max-w-3xl">
                 <!-- Actions -->
                 <div class="flex items-center -mx-6 sm:-mx-12 py-4 pr-4 pl-1 sm:pr-12 sm:pl-7 border-t bg-gray-50 dark:bg-transparent">

@@ -14,8 +14,8 @@ import { RepositoriesService } from 'app/modules/admin/repositories/repositories
     encapsulation  : ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RepositoryDetailsComponent implements OnInit, OnDestroy
-{
+export class RepositoryDetailsComponent implements OnInit, OnDestroy {
+    
     repository: Repository;
     repositoryForm: UntypedFormGroup;
     repositories: Repository[];
@@ -42,21 +42,10 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy
     /**
      * On init
      */
-    ngOnInit(): void
+    ngOnInit(): void 
     {
         // Open the drawer
         this._repositoriesComponent.matDrawer.open();
-
-
-        // Get the repositories
-        // this._repositoriesService.repositories$
-        //     .pipe(takeUntil(this._unsubscribeAll))
-        //     .subscribe((repositories: Repository[]) => {
-        //         this.repositories = repositories;
-
-        //         // Mark for check
-        //         this._changeDetectorRef.markForCheck();
-        //     });
 
         // Get the repository
         this._repositoriesService.getRepository(this._activatedRoute.snapshot.params.id)

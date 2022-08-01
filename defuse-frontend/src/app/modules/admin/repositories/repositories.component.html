@@ -20,7 +20,6 @@
 
             <mat-drawer-content class="flex flex-col">
                 
-                <!-- CONTENT GOES HERE -->
                 <div class="h-400 min-h-400 max-h-400">
 
                     <!-- Header -->
@@ -71,28 +70,26 @@
 
                     <!-- Repositories list -->
                     <div class="relative">
-                        <ng-container *ngIf="repositories$ | async as repositories">
-                            <ng-container *ngIf="repositories.length; else noRepositories">
-                                <ng-container *ngFor="let repository of repositories; let i = index; trackBy: trackByFn">
-                                    <!-- Group -->
-                                    <ng-container *ngIf="i === 0 || repository.full_name.charAt(0) !== repositories[i - 1].full_name.charAt(0)">
-                                        <div class="z-10 sticky top-0 -mt-px px-6 py-1 md:px-8 border-t border-b font-medium uppercase text-secondary bg-gray-50 dark:bg-gray-900">
-                                            {{repository.full_name.charAt(0)}}
-                                        </div>
-                                    </ng-container>
-                                    <!-- Repository -->
-                                    <a
-                                        class="z-20 flex items-center px-6 py-4 md:px-8 cursor-pointer border-b"
-                                        [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectedRepository || selectedRepository.id !== repository.id,
-                                                    'bg-primary-50 dark:bg-hover': selectedRepository && selectedRepository.id === repository.id}"
-                                        [routerLink]="['./', repository.id]">
-                                
-                                        <div class="min-w-0 ml-4">
-                                            <div class="font-medium leading-5 truncate">{{repository.full_name}}</div>
-                                            <div class="leading-5 truncate text-secondary">{{repository.language}}</div>
-                                        </div>
-                                    </a>
+                        <ng-container *ngIf="repositories.length; else noRepositories">
+                            <ng-container *ngFor="let repository of repositories; let i = index; trackBy: trackByFn">
+                                <!-- Group -->
+                                <ng-container *ngIf="i === 0 || repository.full_name.charAt(0) !== repositories[i - 1].full_name.charAt(0)">
+                                    <div class="z-10 sticky top-0 -mt-px px-6 py-1 md:px-8 border-t border-b font-medium uppercase text-secondary bg-gray-50 dark:bg-gray-900">
+                                        {{repository.full_name.charAt(0)}}
+                                    </div>
                                 </ng-container>
+                                <!-- Repository -->
+                                <a
+                                    class="z-20 flex items-center px-6 py-4 md:px-8 cursor-pointer border-b"
+                                    [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectedRepository || selectedRepository.id !== repository.id,
+                                                'bg-primary-50 dark:bg-hover': selectedRepository && selectedRepository.id === repository.id}"
+                                    [routerLink]="['./', repository.id]">
+                            
+                                    <div class="min-w-0 ml-4">
+                                        <div class="font-medium leading-5 truncate">{{repository.full_name}}</div>
+                                        <div class="leading-5 truncate text-secondary">{{repository.language}}</div>
+                                    </div>
+                                </a>
                             </ng-container>
                         </ng-container>
 

@@ -1,5 +1,5 @@
 export interface Repository {
-    id: number;
+    id: string;
     url: string;
     full_name: string;
     default_branch: string,

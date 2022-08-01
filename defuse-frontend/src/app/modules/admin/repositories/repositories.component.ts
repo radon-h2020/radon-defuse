@@ -20,7 +20,7 @@ export class RepositoriesComponent implements OnInit, OnDestroy
     @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
 
     drawerMode: 'side' | 'over';
-    repositories$: Observable<Repository[]>;
+    repositories: Repository[] = [];
     repositoriesCount: number = 0;
     selectedRepository: Repository;
     searchInputControl: UntypedFormControl = new UntypedFormControl();
@@ -39,34 +39,36 @@ export class RepositoriesComponent implements OnInit, OnDestroy
     {
     }
 
-    /**
-     * On init
-     */
-    ngOnInit(): void{
-        // Get the repositories
-        this.repositories$ = this._repositoriesService.repositories$;
-        this._repositoriesService.repositories$
+    private getRepositories(){
+        this._repositoriesService.getRepositories()
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((repositories: Repository[]) => {
-
-                // Update the counts
+                
+                this.repositories = repositories
                 this.repositoriesCount = repositories.length;
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+    }
 
-        // Get the repository
-        this._repositoriesService.repository$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((repository: Repository) => {
+    /**
+     * On init
+     */
+    ngOnInit(): void{
+        this.getRepositories()
 
-                // Update the selected contact
-                this.selectedRepository = repository;
+        // // Get the repository
+        // this._repositoriesService.getRepository()
+        //     .pipe(takeUntil(this._unsubscribeAll))
+        //     .subscribe((repository: Repository) => {
 
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
+        //         // Update the selected contact
+        //         this.selectedRepository = repository;
+
+        //         // Mark for check
+        //         this._changeDetectorRef.markForCheck();
+        //     });
 
         // Subscribe to search input field value changes
         this.searchInputControl.valueChanges
@@ -151,17 +153,17 @@ export class RepositoriesComponent implements OnInit, OnDestroy
                 // Call api
                 // this.onAdd(result.url, result.token)
                 // Create the repository
-                this._repositoriesService.createRepository().subscribe((newRepository) => {
+                // this._repositoriesService.createRepository().subscribe((newRepository) => {
 
-                    if(this._router.url.endsWith("/repositories")){
-                        this._router.navigate(['./', newRepository.id], {relativeTo: this._activatedRoute});
-                    }else{
-                        this._router.navigate(['./', newRepository.id], {relativeTo: this._activatedRoute.parent});
-                    }
+                //     if(this._router.url.endsWith("/repositories")){
+                //         this._router.navigate(['./', newRepository.id], {relativeTo: this._activatedRoute});
+                //     }else{
+                //         this._router.navigate(['./', newRepository.id], {relativeTo: this._activatedRoute.parent});
+                //     }
 
-                    // Mark for check
-                    this._changeDetectorRef.markForCheck();
-                });
+                //     // Mark for check
+                //     this._changeDetectorRef.markForCheck();
+                // });
             }
         })
     }

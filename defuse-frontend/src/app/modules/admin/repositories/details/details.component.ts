@@ -49,17 +49,17 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy
 
 
         // Get the repositories
-        this._repositoriesService.repositories$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((repositories: Repository[]) => {
-                this.repositories = repositories;
+        // this._repositoriesService.repositories$
+        //     .pipe(takeUntil(this._unsubscribeAll))
+        //     .subscribe((repositories: Repository[]) => {
+        //         this.repositories = repositories;
 
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
+        //         // Mark for check
+        //         this._changeDetectorRef.markForCheck();
+        //     });
 
         // Get the repository
-        this._repositoriesService.repository$
+        this._repositoriesService.getRepository(this._activatedRoute.snapshot.params.id)
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((repository: Repository) => {
 
@@ -129,27 +129,27 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy
                 const nextRepositoryId = (this.repositories.length === 1 && this.repositories[0].id === id) ? null : this.repositories[nextRepositoryIndex].id;
 
                 // Delete the repository
-                this._repositoriesService.deleteRepository(id)
-                    .subscribe((isDeleted) => {
+                // this._repositoriesService.deleteRepository(id)
+                //     .subscribe((isDeleted) => {
 
-                        // Return if the repository wasn't deleted...
-                        if ( !isDeleted )
-                        {
-                            return;
-                        }
+                //         // Return if the repository wasn't deleted...
+                //         if ( !isDeleted )
+                //         {
+                //             return;
+                //         }
 
-                        // Navigate to the next repository if available
-                        if ( nextRepositoryId )
-                        {
-                            this._router.navigate(['../', nextRepositoryId], {relativeTo: this._activatedRoute});
-                        }
-                        // Otherwise, navigate to the parent
-                        else
-                        {
-                            this._router.navigate(['../'], {relativeTo: this._activatedRoute});
-                        }
+                //         // Navigate to the next repository if available
+                //         if ( nextRepositoryId )
+                //         {
+                //             this._router.navigate(['../', nextRepositoryId], {relativeTo: this._activatedRoute});
+                //         }
+                //         // Otherwise, navigate to the parent
+                //         else
+                //         {
+                //             this._router.navigate(['../'], {relativeTo: this._activatedRoute});
+                //         }
 
-                    });
+                //     });
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();

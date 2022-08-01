@@ -60,7 +60,7 @@ export class RepositoryResolver implements Resolve<any>
      */
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Repository>
     {
-        return this._repositoriesService.getRepositoryById(Number(route.paramMap.get('id')))
+        return this._repositoriesService.getRepository(route.paramMap.get('id'))
                    .pipe(
                        // Error here means the requested repository is not available
                        catchError((error) => {

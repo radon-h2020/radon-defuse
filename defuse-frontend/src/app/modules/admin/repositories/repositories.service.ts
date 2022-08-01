@@ -17,7 +17,7 @@ export class RepositoriesService
      * Constructor
      */
     constructor(private _httpClient: HttpClient, private _firestore: AngularFirestore) {
-        this.repositories = _firestore.collection('repositories').snapshotChanges().pipe(map(changes => {
+        this.repositories = _firestore.collection('repositories', ref => ref.orderBy('full_name','asc')).snapshotChanges().pipe(map(changes => {
             return changes.map(item => {
                 const data = item.payload.doc.data() as Repository;
 
@@ -90,21 +90,6 @@ export class RepositoriesService
          // );
      }
 
-
-    /**
-     * Search repositories with given query
-     *
-     * @param query
-     */
-    searchRepositories(query: string): Observable<Repository[]> {
-
-        return this.repositories.pipe(
-            tap((repos) => {
-                console.log(repos)
-                repos.find(repo => repo.full_name.toLowerCase().includes(query.toLocaleLowerCase()));
-            })
-        );
-    }
 
 
 

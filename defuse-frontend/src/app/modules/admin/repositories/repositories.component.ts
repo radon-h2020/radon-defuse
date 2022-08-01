@@ -20,8 +20,10 @@ export class RepositoriesComponent implements OnInit, OnDestroy
     @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
 
     drawerMode: 'side' | 'over';
+
     repositories: Repository[] = [];
-    repositoriesCount: number = 0;
+    filteredRepositories: Repository[] = [];
+
     selectedRepository: Repository;
     searchInputControl: UntypedFormControl = new UntypedFormControl();
     private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -43,11 +45,8 @@ export class RepositoriesComponent implements OnInit, OnDestroy
         this._repositoriesService.getRepositories()
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((repositories: Repository[]) => {
-                
                 this.repositories = repositories
-                this.repositoriesCount = repositories.length;
-
-                // Mark for check
+                this.filteredRepositories = repositories
                 this._changeDetectorRef.markForCheck();
             });
     }
@@ -56,31 +55,13 @@ export class RepositoriesComponent implements OnInit, OnDestroy
      * On init
      */
     ngOnInit(): void{
+        // Subscribe to repositories changes
         this.getRepositories()
 
-        // // Get the repository
-        // this._repositoriesService.getRepository()
-        //     .pipe(takeUntil(this._unsubscribeAll))
-        //     .subscribe((repository: Repository) => {
-
-        //         // Update the selected contact
-        //         this.selectedRepository = repository;
-
-        //         // Mark for check
-        //         this._changeDetectorRef.markForCheck();
-        //     });
-
         // Subscribe to search input field value changes
-        this.searchInputControl.valueChanges
-        .pipe(
-            takeUntil(this._unsubscribeAll),
-            switchMap(query =>
-
-                // Search
-                this._repositoriesService.searchRepositories(query)
-            )
-        )
-        .subscribe();
+        this.searchInputControl.valueChanges.subscribe(value => {
+            this.filteredRepositories = this.repositories.filter(repository => repository.full_name.toLowerCase().includes(value?.toLowerCase())); 
+        });
 
         // Subscribe to MatDrawer opened change
         this.matDrawer.openedChange.subscribe((opened) => {

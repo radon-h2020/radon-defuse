@@ -1,0 +1,233 @@
+<div class="flex flex-col w-full">
+
+    <!-- View mode -->
+    <ng-container>
+
+        <!-- Header -->
+        <div class="relative w-full h-20 sm:h-24 px-8 sm:px-12 bg-accent-700 dark:bg-accent-700">
+            <!-- Close button -->
+            <div class="flex items-center justify-end w-full max-w-3xl mx-auto pt-6">
+                <a
+                    mat-icon-button
+                    [matTooltip]="'Close'"
+                    [routerLink]="['../']">
+                    <mat-icon class="text-white" [svgIcon]="'heroicons_outline:x'"></mat-icon>
+                </a>
+            </div>
+        </div>
+
+        <!-- Repository -->
+        <div class="relative flex flex-col flex-auto items-center p-6 pt-0 sm:p-12 sm:pt-0">
+            <div class="w-full max-w-3xl">
+
+                <!-- Name -->
+                <div class="mt-4 text-3xl font-bold truncate">{{repository.full_name}}</div>
+                
+                <!-- URL -->
+                <div class="flex flex-col mt-4 pt-6 border-t space-y-8">
+                    <div class="flex sm:items-center">
+                        <mat-icon [svgIcon]="'heroicons_outline:link'"></mat-icon>
+                        <div class="ml-6 leading-6">
+                            <a
+                                class="hover:underline text-primary-500"
+                                [href]="repository.url"
+                                target="_blank">
+                                {{repository.url}}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Metrics -->
+                <div class="my-5 space-y-6">
+
+                    <!-- Commit frequency -->
+                    <div class="flex flex-col">
+                        <div class="flex items-center">
+                            <div class="flex items-center justify-center w-14 h-14 rounded bg-indigo-100 text-indigo-800 dark:bg-indigo-600 dark:text-indigo-50">
+                                <mat-icon
+                                    class="text-current"
+                                    [svgIcon]="'mat_outline:linear_scale'"></mat-icon>
+                            </div>
+                            <div class="flex-auto ml-4 leading-none">
+                                <div class="text-sm font-medium text-secondary">Commit frequency</div>
+
+                                <div class="flex items-baseline whitespace-nowrap">
+                                    <div class="mt-2 font-medium text-2xl">
+                                        6
+                                    </div>
+                                    <div class="ml-2 text-2xl text-secondary">/ month</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Core contributors -->                   
+                    <div class="flex flex-col">
+                        <div class="flex items-center">
+                            <div class="flex items-center justify-center w-14 h-14 rounded bg-teal-100 text-teal-800 dark:bg-teal-600 dark:text-teal-50">
+                                <mat-icon
+                                    class="text-current"
+                                    [svgIcon]="'mat_outline:supervised_user_circle'"></mat-icon>
+                            </div>
+                            <div class="flex-auto ml-4 leading-none">
+                                <div class="text-sm font-medium text-secondary">Core contributors</div>
+
+                                <div class="flex items-baseline whitespace-nowrap">
+                                    <div class="mt-2 font-medium text-2xl">
+                                        6
+                                    </div>
+                                    <!-- <div class="ml-2 text-2xl text-secondary">/ month</div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comments ratio -->                   
+                    <div class="flex flex-col">
+                        <div class="flex items-center">
+                            <div class="flex items-center justify-center w-14 h-14 rounded bg-purple-100 text-purple-800 dark:bg-purple-600 dark:text-purple-50">
+                                <mat-icon
+                                    class="text-current"
+                                    [svgIcon]="'mat_outline:comment'"></mat-icon>
+                            </div>
+                            <div class="flex-auto ml-4 leading-none">
+                                <div class="text-sm font-medium text-secondary">Comments ratio</div>
+
+                                <div class="flex items-baseline whitespace-nowrap">
+                                    <div class="mt-2 font-medium text-2xl">
+                                        20
+                                    </div>
+                                    <div class="ml-2 text-2xl text-secondary">%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- IaC ratio -->                   
+                    <div class="flex flex-col">
+                        <div class="flex items-center">
+                            <div class="flex items-center justify-center w-14 h-14 rounded bg-purple-100 text-purple-800 dark:bg-purple-600 dark:text-purple-50">
+                                <mat-icon
+                                    class="text-current"
+                                    [svgIcon]="'mat_outline:description'"></mat-icon>
+                            </div>
+                            <div class="flex-auto ml-4 leading-none">
+                                <div class="text-sm font-medium text-secondary">Infrastructure-as-Code files</div>
+
+                                <div class="flex items-baseline whitespace-nowrap">
+                                    <div class="mt-2 font-medium text-2xl">
+                                        20
+                                    </div>
+                                    <div class="ml-2 text-2xl text-secondary">%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lines code -->                   
+                    <div class="flex flex-col">
+                        <div class="flex items-center">
+                            <div class="flex items-center justify-center w-14 h-14 rounded bg-amber-100 text-amber-800 dark:bg-amber-600 dark:text-amber-50">
+                                <mat-icon
+                                    class="text-current"
+                                    [svgIcon]="'mat_outline:code'"></mat-icon>
+                            </div>
+                            <div class="flex-auto ml-4 leading-none">
+                                <div class="text-sm font-medium text-secondary">Lines of code</div>
+
+                                <div class="flex items-baseline whitespace-nowrap">
+                                    <div class="mt-2 font-medium text-2xl">
+                                        150
+                                    </div>
+                                    <!-- <div class="ml-2 text-2xl text-secondary">/ month</div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- License -->                   
+                    <div class="flex flex-col">
+                        <div class="flex items-center">
+                            
+                            <div class="flex items-center justify-center w-14 h-14 rounded bg-red-100 text-red-800 dark:bg-red-600 dark:text-red-50">
+                                <mat-icon
+                                    class="text-current"
+                                    [svgIcon]="'mat_outline:copyright'"></mat-icon>
+                            </div>
+                            
+                            <div class="flex-auto ml-4 leading-none">
+                                <div class="text-sm font-medium text-secondary">License</div>
+
+                                <div class="flex items-baseline whitespace-nowrap">
+                                    <div class="mt-2 font-medium text-2xl">
+                                        No
+                                    </div>
+                                    <!-- <div class="ml-2 text-2xl text-secondary">/ month</div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Continuous integration -->                   
+                    <div class="flex flex-col">
+                        <div class="flex items-center">
+                            
+                            <div class="flex items-center justify-center w-14 h-14 rounded bg-red-100 text-red-800 dark:bg-red-600 dark:text-red-50">
+                                <mat-icon
+                                    class="text-current"
+                                    [svgIcon]="'mat_outline:all_inclusive'"></mat-icon>
+                            </div>
+                            
+                            <div class="flex-auto ml-4 leading-none">
+                                <div class="text-sm font-medium text-secondary">Continuous integration</div>
+
+                                <div class="flex items-baseline whitespace-nowrap">
+                                    <div class="mt-2 font-medium text-2xl">
+                                        No
+                                    </div>
+                                    <!-- <div class="ml-2 text-2xl text-secondary">/ month</div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>  
+        </div>
+
+        <div class="relative flex flex-col flex-auto items-center px-6 sm:px-12" >
+            <div class="w-full max-w-3xl">
+                <!-- Actions -->
+                <div class="flex items-center -mx-6 sm:-mx-12 py-4 pr-4 pl-1 sm:pr-12 sm:pl-7 border-t bg-gray-50 dark:bg-transparent">
+                    <!-- Delete -->
+                    <button
+                        mat-button
+                        [color]="'warn'"
+                        [matTooltip]="'Delete'"
+                        (click)="deleteRepository()">
+                        Delete
+                    </button>
+                    <!-- Close -->
+                    <button
+                        mat-button
+                        class="ml-auto"
+                        [matTooltip]="'Calculate metrics'"
+                        (click)="calculateMetrics()">
+                        Score
+                    </button>
+                    <!-- Save -->
+                    <button
+                        class="ml-2"
+                        mat-flat-button
+                        [color]="'primary'"
+                        [matTooltip]="'Open'"
+                        [routerLink]="['./home']">
+                        Open
+                    </button>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</div>

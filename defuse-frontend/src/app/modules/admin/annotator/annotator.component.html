@@ -1,0 +1,190 @@
+<div class="absolute inset-0 flex flex-col min-w-0 overflow-hidden">    
+
+    <!-- Project selector -->
+    <div class="relative flex self-start pt-2 pb-1 pl-5 pr-4 mt-1 cursor-pointer overflow-hidden rounded-t-xl border border-b-0 bg-card"
+        matRipple
+        [matMenuTriggerFor]="repositoriesMenu">
+
+        <div class="flex items-center">
+            <div class="overflow-hidden">
+                <div class="font-medium leading-6 truncate">{{selectedRepository.full_name}}</div>
+            </div>
+            <div class="flex items-center justify-center pl-2">
+                <mat-icon
+                    class="icon-size-5"
+                    [svgIcon]="'heroicons_solid:chevron-down'"></mat-icon>
+            </div>
+        </div>
+
+        <mat-menu #repositoriesMenu="matMenu"
+            [xPosition]="'before'">
+
+            <ng-container *ngIf="repositories$ | async as repositories">
+                <ng-container *ngFor="let repository of repositories; trackBy: trackRepositoriesByFn">
+                    <button
+                        [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectedRepository || selectedRepository.id !== repository.id,
+                                'bg-primary-50 dark:bg-hover': selectedRepository && selectedRepository.id === repository.id}"
+                        mat-menu-item
+                        (click)="filterCommits(repository)">{{repository.full_name}}
+                    </button>
+                </ng-container>
+            </ng-container>
+        </mat-menu>
+    </div>
+
+
+    <mat-drawer-container
+        class="flex-auto h-full bg-card dark:bg-transparent"
+        (backdropClick)="onBackdropClicked()">
+
+        <!-- Drawer -->
+        <mat-drawer
+            class="w-full md:w-160 dark:bg-gray-900"
+            [mode]="drawerMode"
+            [opened]="false"
+            [position]="'end'"
+            [disableClose]="true"
+            #matDrawer>
+            <!-- <router-outlet></router-outlet> -->
+            
+            <ng-container *ngIf="selectedCommit">
+                <commit-details [commit]="selectedCommit"></commit-details>
+            </ng-container>
+        </mat-drawer>
+
+        <mat-drawer-content class="flex flex-col">
+            
+            <!-- Header -->
+            <div class="h-45 min-h-45 max-h-45">
+                
+                <div class="flex flex-col sm:flex-row md:flex-col flex-auto justify-between py-8 px-6 md:px-8 border-b">
+
+                    <!-- Title -->
+                    <div>
+                        <div class="text-4xl font-extrabold tracking-tight leading-none">Defect-fixing commits</div>
+                        <div class="ml-0.5 font-medium text-secondary">
+                            <ng-container *ngIf="filteredCommitsCount > 0">
+                                {{filteredCommitsCount}}
+                            </ng-container>
+                            {{filteredCommitsCount | i18nPlural: {
+                            '=0'   : 'No commits',
+                            '=1'   : 'commit',
+                            'other': 'commits'
+                        } }}
+                        </div>
+                    </div>
+
+                    <!-- Main actions -->
+                    <div class="flex items-center mt-4 sm:mt-0 md:mt-4">
+                        <!-- Search -->
+                        <div class="flex-auto">
+                            <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-rounded w-full min-w-50">
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:search'"></mat-icon>
+                                <input
+                                    matInput
+                                    [formControl]="searchInputControl"
+                                    [autocomplete]="'off'"
+                                    [placeholder]="'Search commits'">
+                            </mat-form-field>
+                        </div>
+                        <!-- Add commit button -->
+                        <button
+                            class="ml-4"
+                            mat-flat-button
+                            [color]="'primary'">
+                            <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                            <span class="ml-2 mr-1">Mine</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+         
+            
+        <!-- Main -->
+        <div class="flex flex-auto overflow-hidden">
+
+            <!-- Commits list -->
+            <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto">
+
+            <!-- Commits list -->
+            <!-- <div class="relative"> -->
+                <!-- <ng-container *ngIf="commits$ | async as commits"> -->
+                <ng-container *ngIf="filteredCommits.length; else noCommits">
+                    <ng-container *ngFor="let commit of filteredCommits; let i = index; trackBy: trackByFn">
+                        
+                        <div class="group w-full select-none hover:bg-gray-100 dark:hover:bg-hover" 
+                            [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectedCommit || selectedCommit.hash !== commit.hash,
+                                        'bg-primary-50 dark:bg-hover': selectedCommit && selectedCommit.hash === commit.hash,
+                                        'bg-warn-50 dark:bg-warn-50': !commit.is_valid}">
+
+                            <!-- Commit content -->
+                            <div class="relative flex items-center h-full pl-10">
+                            
+                                <!-- (In)validate commit button -->
+                                <button class="mr-2 -ml-2.5 leading-none"
+                                        (click)="toggleCommitValidity(commit)"
+                                        mat-icon-button>
+                            
+                                    <ng-container *ngIf="commit.is_valid">
+                                        <mat-icon
+                                            class="text-primary"
+                                            [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
+                                    </ng-container>
+                                    <ng-container *ngIf="!commit.is_valid">
+                                        <mat-icon
+                                            class="text-warn"
+                                            [svgIcon]="'heroicons_outline:x-circle'"></mat-icon>
+                                    </ng-container>
+                                </button>
+
+                                <a class="flex flex-auto items-center min-w-0 h-full pr-7 p-4 cursor-pointer" 
+                                   (click)="selectedCommit=commit"
+                                   [routerLink]="['./', commit.hash]">
+                                    
+                                    <div class="min-w-0 ml-4">
+                                        <div class="font-medium leading-5 truncate">{{commit.hash}}</div>
+                                        
+                                        <ng-container *ngIf="commit.msg">
+                                            <div class="leading-5 truncate text-secondary mt-1">{{commit.msg}}</div>
+                                        </ng-container>
+
+                                        <!-- Tags -->  
+                                        <div class="flex flex-wrap items-center mt-2">
+                                            <ng-container *ngFor="let tag of commit.defects">
+                                                <div class="flex items-center justify-center py-1 px-3 mr-3 rounded-full leading-normal text-gray-500 bg-gray-100 dark:text-gray-300 dark:bg-gray-700">
+                                                    <span class="text-sm font-medium whitespace-nowrap">{{tag}}</span>
+                                                </div>
+                                            </ng-container>
+                                        </div> 
+                                    </div>
+                                </a>
+                            </div>
+                     </div>
+                        
+                    </ng-container>
+                </ng-container>
+
+                <mat-paginator
+                    class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+                    [length]="pagination.length"
+                    [pageIndex]="pagination.index"
+                    [pageSize]="pagination.size"
+                    [pageSizeOptions]="[2, 5, 10, 25, 100]"
+                    [showFirstLastButtons]="true"></mat-paginator>
+                        
+                <!-- </ng-container> -->
+
+                <!-- No commits -->
+                <ng-template #noCommits>
+                    <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">There are no commits!</div>
+                </ng-template>
+
+            </div>
+        </div>
+        </mat-drawer-content>
+
+    </mat-drawer-container>             
+</div>

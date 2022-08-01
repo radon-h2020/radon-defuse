@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { BehaviorSubject, map, Observable, tap } from 'rxjs';
+import { BehaviorSubject, map, Observable, of, switchMap, take, tap, throwError } from 'rxjs';
 
 import { Repository } from 'app/modules/admin/repositories/repositories.types';
 
@@ -12,6 +12,7 @@ export class RepositoriesService
 {
     private repositoriesCollection: Observable<Repository[]>;
     private _repositories: BehaviorSubject<Repository[] | null> = new BehaviorSubject([]);
+    private _repository: BehaviorSubject<Repository | null> = new BehaviorSubject(null);
 
     /**
      * Constructor
@@ -49,6 +50,13 @@ export class RepositoriesService
     }
 
     // -----------------------------------------------------------------------------------------------------
+    // @ Accessors
+    // -----------------------------------------------------------------------------------------------------
+    get repository$(): Observable<Repository> {
+        return this._repository.asObservable();
+    }
+
+    // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
 
@@ -64,9 +72,25 @@ export class RepositoriesService
      * Get repository by id
      */
     getRepository(id: string): Observable<Repository> {
-        return this.repositoriesCollection.pipe(
+        return this._repositories.pipe(
+            take(1),
             map((repos) => {
-                return repos.find(repo => repo.id === id) || null;
+                // Find the contact
+                const repo = repos.find(repo => repo.id === id) || null;
+                this._repository.next(repo);
+                return repo
+            }),
+            switchMap((repo) => {
+
+                if ( !repo ) {
+                    return this._firestore.collection('repositories', ref => ref.where('id', '==', id)).get().pipe(map(snapshot => {
+                        const repo = snapshot.docs[0].data() as Repository
+                        this._repository.next(repo)
+                        return repo
+                    }))
+                }
+
+                return of(repo);
             })
         )
     }

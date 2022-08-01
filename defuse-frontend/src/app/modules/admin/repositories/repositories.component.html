@@ -17,9 +17,6 @@
 
         <mat-drawer-content class="flex flex-col">
             
-            <div class="h-400 min-h-400 max-h-400">
-            
-
                 <!-- Header -->
                 <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
                     <!-- Title -->
@@ -64,6 +61,7 @@
 
 
                 <div class="flex flex-auto overflow-hidden">
+
                     <!-- Repositories list -->
                     <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto">
 
@@ -77,15 +75,14 @@
                                         </div>
                                     </ng-container>
                                     <!-- Repository -->
-                                    <a
-                                        class="z-20 flex items-center px-6 py-4 md:px-8 cursor-pointer border-b"
-                                        [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectedRepository || selectedRepository.id !== repository.id,
-                                                    'bg-primary-50 dark:bg-hover': selectedRepository && selectedRepository.id === repository.id}"
-                                        [routerLink]="['./', repository.id]">
+                                    <a class="z-20 flex items-center px-6 py-4 md:px-8 cursor-pointer border-b hover:bg-gray-100 dark:hover:bg-hover"
+                                       [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectedRepository || selectedRepository.id !== repository.id,
+                                                   'bg-primary-50 dark:bg-hover': selectedRepository && selectedRepository.id === repository.id}"
+                                       [routerLink]="['./', repository.id]">
                                 
                                         <div class="min-w-0 ml-4">
                                             <div class="font-medium leading-5 truncate">{{repository.full_name}}</div>
-                                            <div class="leading-5 truncate text-secondary">{{repository.language}}</div>
+                                            <!-- <div class="leading-5 truncate text-secondary">{{repository.language}}</div> -->
                                         </div>
                                     </a>
                                 </ng-container>
@@ -99,7 +96,6 @@
                     </div>
                 </div>
 
-            </div>
         </mat-drawer-content>
 
     </mat-drawer-container>             

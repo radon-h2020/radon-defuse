@@ -19,12 +19,12 @@ export class RepositoriesComponent implements OnInit, OnDestroy
 {
     @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
 
-    drawerMode: 'side' | 'over';
+    drawerMode: 'over' // | 'side';
 
     repositories$: Observable<Repository[]>
-    repositoriesCount = 0;
-
+    repositoriesCount: number = 0;
     selectedRepository: Repository;
+
     searchInputControl: UntypedFormControl = new UntypedFormControl();
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -60,6 +60,18 @@ export class RepositoriesComponent implements OnInit, OnDestroy
         // Subscribe to repositories changes
         this.getRepositories()
 
+        // Get the contact
+        this._repositoriesService.repository$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((repository: Repository) => {
+
+                // Update the selected contact
+                this.selectedRepository = repository;
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
         this.searchInputControl.valueChanges
             .pipe(
                 takeUntil(this._unsubscribeAll),
@@ -69,12 +81,11 @@ export class RepositoriesComponent implements OnInit, OnDestroy
             ).subscribe();
 
             
-
         // Subscribe to MatDrawer opened change
         this.matDrawer.openedChange.subscribe((opened) => {
             if ( !opened )
             {
-                // Remove the selected contact when drawer closed
+                // Remove the selected repository when drawer closed
                 this.selectedRepository = null;
 
                 // Mark for check
@@ -83,23 +94,22 @@ export class RepositoriesComponent implements OnInit, OnDestroy
         });
 
         // Subscribe to media changes
-        this._fuseMediaWatcherService.onMediaChange$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe(({matchingAliases}) => {
+        // this._fuseMediaWatcherService.onMediaChange$
+        // .pipe(takeUntil(this._unsubscribeAll))
+        // .subscribe(({matchingAliases}) => {
 
-            // Set the drawerMode if the given breakpoint is active
-            if ( matchingAliases.includes('lg') )
-            {
-                this.drawerMode = 'side';
-            }
-            else
-            {
-                this.drawerMode = 'over';
-            }
+        //     // Set the drawerMode if the given breakpoint is active
+        //     if ( matchingAliases.includes('lg') ) {
+        //         this.drawerMode = 'side';
+        //     }
+        //     else
+        //     {
+        //         this.drawerMode = 'over';
+        //     }
 
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });
+        //     // Mark for check
+        //     this._changeDetectorRef.markForCheck();
+        // });
     }
 
     /**
@@ -120,14 +130,15 @@ export class RepositoriesComponent implements OnInit, OnDestroy
     /**
      * On backdrop clicked
      */
-     onBackdropClicked(): void
-     {
-         // Go back to the list
-         this._router.navigate(['./'], {relativeTo: this._activatedRoute});
- 
-         // Mark for check
-         this._changeDetectorRef.markForCheck();
+     onBackdropClicked(): void {
+
+        // Go back to the list
+        this._router.navigate(['./'], {relativeTo: this._activatedRoute});
+
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
      }
+
 
     /**
      * Add repository

@@ -137,4 +137,8 @@ export class RepositoriesService
         return this._httpClient.post<any>(api_url, {observe:'response'})
     }
 
+    deleteRepository(id: string): Observable<any>{
+        const URL = `/backend-api/repository?id=${id}`;
+        return this._httpClient.delete<any>(URL, {observe:'response'});
+    }
 }

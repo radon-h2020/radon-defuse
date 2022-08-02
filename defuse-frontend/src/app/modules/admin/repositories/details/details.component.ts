@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDe
 import { ActivatedRoute, Router } from '@angular/router';
 import { UntypedFormGroup } from '@angular/forms';
 import { MatDrawerToggleResult } from '@angular/material/sidenav';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Subject, takeUntil } from 'rxjs';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { Repository } from 'app/modules/admin/repositories/repositories.types';
@@ -31,6 +32,7 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy {
         private _repositoriesService: RepositoriesService,
         private _fuseConfirmationService: FuseConfirmationService,
         private _router: Router,
+        private _snackBar: MatSnackBar
     )
     {
     }
@@ -90,7 +92,7 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy {
     /**
      * Delete the repository
      */
-    deleteRepository(): void
+    onDeleteRepository(): void
     {
         // Open the confirmation dialog
         const confirmation = this._fuseConfirmationService.open({
@@ -107,44 +109,27 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy {
         confirmation.afterClosed().subscribe((result) => {
 
             // If the confirm button pressed...
-            if ( result === 'confirmed' )
-            {
-                // Get the current repository's id
-                const id = this.repository.id;
+            if ( result === 'confirmed' ) {
 
-                // Get the next/previous repository's id
-                const currentRepositoryIndex = this.repositories.findIndex(item => item.id === id);
-                const nextRepositoryIndex = currentRepositoryIndex + ((currentRepositoryIndex === (this.repositories.length - 1)) ? -1 : 1);
-                const nextRepositoryId = (this.repositories.length === 1 && this.repositories[0].id === id) ? null : this.repositories[nextRepositoryIndex].id;
+                this._repositoriesService.deleteRepository(this.repository.id)
+                    .subscribe((response) => {
 
-                // Delete the repository
-                // this._repositoriesService.deleteRepository(id)
-                //     .subscribe((isDeleted) => {
+                        // Return if the repository wasn't deleted...
+                        if ( response.status != 204 ) {
+                            this._snackBar.open('Could not delete the repository', 'Dismiss', { duration: 3000 });
+                            return;
+                        } else {                            
+                            this._snackBar.open('Repository deleted', 'Dismiss', { duration: 3000 });
+                            this.closeDrawer()
+                            this._router.navigate(['../'], {relativeTo: this._activatedRoute});
+                        }
 
-                //         // Return if the repository wasn't deleted...
-                //         if ( !isDeleted )
-                //         {
-                //             return;
-                //         }
-
-                //         // Navigate to the next repository if available
-                //         if ( nextRepositoryId )
-                //         {
-                //             this._router.navigate(['../', nextRepositoryId], {relativeTo: this._activatedRoute});
-                //         }
-                //         // Otherwise, navigate to the parent
-                //         else
-                //         {
-                //             this._router.navigate(['../'], {relativeTo: this._activatedRoute});
-                //         }
-
-                //     });
+                    });
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             }
         });
-
     }
 
 

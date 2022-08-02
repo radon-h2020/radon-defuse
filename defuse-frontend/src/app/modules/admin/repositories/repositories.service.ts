@@ -74,6 +74,10 @@ export class RepositoriesService
     getRepositoriesPagination(pageIndex: number = 0, pageSize: number=10): Observable<RepositoryPagination> {
         return this.repositoriesCollection.pipe(
             map((repos) => {
+                
+                // Sort by alphabetic order, case insensitive
+                repos.sort((a, b) => a.full_name.toLowerCase().localeCompare(b.full_name.toLowerCase()));
+
                 // Calculate pagination details
                 const begin = pageIndex * pageSize;
                 const end = Math.min((pageSize * (pageIndex + 1)), repos.length);

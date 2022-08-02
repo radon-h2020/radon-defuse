@@ -63,7 +63,7 @@ export class RepositoriesService
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
 
-    getRepositoriesPage(pageIndex: number = 0, pageSize: number=10): Observable<RepositoryPagination> {
+    getRepositoriesPage(pageIndex: number = 0, pageSize: number=10): Observable<any> {
         return this.repositoriesCollection.pipe(
             map((repos) => {
                 
@@ -76,7 +76,8 @@ export class RepositoriesService
                 const lastPage = Math.max(Math.ceil(repos.length / pageSize), 1);
                 
                 // Paginate the results by size
-                this._repositories.next(repos.slice(begin, end));
+                const reposSlice = repos.slice(begin, end);
+                this._repositories.next(reposSlice);
     
                 const pagination = {
                     length    : repos.length,
@@ -90,7 +91,8 @@ export class RepositoriesService
     
                 this._pagination.next(pagination);
     
-                return pagination
+                // return pagination
+                return { reposSlice, pagination }
             })
         );      
     }

@@ -47,8 +47,8 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
     private getRepositories(pageIndex: number = 0, pageSize: number=10){
         this._repositoriesService.getRepositoriesPage(pageIndex, pageSize)
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((pagination: RepositoryPagination) => {
-                this.repositoriesCount = pagination.length
+            .subscribe((response) => {
+                this.repositoriesCount = response.pagination.length
                 this._changeDetectorRef.markForCheck();
             });
     }

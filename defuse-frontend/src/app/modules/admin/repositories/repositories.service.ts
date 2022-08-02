@@ -63,15 +63,7 @@ export class RepositoriesService
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
 
-    getRepositories(): Observable<Repository[]> {
-        return this.repositoriesCollection.pipe(
-            tap((repos) => {
-                this._repositories.next(repos);
-            })
-        );
-    }
-
-    getRepositoriesPagination(pageIndex: number = 0, pageSize: number=10): Observable<RepositoryPagination> {
+    getRepositoriesPage(pageIndex: number = 0, pageSize: number=10): Observable<RepositoryPagination> {
         return this.repositoriesCollection.pipe(
             map((repos) => {
                 

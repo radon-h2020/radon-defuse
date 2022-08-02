@@ -47,7 +47,7 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
     }
 
     private getRepositories(pageIndex: number = 0, pageSize: number=10){
-        this._repositoriesService.getRepositoriesPagination(pageIndex, pageSize)
+        this._repositoriesService.getRepositoriesPage(pageIndex, pageSize)
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((pagination: RepositoryPagination) => {
                 this.repositoriesCount = pagination.length
@@ -139,7 +139,7 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
             // Get products if sort or page changes
             this._paginator.page.pipe(
                 switchMap(() => {
-                    return this._repositoriesService.getRepositoriesPagination(this._paginator.pageIndex, this._paginator.pageSize);
+                    return this._repositoriesService.getRepositoriesPage(this._paginator.pageIndex, this._paginator.pageSize);
                 })
             ).subscribe();
         }

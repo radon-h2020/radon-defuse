@@ -1,43 +1,46 @@
-<ng-container *ngIf="fixedFiles.length; else noFiles">
-    <ng-container *ngFor="let file of fixedFiles; trackBy: trackByFn">
-        
-        <div class="group w-full select-none" 
-            [ngClass]="{'bg-warn-50 dark:bg-warn-50': !file.is_valid}">
-
-            <!-- File content -->
-            <div class="relative flex items-center h-full pl-5 pt-1 pb-1">
+<ng-container *ngIf="fixedFiles$ | async as fixedFiles">
+    <ng-container *ngIf="fixedFiles.length; else noFiles">
+        <ng-container *ngFor="let file of fixedFiles; trackBy: trackByFn">
             
-                <!-- (In)validate commit button -->
-                <button class="mr-2 -ml-2.5 leading-none"
-                        (click)="toggleFileValidity(file)"
-                        mat-icon-button>
-            
-                    <ng-container *ngIf="file.is_valid">
-                        <mat-icon
-                            class="text-primary"
-                            [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
-                    </ng-container>
-                    <ng-container *ngIf="!file.is_valid">
-                        <mat-icon
-                            class="text-warn"
-                            [svgIcon]="'heroicons_outline:x-circle'"></mat-icon>
-                    </ng-container>
-                </button>
-
-                <div class="flex flex-auto items-center min-w-0 h-full pr-7 p-2">
-                    <div class="font-medium leading-5 truncate"> {{ file.filepath }} </div>
-                </div>
-
-                <a class="cursor-pointer" href="https://github.com" target="_blank">
-                    <div class="flex items-center justify-center py-1 px-3 mr-3 rounded-full leading-normal text-red-500 bg-red-100 dark:text-red-300 dark:bg-red-700">
-                        <span class="text-sm font-medium whitespace-nowrap"> {{ file.hash_bic }} </span>
+            <div class="group w-full select-none" 
+                [ngClass]="{'bg-warn-50 dark:bg-warn-50': !file.is_valid}">
+    
+                <!-- File content -->
+                <div class="relative flex items-center h-full pl-5 pt-1 pb-1">
+                
+                    <!-- (In)validate commit button -->
+                    <button class="mr-2 -ml-2.5 leading-none"
+                            (click)="onToggleFileValidity(file)"
+                            mat-icon-button>
+                
+                        <ng-container *ngIf="file.is_valid">
+                            <mat-icon
+                                class="text-primary"
+                                [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
+                        </ng-container>
+                        <ng-container *ngIf="!file.is_valid">
+                            <mat-icon
+                                class="text-warn"
+                                [svgIcon]="'heroicons_outline:x-circle'"></mat-icon>
+                        </ng-container>
+                    </button>
+    
+                    <div class="flex flex-auto items-center min-w-0 h-full pr-7 p-2">
+                        <div class="font-medium leading-5 truncate"> {{ file.filepath }} </div>
                     </div>
-                </a>
+    
+                    <a class="cursor-pointer" href="https://github.com" target="_blank">
+                        <div class="flex items-center justify-center py-1 px-3 mr-3 rounded-full leading-normal text-red-500 bg-red-100 dark:text-red-300 dark:bg-red-700">
+                            <span class="text-sm font-medium whitespace-nowrap"> {{ file.hash_bic }} </span>
+                        </div>
+                    </a>
+                </div>
             </div>
-        </div>
-        
+            
+        </ng-container>
     </ng-container>
 </ng-container>
+
 
 <!-- No files -->
 <ng-template #noFiles>

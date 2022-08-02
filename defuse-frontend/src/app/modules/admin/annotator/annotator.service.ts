@@ -8,20 +8,16 @@ import { repositories } from 'app/mock-api/apps/repositories/data';
 @Injectable({
     providedIn: 'root'
 })
-export class CommitsService
+export class CommitsService 
 {
 
     // Private
     private _commitsCollection: Observable<Commit[]>;
 
-
     private _commit: BehaviorSubject<Commit | null> = new BehaviorSubject(null);
     private _commits: BehaviorSubject<Commit[] | null> = new BehaviorSubject(null);
     private _pagination: BehaviorSubject<CommitsPagination | null> = new BehaviorSubject({ length: 0, size: 10, page: 0, lastPage: 0, startIndex: 0, endIndex: 0 } as CommitsPagination);
 
-    
-    private _fixedFile: BehaviorSubject<FixedFile | null> = new BehaviorSubject(null);
-    private _fixedFiles: BehaviorSubject<FixedFile[] | null> = new BehaviorSubject(null);
     private _tags: BehaviorSubject<string[] | null> = new BehaviorSubject(null);
 
 
@@ -56,24 +52,6 @@ export class CommitsService
     }
 
 
-    /**
-     * Getter for commit
-     */
-    get fixedFile$(): Observable<FixedFile> {
-        return this._fixedFile.asObservable();
-    }
-
-    /**
-     * Getter for commits
-     */
-    get fixedFiles$(): Observable<FixedFile[]> {
-        return this._fixedFiles.asObservable();
-    }
-
-    
-    /**
-     * Getter for tags
-     */
     get defects$(): Observable<string[]> {
         return this._tags.asObservable();
     }
@@ -167,93 +145,8 @@ export class CommitsService
         return of(true)
     }
 
-    /**
-     * Update commit
-     *
-     * @param id
-     * @param commit
-     */
-    // updateCommit(hash: string, commit: Commit): Observable<Commit>
-    // {
-    //     commit.is_valid = !commit.is_valid
-
-    //     return this.commits$.pipe(
-    //         take(1),
-    //         switchMap(commits => this._httpClient.patch<Commit>('api/apps/commits/commit', {
-    //             hash,
-    //             commit
-    //         }).pipe(
-    //             map((updatedCommit) => {
-
-    //                 // Find the index of the updated commit
-    //                 const index = commits.findIndex(item => item.hash === hash);
-
-    //                 // Update the commit
-    //                 commits[index] = updatedCommit;
-
-    //                 // Update the commits
-    //                 this._commits.next(commits);
-
-    //                 // Return the updated commit
-    //                 return updatedCommit;
-    //             }),
-    //             switchMap(updatedCommit => this.commit$.pipe(
-    //                 take(1),
-    //                 filter(item => item && item.hash === hash),
-    //                 tap(() => {
-
-    //                     // Update the commit if it's selected
-    //                     this._commit.next(updatedCommit);
-
-    //                     // Return the updated commit
-    //                     return updatedCommit;
-    //                 })
-    //             ))
-    //         ))
-    //     );
-    // }
-
-    // -----------------------------------------------------------------------------------------------------
-    // @ Fixed Files
-    // -----------------------------------------------------------------------------------------------------
-
-    getFixedFiles(): Observable<FixedFile[]> {
-        return this._httpClient.get<FixedFile[]>('api/apps/fixed-files/all').pipe(
-            tap((fixedFiles) => {
-                this._fixedFiles.next(fixedFiles);
-            })
-        );
-    }
-
-    getFixedFilesByCommit(hash: string): Observable<FixedFile[]> {
-        return this._httpClient.get<FixedFile[]>('api/apps/fixed-files/commit', {
-            params: {hash}
-        }).pipe(
-            tap((fixedFiles) => {
-                this._fixedFiles.next(fixedFiles);
-            })
-        );
-    }
-
-    getFixedFileById(id: string): Observable<FixedFile> {
-        return this._fixedFiles.pipe(
-            take(1),
-            map((fixedFiles) => {
-                const fixedFile = fixedFiles.find(item => item.id === id) || null;
-                this._fixedFiles.next(fixedFiles);
-                return fixedFile;
-            }),
-            switchMap((fixedFile) => {
-
-                if ( !fixedFile )
-                {
-                    return throwError('Could not found a fixed file with id ' + id + '!');
-                }
-
-                return of(fixedFile);
-            })
-        );
-    }
+    
+   
 
     // -----------------------------------------------------------------------------------------------------
     // @ Tags
@@ -371,4 +264,65 @@ export class CommitsService
         );
     }
   
+}
+
+
+@Injectable({
+    providedIn: 'root'
+})
+export class FixedFilesService {
+
+    // Private
+    private _filesCollection: Observable<FixedFile[]>;
+    
+    private _fixedFile: BehaviorSubject<FixedFile | null> = new BehaviorSubject(null);
+    private _fixedFiles: BehaviorSubject<FixedFile[] | null> = new BehaviorSubject(null);
+
+
+    /**
+     * Constructor
+     */
+    constructor(private _httpClient: HttpClient, private _firestore: AngularFirestore) {
+
+    }
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Accessors
+    // -----------------------------------------------------------------------------------------------------
+    get fixedFile$(): Observable<FixedFile> {
+        return this._fixedFile.asObservable();
+    }
+
+    get fixedFiles$(): Observable<FixedFile[]> {
+        return this._fixedFiles.asObservable();
+    }
+
+    set commit(hash:string) {
+        this._filesCollection = this._firestore.collection('fixed-files', ref => ref.where('hash_fix', '==', hash)).snapshotChanges().pipe(map(changes => {
+            return changes.map(item => { return item.payload.doc.data() as FixedFile; })
+        }))
+    }
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Public methods
+    // -----------------------------------------------------------------------------------------------------
+
+    getFixedFiles(): Observable<FixedFile[]> {
+        return this._filesCollection.pipe(
+            map((files) => {
+               
+                files = files.sort((a, b) => a.filepath.toLowerCase().localeCompare(b.filepath.toLowerCase()))
+
+                this._fixedFiles.next(files);
+    
+                return files
+            })
+        );    
+    }
+
+    updateFixedFile(file: FixedFile): Observable<boolean>{
+        file.is_valid = !file.is_valid
+        this._firestore.doc(`fixed-files/${file.id}`).update(file);
+        return of(true)
+    }
 }

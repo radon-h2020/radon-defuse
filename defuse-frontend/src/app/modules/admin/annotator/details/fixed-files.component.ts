@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, Input, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { debounceTime, Subject, takeUntil } from 'rxjs';
-import { CommitsService } from '../annotator.service';
+import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
+import { CommitsService, FixedFilesService } from '../annotator.service';
 import { Commit, FixedFile } from '../annotator.types';
 
 @Component({
@@ -12,14 +12,14 @@ import { Commit, FixedFile } from '../annotator.types';
 export class FixedFilesComponent{
 
     @Input() commit: Commit
-    fixedFiles: FixedFile[];
+    fixedFiles$: Observable<FixedFile[]>;
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     constructor(
         private _activatedRoute: ActivatedRoute,
         private _router: Router,
-        private _annotatorService: CommitsService,
+        private _fixedFilesService: FixedFilesService,
         private _changeDetectorRef: ChangeDetectorRef,
     ){ }
 
@@ -31,21 +31,30 @@ export class FixedFilesComponent{
      * On init
      */
     ngOnInit(): void {
+        
+        this._fixedFilesService.commit = this.commit.hash
 
-        // Get the tags
-        this._annotatorService.fixedFiles$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((fixedFiles: FixedFile[]) => {
-                this.fixedFiles = fixedFiles;
+        // Get the fixed files
+        this.fixedFiles$ = this._fixedFilesService.fixedFiles$
+        this._fixedFilesService.getFixedFiles()
+                               .pipe(takeUntil(this._unsubscribeAll))
+                               .subscribe((response) => {
+                                //    this.commitsCount = response.pagination.length
+                                   this._changeDetectorRef.markForCheck();
+                               });
 
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
+        // this._fixedFilesService.fixedFiles$
+        //     .pipe(takeUntil(this._unsubscribeAll))
+        //     .subscribe((fixedFiles: FixedFile[]) => {
+        //         // this.fixedFiles = fixedFiles;
+
+        //         // Mark for check
+        //         this._changeDetectorRef.markForCheck();
+        //     });
     }
 
-    toggleFileValidity(file: FixedFile): void {
-        const targetFile = this.fixedFiles.find(item => item.id === file.id)
-        targetFile.is_valid = !targetFile.is_valid;
+    onToggleFileValidity(file: FixedFile): void {
+        this._fixedFilesService.updateFixedFile(file)
         this._changeDetectorRef.markForCheck();
     }
 }

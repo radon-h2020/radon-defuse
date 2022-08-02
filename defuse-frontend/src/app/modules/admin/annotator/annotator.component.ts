@@ -64,19 +64,6 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
     {
     }
 
-
-    private setRepositories(){
-        this.repositories$ = this._repositoriesService.repositories$
-        this._repositoriesService.getRepositoriesPage(0, 1000)
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((response) => {
-                if ( response.pagination.length ){
-                    this.onSelectRepository(response.repositories[0])
-                }
-                this._changeDetectorRef.markForCheck();
-            });
-    }
-
     private getCommits(){
         this._commitsService.getCommitsPage(this.selectedRepository.id)
             .pipe(takeUntil(this._unsubscribeAll))
@@ -90,7 +77,19 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
      * On init
      */
     ngOnInit(): void{
-        this.setRepositories()
+        
+        // Get the repositories
+        this.repositories$ = this._repositoriesService.repositories$
+        this._repositoriesService.getRepositoriesPage(0, 1000)
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response) => {
+                if ( response.pagination.length ){
+                    this.onSelectRepository(response.repositories[0])
+                }
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Bind commits$ to the service's observable
         this.commits$ = this._commitsService.commits$;
 
         // Get the pagination
@@ -117,8 +116,7 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
 
         // Subscribe to MatDrawer opened change
         this.matDrawer.openedChange.subscribe((opened) => {
-            if ( !opened )
-            {
+            if ( !opened ) {
                 // Remove the selected contact when drawer closed
                 this.selectedCommit = null;
 
@@ -158,8 +156,7 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
     /**
      * On destroy
      */
-    ngOnDestroy(): void
-    {
+    ngOnDestroy(): void {
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
@@ -190,22 +187,6 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
     onToggleCommitValidity(commit: Commit): void {
         this._commitsService.toggleCommitValidity(commit)
         this._changeDetectorRef.markForCheck();
-    }
-
-    filterCommits(repository): void {
-        this.matDrawer.close();
-
-        this.selectedRepository = repository
-
-        this._commitsService.commits$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((commits: Commit[]) => {
-                this.filteredCommits = commits.filter(commit => commit.repository_id == this.selectedRepository.id);
-                this.filteredCommitsCount = this.filteredCommits.length
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
     }
 
     /**

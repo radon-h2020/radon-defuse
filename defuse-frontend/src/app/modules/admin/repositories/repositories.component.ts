@@ -21,8 +21,6 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
     @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
     @ViewChild(MatPaginator) private _paginator: MatPaginator;
 
-    drawerMode: 'over' // | 'side';
-
     pagination: RepositoryPagination;
 
     repositories$: Observable<Repository[]>
@@ -110,24 +108,6 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
                 this._changeDetectorRef.markForCheck();
             }
         });
-
-        // Subscribe to media changes
-        // this._fuseMediaWatcherService.onMediaChange$
-        // .pipe(takeUntil(this._unsubscribeAll))
-        // .subscribe(({matchingAliases}) => {
-
-        //     // Set the drawerMode if the given breakpoint is active
-        //     if ( matchingAliases.includes('lg') ) {
-        //         this.drawerMode = 'side';
-        //     }
-        //     else
-        //     {
-        //         this.drawerMode = 'over';
-        //     }
-
-        //     // Mark for check
-        //     this._changeDetectorRef.markForCheck();
-        // });
     }
 
     /**

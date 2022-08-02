@@ -44,8 +44,7 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy {
     /**
      * On init
      */
-    ngOnInit(): void 
-    {
+    ngOnInit(): void {
         // Open the drawer
         this._repositoriesComponent.matDrawer.open();
 
@@ -63,14 +62,12 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy {
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
-
     }
 
     /**
      * On destroy
      */
-    ngOnDestroy(): void
-    {
+    ngOnDestroy(): void {
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
@@ -80,20 +77,11 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy {
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
 
-    /**
-     * Close the drawer
-     */
-    closeDrawer(): Promise<MatDrawerToggleResult>
-    {
+    closeDrawer(): Promise<MatDrawerToggleResult> {
         return this._repositoriesComponent.matDrawer.close();
     }
 
-   
-    /**
-     * Delete the repository
-     */
-    onDeleteRepository(): void
-    {
+    onDeleteRepository(): void {
         // Open the confirmation dialog
         const confirmation = this._fuseConfirmationService.open({
             title  : 'Delete repository',
@@ -131,7 +119,6 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy {
             }
         });
     }
-
 
     calculateMetrics(){
         return false // TODO

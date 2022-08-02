@@ -25,21 +25,16 @@ export class CanDeactivateRepositoryDetails implements CanDeactivate<RepositoryD
         // If the next state doesn't contain '/repositories'
         // it means we are navigating away from the
         // contacts app
-        if ( !nextState.url.includes('/repositories') )
-        {
+        if ( !nextState.url.includes('/repositories') ) {
             // Let it navigate
             return true;
         }
 
         // If we are navigating to another repository...
-        if ( nextRoute.paramMap.get('id') )
-        {
+        if ( nextRoute.paramMap.get('id') ) {
             // Just navigate
             return true;
-        }
-        // Otherwise...
-        else
-        {
+        } else {
             // Close the drawer first, and then navigate
             return component.closeDrawer().then(() => true);
         }

@@ -135,4 +135,10 @@ export class RepositoriesService
         )
     }
 
+    createRepository(url: string, token?: string): Observable<Repository>{
+        let api_url = `/backend-api/repository?url=${url}`;
+        if(token) api_url += `&token=${token}`;
+        return this._httpClient.post<any>(api_url, {observe:'response'})
+    }
+
 }

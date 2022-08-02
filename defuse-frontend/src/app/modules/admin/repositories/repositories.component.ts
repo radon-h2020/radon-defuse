@@ -176,26 +176,25 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
     /**
      * Add repository
      */
-    addRepository(): void {
+    onAddRepository(): void {
 
         // Open dialog to add repository info
         let dialogRef = this._dialog.open(AddRepositoryDialog);
         dialogRef.afterClosed().subscribe(result => {
+            
             if(result && result.url){
-                // Call api
-                // this.onAdd(result.url, result.token)
                 // Create the repository
-                // this._repositoriesService.createRepository().subscribe((newRepository) => {
+                this._repositoriesService.createRepository(result.url, result.token).subscribe((newRepository) => {
+                    
+                    if(this._router.url.endsWith("/repositories")){
+                        this._router.navigate(['./', newRepository.id], {relativeTo: this._activatedRoute});
+                    }else{
+                        this._router.navigate(['./', newRepository.id], {relativeTo: this._activatedRoute.parent});
+                    }
 
-                //     if(this._router.url.endsWith("/repositories")){
-                //         this._router.navigate(['./', newRepository.id], {relativeTo: this._activatedRoute});
-                //     }else{
-                //         this._router.navigate(['./', newRepository.id], {relativeTo: this._activatedRoute.parent});
-                //     }
-
-                //     // Mark for check
-                //     this._changeDetectorRef.markForCheck();
-                // });
+                    // Mark for check
+                    this._changeDetectorRef.markForCheck();
+                });
             }
         })
     }

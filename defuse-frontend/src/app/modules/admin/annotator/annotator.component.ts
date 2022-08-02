@@ -64,7 +64,7 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
     {
     }
 
-    private getCommits(){
+    private getCommits() {
         this._commitsService.getCommitsPage(this.selectedRepository.id)
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response) => {
@@ -76,7 +76,7 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
     /**
      * On init
      */
-    ngOnInit(): void{
+    ngOnInit(): void {
         
         // Get the repositories
         this.repositories$ = this._repositoriesService.repositories$
@@ -210,13 +210,11 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
      * @param index
      * @param item
      */
-    trackCommitsByFn(index: number, item: any): any
-    {
+    trackCommitsByFn(index: number, item: any): any {
         return item.hash || index;
     }
 
-    trackRepositoriesByFn(index: number, item: any): any
-    {
+    trackRepositoriesByFn(index: number, item: any): any {
         return item.id || index;
     }
 }

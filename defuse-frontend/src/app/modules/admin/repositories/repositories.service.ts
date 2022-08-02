@@ -65,22 +65,24 @@ export class RepositoriesService
 
     getRepositoriesPage(pageIndex: number = 0, pageSize: number=10): Observable<any> {
         return this.repositoriesCollection.pipe(
-            map((repos) => {
+            map((repositories) => {
                 
+                const length = repositories.length
+
                 // Sort by alphabetic order, case insensitive
-                repos.sort((a, b) => a.full_name.toLowerCase().localeCompare(b.full_name.toLowerCase()));
+                repositories.sort((a, b) => a.full_name.toLowerCase().localeCompare(b.full_name.toLowerCase()));
 
                 // Calculate pagination details
                 const begin = pageIndex * pageSize;
-                const end = Math.min((pageSize * (pageIndex + 1)), repos.length);
-                const lastPage = Math.max(Math.ceil(repos.length / pageSize), 1);
+                const end = Math.min((pageSize * (pageIndex + 1)), length);
+                const lastPage = Math.max(Math.ceil(length / pageSize), 1);
                 
                 // Paginate the results by size
-                const reposSlice = repos.slice(begin, end);
-                this._repositories.next(reposSlice);
+                repositories = repositories.slice(begin, end);
+                this._repositories.next(repositories);
     
                 const pagination = {
-                    length    : repos.length,
+                    length    : length,
                     size      : pageSize,
                     page      : pageIndex,
                     lastPage  : lastPage,
@@ -92,7 +94,7 @@ export class RepositoriesService
                 this._pagination.next(pagination);
     
                 // return pagination
-                return { reposSlice, pagination }
+                return { repositories, pagination }
             })
         );      
     }

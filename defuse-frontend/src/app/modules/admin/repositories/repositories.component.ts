@@ -134,14 +134,11 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
      * After view init
      */
     ngAfterViewInit(): void {
-        console.log('AfterViewInit')
-        console.log(this._paginator)
         if ( this._paginator ) {
 
             // Get products if sort or page changes
             this._paginator.page.pipe(
                 switchMap(() => {
-                    console.log(this._paginator.pageIndex, this._paginator.pageSize)
                     return this._repositoriesService.getRepositoriesPagination(this._paginator.pageIndex, this._paginator.pageSize);
                 })
             ).subscribe();

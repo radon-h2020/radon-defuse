@@ -55,9 +55,6 @@ export class RepositoriesService
         return this._repositories.asObservable();
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Accessors
-    // -----------------------------------------------------------------------------------------------------
     get repository$(): Observable<Repository> {
         return this._repository.asObservable();
     }

@@ -17,7 +17,7 @@ class Repository(Resource):
         self.bucket = kwargs['bucket']
         self.db = kwargs['db']
 
-    def __delete_commits(self, repo_id: int):
+    def __delete_commits(self, repo_id: str):
         batch = self.db.batch()
         commits = self.db.collection('commits').where('repository_id', '==', repo_id).stream()
         for doc in commits:
@@ -25,7 +25,7 @@ class Repository(Resource):
 
         batch.commit()
 
-    def __delete_files(self, repo_id: int):
+    def __delete_files(self, repo_id: str):
         batch = self.db.batch()
         files = self.db.collection('fixed-files').where('repository_id', '==', repo_id).stream()
         for doc in files:
@@ -33,7 +33,7 @@ class Repository(Resource):
 
         batch.commit()
 
-    def __delete_models(self, repo_id: int):
+    def __delete_models(self, repo_id: str):
         batch = self.db.batch()
         models = self.db.collection('models').where('repository_id', '==', repo_id).stream()
         for doc in models:
@@ -45,7 +45,7 @@ class Repository(Resource):
 
         batch.commit()
 
-    def __delete_tasks(self, repo_id: int):
+    def __delete_tasks(self, repo_id: str):
         batch = self.db.batch()
         tasks = self.db.collection('tasks').where('repository_id', '==', repo_id).stream()
         for doc in tasks:
@@ -61,7 +61,7 @@ class Repository(Resource):
     def delete(self):
         """ Delete repository """
         parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, required=True, location='args')
+        parser.add_argument('id', type=str, required=True, location='args')
         repo_id = parser.parse_args().get('id')
 
         self.__delete_commits(repo_id)
@@ -70,7 +70,7 @@ class Repository(Resource):
         self.__delete_tasks(repo_id)
 
         # Finally, delete from collection 'repositories'
-        self.db.collection('repositories').document(str(repo_id)).delete()
+        self.db.collection('repositories').document(repo_id).delete()
 
         return make_response({}, 204)
 
@@ -99,6 +99,7 @@ class Repository(Resource):
             api_url = f'https://gitlab.com/api/v4/projects/{full_name}'
             if args.get('token'):
                 headers = {'PRIVATE-TOKEN': args.get('token')}
+
         else:
             return make_response({}, 400)
 
@@ -108,7 +109,7 @@ class Repository(Resource):
 
         repo = response.json()
         repo = {
-            'id': repo['id'],
+            'id': str(repo['id']),
             'full_name': full_name,
             'url': args.get('url'),
             'default_branch': repo['default_branch']
@@ -120,7 +121,7 @@ class Repository(Resource):
         repo_ref = self.db.collection('repositories').document(str(repo['id']))
         repo_ref.set(repo)
 
-        return make_response({}, 204)
+        return make_response(repo, 200)
 
     def patch(self):
         """ Compute scores for repository """

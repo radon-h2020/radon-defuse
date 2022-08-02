@@ -10,9 +10,9 @@ export const annotatorRoutes: Route[] = [
         path     : '',
         component: AnnotatorComponent,
         resolve  : {
-            commits : AnnotatorResolver,
-            fixedFiles: FixedFilesResolver,
-            tags: TagsResolver,
+            // commits : AnnotatorResolver,
+            // fixedFiles: FixedFilesResolver,
+            // tags: TagsResolver,
         },
         children : [
             {

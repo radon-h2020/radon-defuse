@@ -25,8 +25,8 @@ export class AnnotatorDetailsComponent implements OnInit, OnDestroy
     @ViewChild('tagsPanel') private _tagsPanel: TemplateRef<any>;
     @ViewChild('tagsPanelOrigin') private _tagsPanelOrigin: ElementRef;
 
-    @Input() commit: Commit
-    // commit: Commit;
+    // @Input() commit: Commit
+    commit: Commit;
     commitForm: UntypedFormGroup;
     commits: Commit[];
     
@@ -43,10 +43,11 @@ export class AnnotatorDetailsComponent implements OnInit, OnDestroy
      */
     constructor(
         private _activatedRoute: ActivatedRoute,
-        private _changeDetectorRef: ChangeDetectorRef,
-        private _commitsComponent: AnnotatorComponent,
+        private _annotatorComponent: AnnotatorComponent,
         private _annotatorService: AnnotatorService,
         private _repositoriesService: RepositoriesService,
+        private _changeDetectorRef: ChangeDetectorRef,
+        private _commitsComponent: AnnotatorComponent,
         private _fuseConfirmationService: FuseConfirmationService,
         private _overlay: Overlay,
         private _renderer2: Renderer2,
@@ -68,55 +69,67 @@ export class AnnotatorDetailsComponent implements OnInit, OnDestroy
         // Open the drawer
         this._commitsComponent.matDrawer.open();
 
-
         // Get the commits
-        this._annotatorService.commits$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((commits: Commit[]) => {
-                this.commits = commits;
+        // this._annotatorService.commits$
+        //     .pipe(takeUntil(this._unsubscribeAll))
+        //     .subscribe((commits: Commit[]) => {
+        //         this.commits = commits;
 
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
+        //         // Mark for check
+        //         this._changeDetectorRef.markForCheck();
+        //     });
 
         // Get the commit
-        this._annotatorService.commit$
+        // this._annotatorService.commit$
+        //     .pipe(takeUntil(this._unsubscribeAll))
+        //     .subscribe((commit: Commit) => {
+
+        //         // Open the drawer in case it is closed
+        //         this._commitsComponent.matDrawer.open();
+
+        //         // Get the commit
+        //         this.commit = commit;
+
+        //         // Get the repository
+        //         this._repositoriesService.getRepository(this.commit.repository_id)
+        //         .pipe(takeUntil(this._unsubscribeAll))
+        //         .subscribe((repository: Repository) => {
+
+        //             // Get the commit
+        //             this.repository = repository;
+
+        //             // Mark for check
+        //             this._changeDetectorRef.markForCheck();
+        //         });
+
+        //         // Get the fixed files
+        //         this._annotatorService.getFixedFilesByCommit(this.commit.hash)
+        //             .pipe(takeUntil(this._unsubscribeAll))
+        //             .subscribe((fixedFiles: FixedFile[]) => {
+        //                 this.fixedFiles = fixedFiles;
+
+        //                 // Mark for check
+        //                 this._changeDetectorRef.markForCheck();
+        //             });
+                
+        //         // Mark for check
+        //         this._changeDetectorRef.markForCheck();
+        //     });
+
+        // Get the commit
+        this._annotatorService.getCommit(this._activatedRoute.snapshot.params.hash)
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((commit: Commit) => {
 
                 // Open the drawer in case it is closed
-                this._commitsComponent.matDrawer.open();
-
-                // Get the commit
-                this.commit = commit;
+                this._annotatorComponent.matDrawer.open();
 
                 // Get the repository
-                this._repositoriesService.getRepositoryById(this.commit.repository_id)
-                .pipe(takeUntil(this._unsubscribeAll))
-                .subscribe((repository: Repository) => {
+                this.commit = commit;
 
-                    // Get the commit
-                    this.repository = repository;
-
-                    // Mark for check
-                    this._changeDetectorRef.markForCheck();
-                });
-
-                // Get the fixed files
-                this._annotatorService.getFixedFilesByCommit(this.commit.hash)
-                    .pipe(takeUntil(this._unsubscribeAll))
-                    .subscribe((fixedFiles: FixedFile[]) => {
-                        this.fixedFiles = fixedFiles;
-
-                        // Mark for check
-                        this._changeDetectorRef.markForCheck();
-                    });
-                
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
-
-        
     }
 
     /**

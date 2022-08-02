@@ -1,6 +1,7 @@
 export interface Commit {
     hash: string;
     msg?: string;
+    url: string;
     is_valid: boolean;
     defects: string[];
     repository_id: string;
@@ -15,8 +16,11 @@ export interface FixedFile {
     repository_id: string;
 }
 
-export interface Pagination {
-    index: number,
-    size: number,
-    length: number
+export interface CommitsPagination {
+    length: number;
+    size: number;
+    page: number;
+    lastPage: number;
+    startIndex: number;
+    endIndex: number;
 }

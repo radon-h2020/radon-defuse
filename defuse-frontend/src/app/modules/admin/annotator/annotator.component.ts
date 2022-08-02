@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, 
+import { AfterViewInit,
+         ChangeDetectionStrategy, 
          ChangeDetectorRef, 
          Component, 
          OnDestroy, 
@@ -11,12 +12,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatDrawer } from '@angular/material/sidenav';
 import { MatDialog } from '@angular/material/dialog'
 import { MatPaginator } from '@angular/material/paginator';
-import { Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { Observable, map, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
-import { Commit, Pagination } from 'app/modules/admin/annotator/annotator.types';
+import { Commit, CommitsPagination } from 'app/modules/admin/annotator/annotator.types';
 import { AnnotatorService } from 'app/modules/admin/annotator/annotator.service'
 import { StartMiningDialog } from './dialogs/start.component';
-import { Repository } from '../repositories/repositories.types';
+import { Repository, RepositoryPagination } from '../repositories/repositories.types';
 import { RepositoriesService } from '../repositories/repositories.service';
 
 @Component({
@@ -25,18 +26,19 @@ import { RepositoriesService } from '../repositories/repositories.service';
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AnnotatorComponent implements OnInit, OnDestroy
+export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
 {
     @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
     @ViewChild(MatPaginator) private _paginator: MatPaginator;
 
     drawerMode: 'side' | 'over';
     commits$: Observable<Commit[]>;
+    commitsCount: number = 0;
 
     filteredCommits: Commit[];
     filteredCommitsCount: number = 0;
 
-    pagination: Pagination
+    pagination: CommitsPagination
     
     repositories$: Observable<Repository[]>;   
     repositoriesCount: number = 0;
@@ -60,62 +62,26 @@ export class AnnotatorComponent implements OnInit, OnDestroy
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _router: Router)
     {
-        this.pagination = {
-            length: 0,
-            index: 0,
-            size: 0 
-        }
     }
 
-    setRepositories(){
-        // Get the repositories to display in the menu
-        this.repositories$ = this._repositoriesService.repositories$;
-        this._repositoriesService.repositories$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((repositories: Repository[]) => {
 
-                this.repositoriesCount = repositories.length;
-                
-                if(repositories.length) {
-                    this.selectedRepository = repositories[0]
+    private setRepositories(){
+        this.repositories$ = this._repositoriesService.repositories$
+        this._repositoriesService.getRepositoriesPage(0, 1000)
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((response) => {
+                if ( response.pagination.length ){
+                    this.onSelectRepository(response.repositories[0])
                 }
-
-                // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
     }
 
-    setCommits(){
-        // Get the commits
-        this.commits$ = this._annotatorService.commits$;
-
-        // Filter commits
-        this._annotatorService.commits$
+    private getCommits(){
+        this._annotatorService.getCommitsPage(this.selectedRepository.id)
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((commits: Commit[]) => {
-
-                // this.pagination.length = this.filteredCommitsCount
-                // this.pagination.index = 0
-                // this.pagination.size = this._paginator.pageSize
-
-                this.filteredCommits = commits.filter(commit => commit.repository_id == this.selectedRepository.id);
-                this.filteredCommitsCount = this.filteredCommits.length
-                
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
-    }
-
-    setCommit(){
-        // Get the commit
-        this._annotatorService.commit$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((commit: Commit) => {
-
-                // Update the selected commit
-                // this.selectedCommit = commit;
-
-                // Mark for check
+            .subscribe((response) => {
+                this.commitsCount = response.pagination.length
                 this._changeDetectorRef.markForCheck();
             });
     }
@@ -125,20 +91,29 @@ export class AnnotatorComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void{
         this.setRepositories()
-        this.setCommits()
-        this.setCommit()
+        this.commits$ = this._annotatorService.commits$;
 
+        // Get the pagination
+        this._annotatorService.pagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagination: CommitsPagination) => {
+
+                // Update the pagination
+                this.pagination = pagination;
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
 
         // Subscribe to search input field value changes
         this.searchInputControl.valueChanges
-        .pipe(
-            takeUntil(this._unsubscribeAll),
-            switchMap(query =>
-                // Search
-                // this._annotatorService.searchCommits(query)
-                this._annotatorService.getCommits(0, 10, query)
-            )
-        ).subscribe();
+            .pipe(
+                takeUntil(this._unsubscribeAll),
+                switchMap(query =>
+                    this._annotatorService.searchCommits(query)
+                )
+            ).subscribe();
+
 
         // Subscribe to MatDrawer opened change
         this.matDrawer.openedChange.subscribe((opened) => {
@@ -155,7 +130,7 @@ export class AnnotatorComponent implements OnInit, OnDestroy
         // Get the pagination
         this._annotatorService.pagination$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((pagination: Pagination) => {
+            .subscribe((pagination: CommitsPagination) => {
 
                 // Update the pagination
                 this.pagination = pagination;
@@ -163,34 +138,21 @@ export class AnnotatorComponent implements OnInit, OnDestroy
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
-            
-        // Get commits if page changes
-        this._paginator.page.pipe(
-            switchMap(() => {
-                this.matDrawer.close();
-                // this.isLoading = true;
-                return this._annotatorService.getCommits(this._paginator.pageIndex, this._paginator.pageSize);
-            })            
-        ).subscribe();
+    }
 
+    /**
+     * After view init
+     */
+    ngAfterViewInit(): void {
+        if ( this._paginator ) {
 
-
-
-        // Subscribe to media changes
-        this._fuseMediaWatcherService.onMediaChange$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe(({matchingAliases}) => {
-
-            // Set the drawerMode if the given breakpoint is active
-            if ( matchingAliases.includes('lg') ) {
-                this.drawerMode = 'side';
-            } else {
-                this.drawerMode = 'over';
-            }
-
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
-        });
+            // Get products if sort or page changes
+            this._paginator.page.pipe(
+                switchMap(() => {
+                    return this._annotatorService.getCommitsPage(this.selectedRepository.id, this._paginator.pageIndex, this._paginator.pageSize);
+                })
+            ).subscribe();
+        }
     }
 
     /**
@@ -213,13 +175,22 @@ export class AnnotatorComponent implements OnInit, OnDestroy
      */
     onBackdropClicked(): void {
         // Go back to the list
-        // this._router.navigate(['./'], {relativeTo: this._activatedRoute});
-        this.matDrawer.close();
+        this._router.navigate(['./'], {relativeTo: this._activatedRoute});
 
         // Mark for check
         this._changeDetectorRef.markForCheck();
     }
 
+    onSelectRepository(repository){
+        this.selectedRepository = repository
+        this._annotatorService.repositoryId = this.selectedRepository.id;
+        this.getCommits()
+    }
+
+    onToggleCommitValidity(commit: Commit): void {
+        this._annotatorService.toggleCommitValidity(commit)
+        this._changeDetectorRef.markForCheck();
+    }
 
     filterCommits(repository): void {
         this.matDrawer.close();
@@ -251,11 +222,6 @@ export class AnnotatorComponent implements OnInit, OnDestroy
         })
     }
 
-    toggleCommitValidity(commit: Commit): void {
-        const targetCommit = this.filteredCommits.find(item => item.hash === commit.hash)
-        targetCommit.is_valid = !targetCommit.is_valid;
-        this._changeDetectorRef.markForCheck();
-    }
 
     /**
      * Track by function for ngFor loops
@@ -263,7 +229,7 @@ export class AnnotatorComponent implements OnInit, OnDestroy
      * @param index
      * @param item
      */
-    trackByFn(index: number, item: any): any
+    trackCommitsByFn(index: number, item: any): any
     {
         return item.hash || index;
     }

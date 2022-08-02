@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
 import { catchError, Observable, throwError } from 'rxjs';
 import { AnnotatorService } from 'app/modules/admin/annotator/annotator.service';
-import { Commit, FixedFile, Pagination } from 'app/modules/admin/annotator/annotator.types';
+import { Commit, FixedFile, CommitsPagination } from 'app/modules/admin/annotator/annotator.types';
 
 @Injectable({
     providedIn: 'root'
@@ -26,9 +26,9 @@ export class AnnotatorResolver implements Resolve<any>
      * @param route
      * @param state
      */
-    resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ pagination: Pagination; commits: Commit[] }>
+    resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<{ pagination: CommitsPagination; commits: Commit[] }>
     {
-        return this._annotatorService.getCommits();
+        return this._annotatorService.getCommitsPage('1');
     }
 }
 
@@ -60,7 +60,7 @@ export class CommitResolver implements Resolve<any>
      */
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Commit>
     {
-        return this._annotatorService.getCommitById(route.paramMap.get('hash'))
+        return this._annotatorService.getCommit(route.paramMap.get('hash'))
                    .pipe(
                        // Error here means the requested commit is not available
                        catchError((error) => {

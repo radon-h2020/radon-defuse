@@ -1,45 +1,60 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { BehaviorSubject, filter, map, Observable, of, switchMap, take, tap, throwError } from 'rxjs';
-import { Commit, FixedFile, Pagination } from 'app/modules/admin/annotator/annotator.types';
+import { Commit, FixedFile, CommitsPagination } from 'app/modules/admin/annotator/annotator.types';
+import { repositories } from 'app/mock-api/apps/repositories/data';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AnnotatorService
 {
+
     // Private
+    private _commitsCollection: Observable<Commit[]>;
+
+
     private _commit: BehaviorSubject<Commit | null> = new BehaviorSubject(null);
     private _commits: BehaviorSubject<Commit[] | null> = new BehaviorSubject(null);
+    private _pagination: BehaviorSubject<CommitsPagination | null> = new BehaviorSubject({ length: 0, size: 10, page: 0, lastPage: 0, startIndex: 0, endIndex: 0 } as CommitsPagination);
+
+    
     private _fixedFile: BehaviorSubject<FixedFile | null> = new BehaviorSubject(null);
     private _fixedFiles: BehaviorSubject<FixedFile[] | null> = new BehaviorSubject(null);
-    private _pagination: BehaviorSubject<Pagination | null> = new BehaviorSubject(null);
     private _tags: BehaviorSubject<string[] | null> = new BehaviorSubject(null);
+
+
 
     /**
      * Constructor
      */
-    constructor(private _httpClient: HttpClient)
-    {
+    constructor(private _httpClient: HttpClient, private _firestore: AngularFirestore) {
+
     }
 
     // -----------------------------------------------------------------------------------------------------
     // @ Accessors
     // -----------------------------------------------------------------------------------------------------
 
-    /**
-     * Getter for commit
-     */
     get commit$(): Observable<Commit> {
         return this._commit.asObservable();
     }
 
-    /**
-     * Getter for commits
-     */
     get commits$(): Observable<Commit[]> {
         return this._commits.asObservable();
     }
+
+    get pagination$(): Observable<CommitsPagination> {
+        return this._pagination.asObservable();
+    }
+
+    set repositoryId(id:string) {
+        this._commitsCollection = this._firestore.collection('commits', ref => ref.where('repository_id', '==', id)).snapshotChanges().pipe(map(changes => {
+            return changes.map(item => { return item.payload.doc.data() as Commit; })
+        }))
+    }
+
 
     /**
      * Getter for commit
@@ -63,103 +78,93 @@ export class AnnotatorService
         return this._tags.asObservable();
     }
 
-    /**
-     * Getter for pagination
-     */
-    get pagination$(): Observable<Pagination>
-    {
-        return this._pagination.asObservable();
-    }
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
 
-    /**
-     * Get commits
-     */
-    // getCommits(): Observable<Commit[]>
-    // {
-    //     return this._httpClient.get<Commit[]>('api/apps/commits/all').pipe(
-    //         tap((commits) => {
-    //             this._commits.next(commits);
-    //         })
-    //     );
-    // }
+    getCommitsPage(repositoryId: string, pageIndex: number = 0, pageSize: number=10): Observable<any> {
+        return this._commitsCollection.pipe(
+            map((commits) => {
+               
+                commits = commits.filter(commit => commit.repository_id == repositoryId)
+                                 .sort((a, b) => a.hash.localeCompare(b.hash))
 
-    getCommits(page: number = 0, size: number = 10, query: string = ''): Observable<{ pagination: Pagination; commits: Commit[] }> {
-        return this._httpClient.get<{ pagination: Pagination; commits: Commit[] }>('api/apps/commits/all', {
-            params: {
-                page: '' + page,
-                size: '' + size,
-                query
-            }
-        }).pipe(
-            tap((response) => {
-                this._pagination.next(response.pagination);
-                this._commits.next(response.commits);
-            })
-        );
-    }
-        
-    /**
-     * Filter commits of a given repository
-     *
-     * @param query
-     */
-    // filterCommits(repositoryId: number): Observable<Commit[]>
-    // {
-    //     return this._httpClient.get<Commit[]>('api/apps/commits/filter', {
-    //         params: {repositoryId}
-    //     }).pipe(
-    //         tap((commits) => {
-    //             this._commits.next(commits);
-    //         })
-    //     );
-    // }
-    
-    /**
-     * Search commits with given query
-     *
-     * @param query
-     */
-    searchCommits(query: string): Observable<Commit[]>
-    {
-        return this._httpClient.get<Commit[]>('api/apps/commits/search', {
-            params: {query}
-        }).pipe(
-            tap((commits) => {
+                const length = commits.length
+
+                // Calculate pagination details
+                const begin = pageIndex * pageSize;
+                const end = Math.min((pageSize * (pageIndex + 1)), length);
+                const lastPage = Math.max(Math.ceil(length / pageSize), 1);
+                
+                // Paginate the results by size
+                commits = commits.slice(begin, end);
                 this._commits.next(commits);
+    
+                const pagination = {
+                    length    : length,
+                    size      : pageSize,
+                    page      : pageIndex,
+                    lastPage  : lastPage,
+                    startIndex: begin,
+                    endIndex  : end - 1
+                } as CommitsPagination
+    
+    
+                this._pagination.next(pagination);
+    
+                // return pagination
+                return { commits, pagination }
             })
-        );
+        );      
     }
 
-    /**
-     * Get commit by id
-     */
-    getCommitById(hash: string): Observable<Commit> {
+    getCommit(hash: string): Observable<Commit> {
         return this._commits.pipe(
             take(1),
             map((commits) => {
 
-                // Find the commit
-                const commit = commits.find(item => item.hash === hash) || null;
+                if ( !commits ){
+                    return
+                }
 
-                // Update the commit
+                // Find the contact
+                const commit = commits.find(commit => commit.hash === hash) || null;
                 this._commit.next(commit);
-
-                // Return the commit
-                return commit;
+                return commit
             }),
             switchMap((commit) => {
 
-                if ( !commit )
-                {
-                    return throwError('Could not found commit with hash of ' + hash + '!');
+                if ( !commit ) {
+                    return this._firestore.collection('commits', ref => ref.where('hash', '==', hash)).get().pipe(map(snapshot => {
+                        const commit = snapshot.docs[0].data() as Commit
+                        this._commit.next(commit)
+                        return commit
+                    }))
                 }
 
                 return of(commit);
             })
-        );
+        )
+    }
+
+    searchCommits(query: string): Observable<Commit[]>{
+        return this._commitsCollection.pipe(
+            tap((repos) => {
+                const filteredRepos = repos.filter(repo => 
+                    repo.hash.includes(query?.toLowerCase())
+                    || repo.msg.includes(query?.toLowerCase())
+                    || repo.defects.includes(query?.toLowerCase())
+                ); 
+                this._commits.next(filteredRepos);
+            })
+        )
+    }
+
+    toggleCommitValidity(commit: Commit): Observable<boolean>{
+        commit.is_valid = !commit.is_valid
+        const commitDoc = this._firestore.doc(`commits/${commit.hash}`);
+        commitDoc.update(commit);
+        return of(true)
     }
 
     /**
@@ -168,45 +173,45 @@ export class AnnotatorService
      * @param id
      * @param commit
      */
-    updateCommit(hash: string, commit: Commit): Observable<Commit>
-    {
-        commit.is_valid = !commit.is_valid
+    // updateCommit(hash: string, commit: Commit): Observable<Commit>
+    // {
+    //     commit.is_valid = !commit.is_valid
 
-        return this.commits$.pipe(
-            take(1),
-            switchMap(commits => this._httpClient.patch<Commit>('api/apps/commits/commit', {
-                hash,
-                commit
-            }).pipe(
-                map((updatedCommit) => {
+    //     return this.commits$.pipe(
+    //         take(1),
+    //         switchMap(commits => this._httpClient.patch<Commit>('api/apps/commits/commit', {
+    //             hash,
+    //             commit
+    //         }).pipe(
+    //             map((updatedCommit) => {
 
-                    // Find the index of the updated commit
-                    const index = commits.findIndex(item => item.hash === hash);
+    //                 // Find the index of the updated commit
+    //                 const index = commits.findIndex(item => item.hash === hash);
 
-                    // Update the commit
-                    commits[index] = updatedCommit;
+    //                 // Update the commit
+    //                 commits[index] = updatedCommit;
 
-                    // Update the commits
-                    this._commits.next(commits);
+    //                 // Update the commits
+    //                 this._commits.next(commits);
 
-                    // Return the updated commit
-                    return updatedCommit;
-                }),
-                switchMap(updatedCommit => this.commit$.pipe(
-                    take(1),
-                    filter(item => item && item.hash === hash),
-                    tap(() => {
+    //                 // Return the updated commit
+    //                 return updatedCommit;
+    //             }),
+    //             switchMap(updatedCommit => this.commit$.pipe(
+    //                 take(1),
+    //                 filter(item => item && item.hash === hash),
+    //                 tap(() => {
 
-                        // Update the commit if it's selected
-                        this._commit.next(updatedCommit);
+    //                     // Update the commit if it's selected
+    //                     this._commit.next(updatedCommit);
 
-                        // Return the updated commit
-                        return updatedCommit;
-                    })
-                ))
-            ))
-        );
-    }
+    //                     // Return the updated commit
+    //                     return updatedCommit;
+    //                 })
+    //             ))
+    //         ))
+    //     );
+    // }
 
     // -----------------------------------------------------------------------------------------------------
     // @ Fixed Files

@@ -7,7 +7,7 @@ import { MatDrawerToggleResult } from '@angular/material/sidenav';
 import { Subject, takeUntil } from 'rxjs';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { AnnotatorComponent } from 'app/modules/admin/annotator/annotator.component';
-import { AnnotatorService } from 'app/modules/admin/annotator/annotator.service';
+import { CommitsService } from 'app/modules/admin/annotator/annotator.service';
 import { RepositoriesService } from 'app/modules/admin/repositories/repositories.service';
 
 import { Commit, FixedFile } from 'app/modules/admin/annotator/annotator.types';
@@ -44,7 +44,7 @@ export class AnnotatorDetailsComponent implements OnInit, OnDestroy
     constructor(
         private _activatedRoute: ActivatedRoute,
         private _annotatorComponent: AnnotatorComponent,
-        private _annotatorService: AnnotatorService,
+        private _commitsService: CommitsService,
         private _repositoriesService: RepositoriesService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _commitsComponent: AnnotatorComponent,
@@ -117,7 +117,7 @@ export class AnnotatorDetailsComponent implements OnInit, OnDestroy
         //     });
 
         // Get the commit
-        this._annotatorService.getCommit(this._activatedRoute.snapshot.params.hash)
+        this._commitsService.getCommit(this._activatedRoute.snapshot.params.hash)
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((commit: Commit) => {
 

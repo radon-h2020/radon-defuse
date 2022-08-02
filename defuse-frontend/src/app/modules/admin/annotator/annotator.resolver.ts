@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
 import { catchError, Observable, throwError } from 'rxjs';
-import { AnnotatorService } from 'app/modules/admin/annotator/annotator.service';
+import { CommitsService } from 'app/modules/admin/annotator/annotator.service';
 import { Commit, FixedFile, CommitsPagination } from 'app/modules/admin/annotator/annotator.types';
 
 @Injectable({
@@ -12,7 +12,7 @@ export class AnnotatorResolver implements Resolve<any>
     /**
      * Constructor
      */
-    constructor(private _annotatorService: AnnotatorService)
+    constructor(private _annotatorService: CommitsService)
     {
     }
 
@@ -42,7 +42,7 @@ export class CommitResolver implements Resolve<any>
      * Constructor
      */
     constructor(
-        private _annotatorService: AnnotatorService,
+        private _annotatorService: CommitsService,
         private _router: Router
     )
     {
@@ -88,7 +88,7 @@ export class FixedFilesResolver implements Resolve<any> {
     /**
      * Constructor
      */
-    constructor(private _annotatorService: AnnotatorService)
+    constructor(private _annotatorService: CommitsService)
     {
     }
 
@@ -116,7 +116,7 @@ export class TagsResolver implements Resolve<any>
     /**
      * Constructor
      */
-    constructor(private _annotatorService: AnnotatorService)
+    constructor(private _annotatorService: CommitsService)
     {
     }
 

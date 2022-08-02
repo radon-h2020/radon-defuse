@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, Input, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
-import { AnnotatorService } from '../annotator.service';
+import { CommitsService } from '../annotator.service';
 import { Commit, FixedFile } from '../annotator.types';
 
 @Component({
@@ -19,7 +19,7 @@ export class FixedFilesComponent{
     constructor(
         private _activatedRoute: ActivatedRoute,
         private _router: Router,
-        private _annotatorService: AnnotatorService,
+        private _annotatorService: CommitsService,
         private _changeDetectorRef: ChangeDetectorRef,
     ){ }
 

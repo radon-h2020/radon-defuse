@@ -8,7 +8,7 @@ import { repositories } from 'app/mock-api/apps/repositories/data';
 @Injectable({
     providedIn: 'root'
 })
-export class AnnotatorService
+export class CommitsService
 {
 
     // Private

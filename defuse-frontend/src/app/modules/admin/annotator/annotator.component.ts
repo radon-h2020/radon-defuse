@@ -15,7 +15,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { Observable, map, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { Commit, CommitsPagination } from 'app/modules/admin/annotator/annotator.types';
-import { AnnotatorService } from 'app/modules/admin/annotator/annotator.service'
+import { CommitsService } from 'app/modules/admin/annotator/annotator.service'
 import { StartMiningDialog } from './dialogs/start.component';
 import { Repository, RepositoryPagination } from '../repositories/repositories.types';
 import { RepositoriesService } from '../repositories/repositories.service';
@@ -55,7 +55,7 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
      */
     constructor(
         private _activatedRoute: ActivatedRoute,
-        private _annotatorService: AnnotatorService,
+        private _commitsService: CommitsService,
         private _repositoriesService: RepositoriesService,
         private _changeDetectorRef: ChangeDetectorRef,
         public _dialog: MatDialog,
@@ -78,7 +78,7 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
     }
 
     private getCommits(){
-        this._annotatorService.getCommitsPage(this.selectedRepository.id)
+        this._commitsService.getCommitsPage(this.selectedRepository.id)
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response) => {
                 this.commitsCount = response.pagination.length
@@ -91,10 +91,10 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
      */
     ngOnInit(): void{
         this.setRepositories()
-        this.commits$ = this._annotatorService.commits$;
+        this.commits$ = this._commitsService.commits$;
 
         // Get the pagination
-        this._annotatorService.pagination$
+        this._commitsService.pagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((pagination: CommitsPagination) => {
 
@@ -110,7 +110,7 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
             .pipe(
                 takeUntil(this._unsubscribeAll),
                 switchMap(query =>
-                    this._annotatorService.searchCommits(query)
+                    this._commitsService.searchCommits(query)
                 )
             ).subscribe();
 
@@ -128,7 +128,7 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
         });
 
         // Get the pagination
-        this._annotatorService.pagination$
+        this._commitsService.pagination$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((pagination: CommitsPagination) => {
 
@@ -149,7 +149,7 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
             // Get products if sort or page changes
             this._paginator.page.pipe(
                 switchMap(() => {
-                    return this._annotatorService.getCommitsPage(this.selectedRepository.id, this._paginator.pageIndex, this._paginator.pageSize);
+                    return this._commitsService.getCommitsPage(this.selectedRepository.id, this._paginator.pageIndex, this._paginator.pageSize);
                 })
             ).subscribe();
         }
@@ -183,12 +183,12 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
 
     onSelectRepository(repository){
         this.selectedRepository = repository
-        this._annotatorService.repositoryId = this.selectedRepository.id;
+        this._commitsService.repositoryId = this.selectedRepository.id;
         this.getCommits()
     }
 
     onToggleCommitValidity(commit: Commit): void {
-        this._annotatorService.toggleCommitValidity(commit)
+        this._commitsService.toggleCommitValidity(commit)
         this._changeDetectorRef.markForCheck();
     }
 
@@ -197,7 +197,7 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
 
         this.selectedRepository = repository
 
-        this._annotatorService.commits$
+        this._commitsService.commits$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((commits: Commit[]) => {
                 this.filteredCommits = commits.filter(commit => commit.repository_id == this.selectedRepository.id);

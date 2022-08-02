@@ -12,3 +12,12 @@ export interface Repository {
     iac_ratio?: number;
     size?: number;
 }
+
+export interface RepositoryPagination {
+    length: number;
+    size: number;
+    page: number;
+    lastPage: number;
+    startIndex: number;
+    endIndex: number;
+}

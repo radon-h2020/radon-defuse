@@ -88,11 +88,19 @@
                                 </ng-container>
                             </ng-container>
 
-                            <!-- No repositories -->
-                            <ng-template #noRepositories>
-                                <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">There are no repositories!</div>
-                            </ng-template>
+                            <mat-paginator class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+                                [length]="pagination.length"
+                                [pageIndex]="pagination.index"
+                                [pageSize]="pagination.size"
+                                [pageSizeOptions]="[2, 5, 10, 25, 100]"
+                                [showFirstLastButtons]="true"></mat-paginator>
+
                         </ng-container>
+
+                        <!-- No repositories -->
+                        <ng-template #noRepositories>
+                            <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">There are no repositories!</div>
+                        </ng-template>
                     </div>
                 </div>
 

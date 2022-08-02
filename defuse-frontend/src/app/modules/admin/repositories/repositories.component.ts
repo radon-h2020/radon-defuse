@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDrawer } from '@angular/material/sidenav';
 import { MatDialog } from '@angular/material/dialog'
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { Observable, Subject, switchMap, takeUntil } from 'rxjs';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
-import { Repository } from 'app/modules/admin/repositories/repositories.types';
+import { Repository, RepositoryPagination } from 'app/modules/admin/repositories/repositories.types';
 import { RepositoriesService } from 'app/modules/admin/repositories/repositories.service'
 import { AddRepositoryDialog } from './dialogs/add.component';
 
@@ -15,11 +16,14 @@ import { AddRepositoryDialog } from './dialogs/add.component';
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RepositoriesComponent implements OnInit, OnDestroy
+export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
 {
     @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
+    @ViewChild(MatPaginator) private _paginator: MatPaginator;
 
     drawerMode: 'over' // | 'side';
+
+    pagination: RepositoryPagination;
 
     repositories$: Observable<Repository[]>
     repositoriesCount: number = 0;
@@ -39,22 +43,36 @@ export class RepositoriesComponent implements OnInit, OnDestroy
         private _router: Router,
         private _fuseMediaWatcherService: FuseMediaWatcherService)
     {
+
     }
 
-    private getRepositories(){
-        this._repositoriesService.getRepositories()
+    private getRepositories(pageIndex: number = 0, pageSize: number=10){
+        this._repositoriesService.getRepositoriesPagination(pageIndex, pageSize)
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((repositories: Repository[]) => {
-                this.repositoriesCount = repositories.length
+            .subscribe((pagination: RepositoryPagination) => {
+                this.repositoriesCount = pagination.length
                 this._changeDetectorRef.markForCheck();
             });
     }
 
+    
     /**
      * On init
      */
     ngOnInit(): void{
 
+        // Get the pagination
+        this._repositoriesService.pagination$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagination: RepositoryPagination) => {
+
+                // Update the pagination
+                this.pagination = pagination;
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+        
         this.repositories$ = this._repositoriesService.repositories$
         
         // Subscribe to repositories changes
@@ -110,6 +128,24 @@ export class RepositoriesComponent implements OnInit, OnDestroy
         //     // Mark for check
         //     this._changeDetectorRef.markForCheck();
         // });
+    }
+
+    /**
+     * After view init
+     */
+    ngAfterViewInit(): void {
+        console.log('AfterViewInit')
+        console.log(this._paginator)
+        if ( this._paginator ) {
+
+            // Get products if sort or page changes
+            this._paginator.page.pipe(
+                switchMap(() => {
+                    console.log(this._paginator.pageIndex, this._paginator.pageSize)
+                    return this._repositoriesService.getRepositoriesPagination(this._paginator.pageIndex, this._paginator.pageSize);
+                })
+            ).subscribe();
+        }
     }
 
     /**

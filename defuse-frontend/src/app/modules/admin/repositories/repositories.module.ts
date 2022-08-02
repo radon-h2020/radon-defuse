@@ -7,6 +7,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FuseFindByKeyPipeModule } from '@fuse/pipes/find-by-key';
@@ -32,6 +33,7 @@ import { AddRepositoryDialog } from './dialogs/add.component';
         MatFormFieldModule,
         MatIconModule,
         MatInputModule,
+        MatPaginatorModule,
         MatSidenavModule,
         MatTooltipModule,
         FuseFindByKeyPipeModule,

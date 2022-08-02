@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { BehaviorSubject, map, Observable, of, switchMap, take, tap, throwError } from 'rxjs';
 
-import { Repository } from 'app/modules/admin/repositories/repositories.types';
+import { Repository, RepositoryPagination } from 'app/modules/admin/repositories/repositories.types';
 
 @Injectable({
     providedIn: 'root'
@@ -11,6 +11,8 @@ import { Repository } from 'app/modules/admin/repositories/repositories.types';
 export class RepositoriesService
 {
     private repositoriesCollection: Observable<Repository[]>;
+
+    private _pagination: BehaviorSubject<RepositoryPagination | null> = new BehaviorSubject({ length: 0, size: 10, page: 0, lastPage: 0, startIndex: 0, endIndex: 0 } as RepositoryPagination);
     private _repositories: BehaviorSubject<Repository[] | null> = new BehaviorSubject([]);
     private _repository: BehaviorSubject<Repository | null> = new BehaviorSubject(null);
 
@@ -45,6 +47,10 @@ export class RepositoriesService
     // -----------------------------------------------------------------------------------------------------
     // @ Accessors
     // -----------------------------------------------------------------------------------------------------
+    get pagination$(): Observable<RepositoryPagination> {
+        return this._pagination.asObservable();
+    }
+
     get repositories$(): Observable<Repository[]> {
         return this._repositories.asObservable();
     }
@@ -66,6 +72,34 @@ export class RepositoriesService
                 this._repositories.next(repos);
             })
         );
+    }
+
+    getRepositoriesPagination(pageIndex: number = 0, pageSize: number=10): Observable<RepositoryPagination> {
+        return this.repositoriesCollection.pipe(
+            map((repos) => {
+                // Calculate pagination details
+                const begin = pageIndex * pageSize;
+                const end = Math.min((pageSize * (pageIndex + 1)), repos.length);
+                const lastPage = Math.max(Math.ceil(repos.length / pageSize), 1);
+                
+                // Paginate the results by size
+                this._repositories.next(repos.slice(begin, end));
+    
+                const pagination = {
+                    length    : repos.length,
+                    size      : pageSize,
+                    page      : pageIndex,
+                    lastPage  : lastPage,
+                    startIndex: begin,
+                    endIndex  : end - 1
+                } as RepositoryPagination
+    
+    
+                this._pagination.next(pagination);
+    
+                return pagination
+            })
+        );      
     }
 
     /**

@@ -71,7 +71,7 @@
 
                             <!-- Tags panel -->
                             <ng-template #tagsPanel>
-                                <tags-panel [commit]="commit"></tags-panel>
+                                <tags-panel [commit]="commit" (onDefectsChanged)="onDefectsChanged($event)"></tags-panel>
                             </ng-template>
                         </div>
                     </div>

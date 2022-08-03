@@ -10,7 +10,7 @@ import { AnnotatorComponent } from 'app/modules/admin/annotator/annotator.compon
 import { CommitsService } from 'app/modules/admin/annotator/annotator.service';
 import { RepositoriesService } from 'app/modules/admin/repositories/repositories.service';
 
-import { Commit, FixedFile } from 'app/modules/admin/annotator/annotator.types';
+import { Commit, Defect, FixedFile } from 'app/modules/admin/annotator/annotator.types';
 import { Repository } from 'app/modules/admin/repositories/repositories.types';
 
 
@@ -94,10 +94,11 @@ export class AnnotatorDetailsComponent implements OnInit, OnDestroy
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
+    
+    onDefectsChanged(event: any){
+        this._changeDetectorRef.markForCheck();
+    }    
 
-    /**
-     * Close the drawer
-     */
     closeDrawer(): Promise<MatDrawerToggleResult> {
         return this._commitsComponent.matDrawer.close();
     }

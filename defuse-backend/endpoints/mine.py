@@ -17,7 +17,7 @@ class Mine(Resource):
 
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, required=True, location='args')
+        parser.add_argument('id', type=str, required=True, location='args')
         parser.add_argument('language', type=str, required=True, location='args')
 
         self.args = parser.parse_args()  # parse arguments to dictionary
@@ -60,7 +60,11 @@ class Mine(Resource):
             for commit in Repository(path_to_repo=path_to_local_repo).traverse_commits():
                 hash_msg[commit.hash] = commit.msg
 
+            defects_set = set()
+
             for commit_hash, defects in miner.get_fixing_commits().items():
+
+                defects_set = defects_set.union(defects)
 
                 commit_ref = self.db.collection('commits').document(commit_hash)
                 commit_doc = commit_ref.get()
@@ -78,10 +82,19 @@ class Mine(Resource):
                         'hash': commit_hash,
                         'msg': hash_msg.pop(commit_hash, ''),
                         'is_valid': True,
-                        'repository_id': int(self.args.get('id')),
-                        'defects': defects,
+                        'repository_id': self.args.get('id'),
+                        'defects': [d.lower() for d in defects],
+                        'url': f'{url}/commit/{commit_hash}',
                         'languages': [self.args.get('language').lower()]
                     })
+
+            existing_defects = [ doc.to_dict() for doc in self.db.collection('defects').stream() ]
+
+            for defect in defects_set:
+                if any([doc['title'].lower() == defect.lower() for doc in existing_defects]):
+                    continue
+                else:
+                    self.db.collection('defects').add({ 'title': defect.lower() })
 
             existing_files = [
                 doc.to_dict() for doc in self.db.collection('fixed-files')
@@ -100,7 +113,7 @@ class Mine(Resource):
                         'hash_bic': file.bic,
                         'filepath': file.filepath,
                         'is_valid': True,
-                        'repository_id': int(self.args.get('id')),
+                        'repository_id': self.args.get('id'),
                         'language': self.args.get('language').lower()
                     })
 

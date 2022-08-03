@@ -4,12 +4,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatDrawer } from '@angular/material/sidenav';
 import { MatDialog } from '@angular/material/dialog'
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subject, switchMap, takeUntil } from 'rxjs';
 import { Commit, CommitsPagination, Defect } from 'app/modules/admin/annotator/annotator.types';
 import { CommitsService, DefectsService } from 'app/modules/admin/annotator/annotator.service'
 import { StartMiningDialog } from './dialogs/start.component';
 import { Repository } from '../repositories/repositories.types';
 import { RepositoriesService } from '../repositories/repositories.service';
+import { TasksService } from '../tasks/tasks.service';
 
 @Component({
     selector     : 'annotator',
@@ -52,7 +54,9 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy {
         private _defectsService: DefectsService,
         public _dialog: MatDialog,
         private _repositoriesService: RepositoriesService,
-        private _router: Router)
+        private _router: Router,
+        private _snackBar: MatSnackBar,
+        private _tasksService: TasksService)
     {
     }
 
@@ -197,20 +201,26 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy {
         this._changeDetectorRef.markForCheck();
     }
 
-    /**
-     * Add repository
-     */
-    startMining(): void {
-
+    onMineRepository(): void {
         // Open dialog to add repository info
         let dialogRef = this._dialog.open(StartMiningDialog);
-        dialogRef.afterClosed().subscribe(result => {
-            if(result && result.url){
-                // do something
+        dialogRef.afterClosed().subscribe(selection => {
+            if(selection && selection.language){
+                this._tasksService.mine(this.selectedRepository.id, selection.language).subscribe(response => {
+
+                    let message = ''
+        
+                    if (response.status === 202) {
+                        message = 'Mining started.'
+                    } else {
+                        message = 'Some errors have occurred.'
+                    }
+        
+                    this._snackBar.open(message, 'Dismiss', { duration: 3000 });
+                })
             }
         })
     }
-
 
     /**
      * Track by function for ngFor loops

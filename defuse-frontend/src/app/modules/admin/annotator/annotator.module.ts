@@ -14,6 +14,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatRippleModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FuseFindByKeyPipeModule } from '@fuse/pipes/find-by-key';
 import { SharedModule } from 'app/shared/shared.module';
@@ -49,6 +50,7 @@ import { TagsPanelComponent } from 'app/modules/admin/annotator/tags/panel.compo
         MatRippleModule,
         MatSelectModule,
         MatSidenavModule,
+        MatSnackBarModule,
         MatTooltipModule,
         FuseFindByKeyPipeModule,
         SharedModule

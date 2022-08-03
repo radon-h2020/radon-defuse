@@ -259,7 +259,11 @@ export class FixedFilesService {
 
     set commit(hash:string) {
         this._filesCollection = this._firestore.collection('fixed-files', ref => ref.where('hash_fix', '==', hash)).snapshotChanges().pipe(map(changes => {
-            return changes.map(item => { return item.payload.doc.data() as FixedFile; })
+            return changes.map(item => { 
+                let file = item.payload.doc.data() as FixedFile;
+                file.id = item.payload.doc.id;
+                return file
+            })
         }))
     }
 

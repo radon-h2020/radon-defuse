@@ -9,7 +9,7 @@
                     class="w-full min-w-0 py-1 border-0"
                     type="text"
                     placeholder="Enter tag name"
-                    (input)="filterTags($event)"
+                    (input)="filterDefects($event)"
                     [maxLength]="30"
                     #newTagInput>
             </div>
@@ -17,7 +17,7 @@
         <button
             class="ml-1"
             mat-icon-button
-            (click)="toggleTagsEditMode()">
+            (click)="onToggleDefectsEditMode()">
             <mat-icon
                 *ngIf="!tagsEditMode"
                 class="icon-size-5"
@@ -30,55 +30,58 @@
     </div>
 
     <!-- Tags panel body -->
-    <div
-        class="flex flex-col max-h-64 py-2 border-t overflow-y-auto">
+    <div class="flex flex-col max-h-64 py-2 border-t overflow-y-auto">
         <!-- Tags -->
         <ng-container *ngIf="!tagsEditMode">
-            <ng-container *ngFor="let tag of filteredTags; trackBy: trackByFn">
-                <div
-                    class="flex items-center h-10 min-h-10 px-4 cursor-pointer hover:bg-hover"
-                    (click)="toggleCommitTag(tag)"
-                    matRipple>
-                    <mat-checkbox
-                        class="flex items-center h-10 min-h-10 pointer-events-none"
-                        [checked]="commit.defects.includes(tag)"
-                        [color]="'primary'"
-                        [disableRipple]="true">
-                    </mat-checkbox>
-                    <div class="ml-1">{{tag}}</div>
-                </div>
-            </ng-container>
+            <!-- <ng-container *ngIf="defects$ | async as defects"> -->
+                <ng-container *ngFor="let defect of defects; trackBy: trackByFn">
+                    <div
+                        class="flex items-center h-10 min-h-10 px-4 cursor-pointer hover:bg-hover"
+                        (click)="onToggleCommitTag(defect)"
+                        matRipple>
+                        <mat-checkbox
+                            class="flex items-center h-10 min-h-10 pointer-events-none"
+                            [checked]="commit.defects.includes(defect.title)"
+                            [color]="'primary'"
+                            [disableRipple]="true">
+                        </mat-checkbox>
+                        <div class="ml-1">{{defect.title}}</div>
+                    </div>
+                </ng-container>
+            <!-- </ng-container> -->
         </ng-container>
 
         <!-- Tags editing -->
         <ng-container *ngIf="tagsEditMode">
             <div class="py-2 space-y-2">
-                <ng-container *ngFor="let tag of filteredTags; trackBy: trackByFn">
-                    <div class="flex items-center">
-                        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full mx-4">
-                            <input
-                                matInput
-                                [value]="tag"
-                                (input)="updateTag(tag, $event)">
-                            <button
-                                mat-icon-button
-                                (click)="deleteTag(tag)"
-                                matSuffix>
-                                <mat-icon
-                                    class="icon-size-5 ml-2"
-                                    [svgIcon]="'heroicons_solid:trash'"></mat-icon>
-                            </button>
-                        </mat-form-field>
-                    </div>
-                </ng-container>
+                <!-- <ng-container *ngIf="defects$ | async as defects"> -->
+                    <ng-container *ngFor="let defect of defects; trackBy: trackByFn">
+                        <div class="flex items-center">
+                            <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full mx-4">
+                                <input
+                                    matInput
+                                    [value]="defect.title"
+                                    (input)="updateDefect(defect, $event)">
+                                <button
+                                    mat-icon-button
+                                    (click)="deleteDefect(defect)"
+                                    matSuffix>
+                                    <mat-icon
+                                        class="icon-size-5 ml-2"
+                                        [svgIcon]="'heroicons_solid:trash'"></mat-icon>
+                                </button>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+                <!-- </ng-container> -->
             </div>
         </ng-container>
 
         <!-- Create tag -->
         <div
             class="flex items-center h-10 min-h-10 -ml-0.5 pl-4 pr-3 leading-none cursor-pointer hover:bg-hover"
-            *ngIf="shouldShowCreateTagButton(newTagInput.value)"
-            (click)="createTag(newTagInput.value); newTagInput.value = ''"
+            (click)="createDefect(newTagInput.value); newTagInput.value = ''"
+            *ngIf="shouldShowCreateDefectButton(newTagInput.value)" 
             matRipple>
             <mat-icon
                 class="mr-2 icon-size-5"

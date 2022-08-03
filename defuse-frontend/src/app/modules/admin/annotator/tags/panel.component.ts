@@ -1,8 +1,8 @@
 import { ChangeDetectorRef, Component, Input, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { debounceTime, Subject, takeUntil } from 'rxjs';
-import { CommitsService } from '../annotator.service';
-import { Commit } from '../annotator.types';
+import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
+import { CommitsService, DefectsService } from '../annotator.service';
+import { Commit, Defect } from '../annotator.types';
 
 @Component({
   selector: 'tags-panel',
@@ -13,18 +13,19 @@ export class TagsPanelComponent{
 
     @Input() commit: Commit
         
-    tags: string[];
-    filteredTags: string[];
+    // defects$: Observable<Defect[]>
+    defects: Defect[]
+
     tagsEditMode: boolean = false
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     constructor(
-        private _activatedRoute: ActivatedRoute,
-        private _router: Router,
-        private _annotatorService: CommitsService,
+        private _commitsService: CommitsService,
+        private _defectsService: DefectsService,
         private _changeDetectorRef: ChangeDetectorRef,
-    ){ }
+    ){ 
+    }
 
     // -----------------------------------------------------------------------------------------------------
     // @ Lifecycle hooks
@@ -33,15 +34,16 @@ export class TagsPanelComponent{
     /**
      * On init
      */
-    ngOnInit(): void
-    {
-        // Get the tags
-        this._annotatorService.defects$
+    ngOnInit(): void {
+        // Initialize repositoryId for the commits service
+        this._commitsService.repositoryId = this.commit.repository_id
+        
+        // Bind defects$ to the service's observable and get them
+        // this.defects$ = this._defectsService.defects$
+        this._defectsService.getDefects()
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((defects: string[]) => {
-                this.tags = defects;
-                this.filteredTags = defects;
-
+            .subscribe((defects) => {
+                this.defects = defects
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -50,8 +52,7 @@ export class TagsPanelComponent{
      /**
       * On destroy
       */
-    ngOnDestroy(): void
-    {
+    ngOnDestroy(): void {
     // Unsubscribe from all subscriptions
     this._unsubscribeAll.next(null);
     this._unsubscribeAll.complete();
@@ -60,79 +61,71 @@ export class TagsPanelComponent{
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
+    addDefectToCommit(defect: Defect): void {
+        this._commitsService.addDefectToCommit(this.commit, defect);
+        this._changeDetectorRef.markForCheck();
+    }
 
-    filterTags(event): void {
+    createDefect(title: string): void {
+        // Create tag on the server
+        this._defectsService.createDefect(title)
+            .subscribe((defect) => {
+                // Add the tag to the contact
+                this.addDefectToCommit(defect);
+            });
+    }
+
+    deleteDefect(defect: Defect): void {
+        // Delete the tag from the server
+        this._defectsService.deleteDefect(defect)
+        this.removeDefectFromCommit(defect);
+
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
+    }
+
+    filterDefects(event): void {
         // Get the value
         const value = event.target.value.toLowerCase();
-
-        // Filter the tags
-        this.filteredTags = this.tags.filter(tag => tag.toLowerCase().includes(value));
+        this._defectsService.searchDefects(event.target.value.toLowerCase())
     }
 
-    addTagToCommit(tag: string): void {
-        // Add the tag
-        this.commit.defects.unshift(tag);
-
-        // Mark for check
-        this._changeDetectorRef.markForCheck();
-    }
- 
-    removeTagFromCommit(tag: string): void {
-        // Remove the tag
-        this.commit.defects.splice(this.commit.defects.findIndex(item => item === tag), 1);
-
-        // Mark for check
-        this._changeDetectorRef.markForCheck();
-    }
-
-    shouldShowCreateTagButton(inputValue: string): boolean {
-        return !(inputValue === '' || this.tags.findIndex(tag => tag.toLowerCase() === inputValue.toLowerCase()) > -1);
-    }
-
-    toggleCommitTag(tag: string): void {
-        if ( this.commit.defects.includes(tag) ){
-            this.removeTagFromCommit(tag);
+    onToggleCommitTag(defect: Defect): void {
+        if ( this.commit.defects.includes(defect.title) ){
+            this.removeDefectFromCommit(defect);
         } else {
-            this.addTagToCommit(tag);
+            this.addDefectToCommit(defect);
         }
     }
 
-    toggleTagsEditMode(): void {
+    onToggleDefectsEditMode(): void {
         this.tagsEditMode = !this.tagsEditMode;
     }
 
-    createTag(tag: string): void {
-        // Create tag on the server
-        this._annotatorService.createTag(tag)
-            .subscribe((response) => {
-
-                // Add the tag to the contact
-                this.addTagToCommit(response);
-            });
-    }
- 
-    deleteTag(tag: string): void {
-        // Delete the tag from the server
-        this._annotatorService.deleteTag(tag).subscribe();
+    removeDefectFromCommit(defect: Defect): void {
+        // Remove the tag
+        this._commitsService.removeDefectFromCommit(this.commit, defect);
 
         // Mark for check
         this._changeDetectorRef.markForCheck();
     }
 
-    updateTag(tag: string, event): void {
+    shouldShowCreateDefectButton(inputValue: string): boolean {
+        return !(inputValue === '' || this.defects.findIndex(defect => defect.title.toLowerCase() === inputValue.toLowerCase()) > -1);
+    }
+
+    updateDefect(defect: Defect, event): void {
         // Update the title on the tag
-        let updatedTag = event.target.value;
+        let newTitle = event.target.value;
 
         // Update the tag on the server
-        this._annotatorService.updateTag(tag, updatedTag)
-            .pipe(debounceTime(300))
-            .subscribe();
+        this._defectsService.updateDefect(defect, newTitle)
 
         // Mark for check
         this._changeDetectorRef.markForCheck();
     }
 
     trackByFn(index: number, item: any): any {
-        return item || index;
+        return item.id || index;
     }
 }

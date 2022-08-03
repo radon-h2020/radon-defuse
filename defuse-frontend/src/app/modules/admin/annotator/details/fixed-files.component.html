@@ -29,7 +29,7 @@
                         <div class="font-medium leading-5 truncate"> {{ file.filepath }} </div>
                     </div>
     
-                    <a class="cursor-pointer" href="https://github.com" target="_blank">
+                    <a class="cursor-pointer" [href]="commit.url.substring(0, commit.url.length - 40) + file.hash_bic" target="_blank">
                         <div class="flex items-center justify-center py-1 px-3 mr-3 rounded-full leading-normal text-red-500 bg-red-100 dark:text-red-300 dark:bg-red-700">
                             <span class="text-sm font-medium whitespace-nowrap"> {{ file.hash_bic.substring(0,7) }} </span>
                         </div>

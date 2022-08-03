@@ -126,6 +126,14 @@ export class CommitsService {
         )
     }
 
+    searchCommitsByDefect(defect: string): Observable<Commit[]> {
+        return this._commitsCollection.pipe(
+            tap((commits) => {
+                this._commits.next(commits.filter(commit => commit.defects.includes(defect.toLowerCase())));
+            })
+        )
+    }
+
     toggleCommitValidity(commit: Commit): Observable<boolean> {
         commit.is_valid = !commit.is_valid
         const commitDoc = this._firestore.doc(`commits/${commit.hash}`);

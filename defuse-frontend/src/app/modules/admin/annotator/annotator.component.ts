@@ -5,8 +5,8 @@ import { MatDrawer } from '@angular/material/sidenav';
 import { MatDialog } from '@angular/material/dialog'
 import { MatPaginator } from '@angular/material/paginator';
 import { Observable, Subject, switchMap, takeUntil } from 'rxjs';
-import { Commit, CommitsPagination } from 'app/modules/admin/annotator/annotator.types';
-import { CommitsService } from 'app/modules/admin/annotator/annotator.service'
+import { Commit, CommitsPagination, Defect } from 'app/modules/admin/annotator/annotator.types';
+import { CommitsService, DefectsService } from 'app/modules/admin/annotator/annotator.service'
 import { StartMiningDialog } from './dialogs/start.component';
 import { Repository } from '../repositories/repositories.types';
 import { RepositoriesService } from '../repositories/repositories.service';
@@ -24,6 +24,8 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy {
     drawerMode: 'side' | 'over';
     commits$: Observable<Commit[]>;
     commitsCount: number = 0;
+
+    defects$: Observable<Defect[]>
 
     filteredCommits: Commit[];
     filteredCommitsCount: number = 0;
@@ -47,6 +49,7 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy {
         private _activatedRoute: ActivatedRoute,
         private _changeDetectorRef: ChangeDetectorRef,
         private _commitsService: CommitsService,
+        private _defectsService: DefectsService,
         public _dialog: MatDialog,
         private _repositoriesService: RepositoriesService,
         private _router: Router)
@@ -80,6 +83,12 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy {
 
         // Bind commits$ to the service's observable
         this.commits$ = this._commitsService.commits$;
+
+        // Bind defects$ to DefectsService's observable and retrieve them
+        this.defects$ = this._defectsService.defects$;
+        this._defectsService.getDefects()
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(() => this._changeDetectorRef.markForCheck())
 
         // Get the pagination
         this._commitsService.pagination$
@@ -167,6 +176,16 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy {
         this._changeDetectorRef.markForCheck();
     }
 
+    onFilterByDefect(choice) {
+        if ( choice.value == 'all'){
+            this.getCommits()
+        } else {
+            this._commitsService.searchCommitsByDefect(choice.value)
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(() => this._changeDetectorRef.markForCheck())    
+        }
+    }
+
     onSelectRepository(repository) {
         this.selectedRepository = repository
         this._commitsService.repositoryId = this.selectedRepository.id;
@@ -205,5 +224,9 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy {
 
     trackRepositoriesByFn(index: number, item: any): any {
         return item.id || index;
+    }
+
+    trackByDefect(index: number, item: any): any {
+        return item || index;
     }
 }

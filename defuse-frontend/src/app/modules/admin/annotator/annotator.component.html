@@ -68,8 +68,23 @@
                     </div>
                     <!-- Actions -->
                     <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+
+                        <!-- Defects filter button -->
+                        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full sm:w-36">
+                            <mat-select
+                                [value]="'all'"
+                                (selectionChange)="onFilterByDefect($event)">
+                                <mat-option [value]="'all'">All</mat-option>
+                                <ng-container *ngIf="defects$ | async as defects">
+                                    <ng-container *ngFor="let defect of defects; trackBy: trackByDefect">
+                                        <mat-option [value]="defect.title">{{ defect.title }}</mat-option>
+                                    </ng-container>
+                                </ng-container>
+                            </mat-select>
+                        </mat-form-field>
+
                         <!-- Search -->
-                        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-rounded min-w-64">
+                        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-64 ml-4">
                             <mat-icon
                                 class="icon-size-5"
                                 matPrefix
@@ -80,6 +95,7 @@
                                 [autocomplete]="'off'"
                                 [placeholder]="'Search repositories'">
                         </mat-form-field>
+
                         <!-- Add product button -->
                         <button
                             class="ml-4"

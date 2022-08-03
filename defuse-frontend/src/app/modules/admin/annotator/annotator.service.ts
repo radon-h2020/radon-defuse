@@ -117,9 +117,7 @@ export class CommitsService {
         return this._commitsCollection.pipe(
             tap((commits) => {
                 const filteredCommits = commits.filter(commit => 
-                    commit.hash.includes(query?.toLowerCase())
-                    || commit.msg.includes(query?.toLowerCase())
-                    || commit.defects.includes(query?.toLowerCase())
+                    commit.hash.includes(query?.toLowerCase()) || commit.msg.includes(query?.toLowerCase())
                 ); 
                 this._commits.next(filteredCommits);
             })

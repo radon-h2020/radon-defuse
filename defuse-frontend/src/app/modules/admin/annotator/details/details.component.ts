@@ -65,14 +65,8 @@ export class AnnotatorDetailsComponent implements OnInit, OnDestroy {
         this._commitsService.getCommit(this._activatedRoute.snapshot.params.hash)
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((commit: Commit) => {
-
-                // Open the drawer in case it is closed
                 this._annotatorComponent.matDrawer.open();
-
-                // Get the repository
                 this.commit = commit;
-
-                // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
     }

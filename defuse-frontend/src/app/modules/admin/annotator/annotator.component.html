@@ -150,7 +150,7 @@
                                                     <div class="font-medium text-secondary leading-5 truncate">{{commit.hash}}</div>
                                                     
                                                     <ng-container *ngIf="commit.msg">
-                                                        <div class="leading-5 truncate mt-1">{{commit.msg}}</div>
+                                                        <div class="leading-5 truncate mt-1">{{commit.msg | titlecase}}</div>
                                                     </ng-container>
 
                                                     <!-- Tags -->  

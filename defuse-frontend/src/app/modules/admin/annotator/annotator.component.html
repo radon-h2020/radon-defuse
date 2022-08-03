@@ -120,7 +120,7 @@
                                     <div class="group w-full select-none hover:bg-gray-100 dark:hover:bg-hover" 
                                     [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectedCommit || selectedCommit.hash !== commit.hash,
                                                 'bg-primary-50 dark:bg-hover': selectedCommit && selectedCommit.hash === commit.hash,
-                                                'bg-warn-50 dark:bg-warn-50': !commit.is_valid}">
+                                                'bg-warn-50 dark:bg-transparent': !commit.is_valid}">
 
                                         <!-- Commit content -->
                                         <div class="relative flex items-center h-full pl-10">

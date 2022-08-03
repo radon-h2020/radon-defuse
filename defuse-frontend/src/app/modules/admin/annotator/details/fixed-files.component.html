@@ -3,7 +3,7 @@
         <ng-container *ngFor="let file of fixedFiles; trackBy: trackByFn">
             
             <div class="group w-full select-none" 
-                [ngClass]="{'bg-warn-50 dark:bg-warn-50': !file.is_valid}">
+                [ngClass]="{'bg-warn-50 dark:bg-transparent': !file.is_valid}">
     
                 <!-- File content -->
                 <div class="relative flex items-center h-full pl-5 pt-1 pb-1">

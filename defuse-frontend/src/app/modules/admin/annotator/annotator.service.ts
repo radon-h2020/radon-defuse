@@ -60,12 +60,11 @@ export class CommitsService
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
 
-    getCommitsPage(repositoryId: string, pageIndex: number = 0, pageSize: number=10): Observable<any> {
+    getCommitsPage(pageIndex: number = 0, pageSize: number=10): Observable<any> {
         return this._commitsCollection.pipe(
             map((commits) => {
                
-                commits = commits.filter(commit => commit.repository_id == repositoryId)
-                                 .sort((a, b) => a.hash.localeCompare(b.hash))
+                commits = commits.sort((a, b) => a.hash.localeCompare(b.hash))
 
                 const length = commits.length
 

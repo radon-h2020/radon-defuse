@@ -65,7 +65,7 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
     }
 
     private getCommits() {
-        this._commitsService.getCommitsPage(this.selectedRepository.id)
+        this._commitsService.getCommitsPage()
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response) => {
                 this.commitsCount = response.pagination.length
@@ -147,7 +147,7 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
             // Get products if sort or page changes
             this._paginator.page.pipe(
                 switchMap(() => {
-                    return this._commitsService.getCommitsPage(this.selectedRepository.id, this._paginator.pageIndex, this._paginator.pageSize);
+                    return this._commitsService.getCommitsPage(this._paginator.pageIndex, this._paginator.pageSize);
                 })
             ).subscribe();
         }

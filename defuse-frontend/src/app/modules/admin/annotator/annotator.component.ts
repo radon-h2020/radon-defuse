@@ -123,18 +123,6 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy {
                 this._changeDetectorRef.markForCheck();
             }
         });
-
-        // Get the pagination
-        this._commitsService.pagination$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((pagination: CommitsPagination) => {
-
-                // Update the pagination
-                this.pagination = pagination;
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
     }
 
     /**

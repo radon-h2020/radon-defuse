@@ -12,15 +12,15 @@ export interface MiningData{
 })
 export class StartMiningDialog implements OnInit {
 
-  data: MiningData
-  constructor() {
-    this.data = {
-        url: undefined,
-        token: undefined
-    }
-  }
+  languages = [
+    {value: 'ansible', viewValue: 'Ansible'},
+    {value: 'tosca', viewValue: 'Tosca'}
+  ]
+
+  selectedLanguage: string;
 
   ngOnInit(): void {
+      this.selectedLanguage = null // this.languages[0].value;
   }
 
 }

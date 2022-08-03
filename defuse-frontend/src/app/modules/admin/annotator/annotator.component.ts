@@ -131,7 +131,7 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy {
     ngAfterViewInit(): void {
         if ( this._paginator ) {
 
-            // Get products if sort or page changes
+            // Get commits if page changes
             this._paginator.page.pipe(
                 switchMap(() => {
                     return this._commitsService.getCommitsPage(this._paginator.pageIndex, this._paginator.pageSize);

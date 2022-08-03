@@ -147,10 +147,10 @@
                                             [routerLink]="['./', commit.hash]">
                                                 
                                                 <div class="min-w-0 ml-4">
-                                                    <div class="font-medium leading-5 truncate">{{commit.hash}}</div>
+                                                    <div class="font-medium text-secondary leading-5 truncate">{{commit.hash}}</div>
                                                     
                                                     <ng-container *ngIf="commit.msg">
-                                                        <div class="leading-5 truncate text-secondary mt-1">{{commit.msg}}</div>
+                                                        <div class="leading-5 truncate mt-1">{{commit.msg}}</div>
                                                     </ng-container>
 
                                                     <!-- Tags -->  

@@ -29,9 +29,6 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy {
 
     defects$: Observable<Defect[]>
 
-    filteredCommits: Commit[];
-    filteredCommitsCount: number = 0;
-
     pagination: CommitsPagination
     
     repositories$: Observable<Repository[]>;   

@@ -3,9 +3,8 @@ import { UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDrawer } from '@angular/material/sidenav';
 import { MatDialog } from '@angular/material/dialog'
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { MatPaginator } from '@angular/material/paginator';
 import { Observable, Subject, switchMap, takeUntil } from 'rxjs';
-import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { Repository, RepositoryPagination } from 'app/modules/admin/repositories/repositories.types';
 import { RepositoriesService } from 'app/modules/admin/repositories/repositories.service'
 import { AddRepositoryDialog } from './dialogs/add.component';
@@ -38,8 +37,7 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
         private _changeDetectorRef: ChangeDetectorRef,
         public _dialog: MatDialog,
         private _repositoriesService: RepositoriesService,
-        private _router: Router,
-        private _fuseMediaWatcherService: FuseMediaWatcherService)
+        private _router: Router)
     {
 
     }

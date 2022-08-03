@@ -1,7 +1,6 @@
 import { ChangeDetectorRef, Component, Input, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
-import { CommitsService, FixedFilesService } from '../annotator.service';
+import { Observable, Subject, takeUntil } from 'rxjs';
+import { FixedFilesService } from '../annotator.service';
 import { Commit, FixedFile } from '../annotator.types';
 
 @Component({
@@ -17,8 +16,6 @@ export class FixedFilesComponent{
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     constructor(
-        private _activatedRoute: ActivatedRoute,
-        private _router: Router,
         private _fixedFilesService: FixedFilesService,
         private _changeDetectorRef: ChangeDetectorRef,
     ){ }
@@ -42,15 +39,6 @@ export class FixedFilesComponent{
                                 //    this.commitsCount = response.pagination.length
                                    this._changeDetectorRef.markForCheck();
                                });
-
-        // this._fixedFilesService.fixedFiles$
-        //     .pipe(takeUntil(this._unsubscribeAll))
-        //     .subscribe((fixedFiles: FixedFile[]) => {
-        //         // this.fixedFiles = fixedFiles;
-
-        //         // Mark for check
-        //         this._changeDetectorRef.markForCheck();
-        //     });
     }
 
     onToggleFileValidity(file: FixedFile): void {

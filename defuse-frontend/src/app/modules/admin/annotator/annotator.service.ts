@@ -225,13 +225,6 @@ export class DefectsService {
         )
     }
 
-    updateDefect(defect: Defect, newTitle: string): void {
-        defect.title = newTitle
-
-        console.log(defect)
-        this._firestore.doc(`defects/${defect.id}`).update(defect);
-    }
-
     deleteDefect(defect: Defect): void {
         this._firestore.doc(`defects/${defect.id}`).delete();
     }

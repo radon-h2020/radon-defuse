@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { CommitsService, DefectsService } from '../annotator.service';
@@ -12,8 +12,8 @@ import { Commit, Defect } from '../annotator.types';
 export class TagsPanelComponent{
 
     @Input() commit: Commit
-        
-    // defects$: Observable<Defect[]>
+    @Output() onDefectsChanged = new EventEmitter<any>();
+
     defects: Defect[]
 
     tagsEditMode: boolean = false
@@ -64,6 +64,20 @@ export class TagsPanelComponent{
     addDefectToCommit(defect: Defect): void {
         this._commitsService.addDefectToCommit(this.commit, defect);
         this._changeDetectorRef.markForCheck();
+
+        // Notify parent component
+        this.onDefectsChanged.emit()
+    }
+
+    removeDefectFromCommit(defect: Defect): void {
+        // Remove the tag
+        this._commitsService.removeDefectFromCommit(this.commit, defect);
+
+        // Mark for check
+        this._changeDetectorRef.markForCheck();
+
+        // Notify parent component
+        this.onDefectsChanged.emit()
     }
 
     createDefect(title: string): void {
@@ -85,8 +99,6 @@ export class TagsPanelComponent{
     }
 
     filterDefects(event): void {
-        // Get the value
-        const value = event.target.value.toLowerCase();
         this._defectsService.searchDefects(event.target.value.toLowerCase())
     }
 
@@ -102,27 +114,8 @@ export class TagsPanelComponent{
         this.tagsEditMode = !this.tagsEditMode;
     }
 
-    removeDefectFromCommit(defect: Defect): void {
-        // Remove the tag
-        this._commitsService.removeDefectFromCommit(this.commit, defect);
-
-        // Mark for check
-        this._changeDetectorRef.markForCheck();
-    }
-
     shouldShowCreateDefectButton(inputValue: string): boolean {
         return !(inputValue === '' || this.defects.findIndex(defect => defect.title.toLowerCase() === inputValue.toLowerCase()) > -1);
-    }
-
-    updateDefect(defect: Defect, event): void {
-        // Update the title on the tag
-        let newTitle = event.target.value;
-
-        // Update the tag on the server
-        this._defectsService.updateDefect(defect, newTitle)
-
-        // Mark for check
-        this._changeDetectorRef.markForCheck();
     }
 
     trackByFn(index: number, item: any): any {

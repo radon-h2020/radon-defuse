@@ -60,8 +60,8 @@
                             <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full mx-4">
                                 <input
                                     matInput
-                                    [value]="defect.title"
-                                    (input)="updateDefect(defect, $event)">
+                                    disabled="true"
+                                    [value]="defect.title">
                                 <button
                                     mat-icon-button
                                     (click)="deleteDefect(defect)"

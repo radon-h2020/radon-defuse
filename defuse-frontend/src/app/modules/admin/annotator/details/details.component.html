@@ -80,7 +80,7 @@
                     <ng-container *ngIf="commit.msg">
                         <div class="flex mt-4">
                             <mat-icon [svgIcon]="'heroicons_outline:menu-alt-2'"></mat-icon>
-                            <div class="max-w-none ml-4 prose prose-sm" [innerHTML]="commit.msg"></div>
+                            <div class="max-w-none ml-4 prose prose-sm" [innerText]="commit.msg?.length > 200 ? commit.msg?.substring(0, 200) : commit.msg "></div>
                         </div>
                     </ng-container>
 

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { BehaviorSubject, filter, map, Observable, of, switchMap, take, tap, throwError } from 'rxjs';
-import { Commit, FixedFile, CommitsPagination } from 'app/modules/admin/annotator/annotator.types';
+import { Commit, FixedFile, CommitsPagination, Defect } from 'app/modules/admin/annotator/annotator.types';
 import { repositories } from 'app/mock-api/apps/repositories/data';
 
 @Injectable({
@@ -142,124 +142,99 @@ export class CommitsService {
         return of(true)
     }
 
+    addDefectToCommit(commit: Commit, defect: Defect): Observable<boolean> {
+        if (!commit.defects.includes(defect.title)){
+            commit.defects.unshift(defect.title);
+            this._firestore.doc(`commits/${commit.hash}`).update(commit);
+            return of(true)
+        } 
+
+        return of(true)
+    }
+
+    removeDefectFromCommit(commit: Commit, defect: Defect): Observable<boolean> {
+        if (commit.defects.includes(defect.title)){
+            commit.defects.splice(commit.defects.findIndex(item => item === defect.title), 1);
+            this._firestore.doc(`commits/${commit.hash}`).update(commit);
+        } 
+
+        return of(true)
+    }
+
+}
+
+
+@Injectable({
+    providedIn: 'root'
+})
+export class DefectsService {
+
+    // Private
+    private _defectsCollection: Observable<Defect[]>;
     
-   
+    private _defect: BehaviorSubject<Defect | null> = new BehaviorSubject(null);
+    private _defects: BehaviorSubject<Defect[] | null> = new BehaviorSubject(null);
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Tags
-    // -----------------------------------------------------------------------------------------------------
 
     /**
-     * Get tags
+     * Constructor
      */
-    getTags(): Observable<string[]> {
-        return this._httpClient.get<string[]>('api/apps/commits/tags').pipe(
-            tap((tags) => {
-                this._tags.next(tags);
+    constructor(private _firestore: AngularFirestore) {
+        this._defectsCollection = this._firestore.collection('defects').snapshotChanges().pipe(map(changes => {
+            return changes.map(item => { 
+                let defect = item.payload.doc.data() as Defect;
+                defect.id = item.payload.doc.id;
+                return defect 
             })
-        );
+        }))
+    }
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Accessors
+    // -----------------------------------------------------------------------------------------------------
+    get defect$(): Observable<Defect> {
+        return this._defect.asObservable();
+    }
+
+    get defects$(): Observable<Defect[]> {
+        return this._defects.asObservable();
+    }
+
+    getDefects(): Observable<Defect[]> {
+        return this._defectsCollection.pipe(
+            map((defects) => {
+                defects = defects.sort((a, b) => a.title.toLowerCase().localeCompare(b.title.toLowerCase()))
+                this._defects.next(defects);
+                return defects
+            })
+        );    
     }
   
-    /**
-     * Create tag
-     *
-     * @param tag
-     */
-    createTag(tag: string): Observable<string> {
-        return this.defects$.pipe(
-            take(1),
-            switchMap(tags => this._httpClient.post<string>('api/apps/commits/tag', {tag}).pipe(
-                map((newTag) => {
-                    
-                    // Update the tags with the new tag
-                    this._tags.next([...tags, newTag]);
-
-                    // Return new tag from observable
-                    return newTag;
-                })
-            ))
-        );
+    createDefect(title: string): Observable<Defect> {
+        let newDefect = { title: title } as Defect 
+        this._firestore.collection('defects').add(newDefect)
+        return of(newDefect)
     }
-  
-    /**
-     * Update the tag
-     *
-     * @param id
-     * @param tag
-     */
-    updateTag(oldTag: string, newTag: string): Observable<string> {
-        return this.defects$.pipe(
-            take(1),
-            switchMap(tags => this._httpClient.patch<string>('api/apps/commits/tag', {
-                oldTag,
-                newTag
-            }).pipe(
-                map((updatedTag) => {
 
-                    // Find the index of the updated tag
-                    const index = tags.findIndex(item => item === oldTag);
-
-                    // Update the tag
-                    tags[index] = updatedTag;
-
-                    // Update the tags
-                    this._tags.next(tags);
-
-                    // Return the updated tag
-                    return updatedTag;
-                })
-            ))
-        );
+    searchDefects(query: string): Observable<Defect[]> {
+        return this._defectsCollection.pipe(
+            tap((defects) => {
+                const filteredDefects = defects.filter(defect => defect.title.toLowerCase().includes(query?.toLowerCase())); 
+                this._defects.next(filteredDefects);
+            })
+        )
     }
-  
-    /**
-     * Delete the tag
-     *
-     * @param id
-     */
-    deleteTag(tag: string): Observable<boolean> {
-        return this.defects$.pipe(
-            take(1),
-            switchMap(tags => this._httpClient.delete('api/apps/commits/tag', {params: {tag}}).pipe(
-                map((isDeleted: boolean) => {
 
-                    // Find the index of the deleted tag
-                    const index = tags.findIndex(item => item === tag);
+    updateDefect(defect: Defect, newTitle: string): void {
+        defect.title = newTitle
 
-                    // Delete the tag
-                    tags.splice(index, 1);
-
-                    // Update the tags
-                    this._tags.next(tags);
-
-                    // Return the deleted status
-                    return isDeleted;
-                }),
-                filter(isDeleted => isDeleted),
-                switchMap(isDeleted => this.commits$.pipe(
-                    take(1),
-                    map((commits) => {
-
-                        // Iterate through the commits
-                        commits.forEach((commit) => {
-
-                            const tagIndex = commit.defects.findIndex(item => item === tag);
-
-                            // If the commits has the tag, remove it
-                            if ( tagIndex > -1 )
-                            {
-                                commit.defects.splice(tagIndex, 1);
-                            }
-                        });
-
-                        // Return the deleted status
-                        return isDeleted;
-                    })
-                ))
-            ))
-        );
+        console.log(defect)
+        this._firestore.doc(`defects/${defect.id}`).update(defect);
     }
-  
+
+    deleteDefect(defect: Defect): void {
+        this._firestore.doc(`defects/${defect.id}`).delete();
+    }
 }
 
 

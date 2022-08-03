@@ -7,6 +7,11 @@ export interface Commit {
     repository_id: string;
 }
 
+export interface Defect {
+    id: string;
+    title: string;
+}
+
 export interface FixedFile {
     id: string; // Firebase id
     filepath: string,

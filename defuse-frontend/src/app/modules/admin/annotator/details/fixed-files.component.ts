@@ -35,8 +35,7 @@ export class FixedFilesComponent{
         this.fixedFiles$ = this._fixedFilesService.fixedFiles$
         this._fixedFilesService.getFixedFiles()
                                .pipe(takeUntil(this._unsubscribeAll))
-                               .subscribe((response) => {
-                                //    this.commitsCount = response.pagination.length
+                               .subscribe(() => {
                                    this._changeDetectorRef.markForCheck();
                                });
     }

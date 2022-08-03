@@ -5,12 +5,10 @@ import { TemplatePortal } from '@angular/cdk/portal';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { MatDrawerToggleResult } from '@angular/material/sidenav';
 import { Subject, takeUntil } from 'rxjs';
-import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { AnnotatorComponent } from 'app/modules/admin/annotator/annotator.component';
 import { CommitsService } from 'app/modules/admin/annotator/annotator.service';
-import { RepositoriesService } from 'app/modules/admin/repositories/repositories.service';
 
-import { Commit, Defect, FixedFile } from 'app/modules/admin/annotator/annotator.types';
+import { Commit, FixedFile } from 'app/modules/admin/annotator/annotator.types';
 import { Repository } from 'app/modules/admin/repositories/repositories.types';
 
 
@@ -20,12 +18,10 @@ import { Repository } from 'app/modules/admin/repositories/repositories.types';
     encapsulation  : ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AnnotatorDetailsComponent implements OnInit, OnDestroy
-{   
+export class AnnotatorDetailsComponent implements OnInit, OnDestroy {   
     @ViewChild('tagsPanel') private _tagsPanel: TemplateRef<any>;
     @ViewChild('tagsPanelOrigin') private _tagsPanelOrigin: ElementRef;
 
-    // @Input() commit: Commit
     commit: Commit;
     commitForm: UntypedFormGroup;
     commits: Commit[];
@@ -61,8 +57,7 @@ export class AnnotatorDetailsComponent implements OnInit, OnDestroy
     /**
      * On init
      */
-    ngOnInit(): void
-    {
+    ngOnInit(): void {
         // Open the drawer
         this._commitsComponent.matDrawer.open();
 
@@ -95,7 +90,7 @@ export class AnnotatorDetailsComponent implements OnInit, OnDestroy
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
     
-    onDefectsChanged(event: any){
+    onDefectsChanged(event: any) {
         this._changeDetectorRef.markForCheck();
     }    
 
@@ -191,7 +186,7 @@ export class AnnotatorDetailsComponent implements OnInit, OnDestroy
      * @param index
      * @param item
      */
-    trackTagsByFn(index: number, item: any): any {
+     trackDefectsByFn(index: number, item: any): any {
         return item || index;
     }
 }

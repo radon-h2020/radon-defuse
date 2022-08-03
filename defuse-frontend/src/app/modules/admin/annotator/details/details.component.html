@@ -42,7 +42,7 @@
                     
                         <!-- Tags -->
                         <ng-container *ngIf="commit.defects.length">
-                            <ng-container *ngFor="let tag of commit.defects; trackBy: trackTagsByFn">
+                            <ng-container *ngFor="let tag of commit.defects; trackBy: trackDefectsByFn">
                                 <div class="flex items-center justify-center px-4 m-1.5 rounded-full leading-9 text-gray-500 bg-gray-100 dark:text-gray-300 dark:bg-gray-700">
                                     <span class="text-md font-medium whitespace-nowrap">{{tag}}</span>
                                 </div>

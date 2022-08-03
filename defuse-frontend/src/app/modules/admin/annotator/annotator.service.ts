@@ -8,8 +8,7 @@ import { repositories } from 'app/mock-api/apps/repositories/data';
 @Injectable({
     providedIn: 'root'
 })
-export class CommitsService 
-{
+export class CommitsService {
 
     // Private
     private _commitsCollection: Observable<Commit[]>;
@@ -26,7 +25,6 @@ export class CommitsService
      * Constructor
      */
     constructor(private _httpClient: HttpClient, private _firestore: AngularFirestore) {
-
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -124,7 +122,7 @@ export class CommitsService
         )
     }
 
-    searchCommits(query: string): Observable<Commit[]>{
+    searchCommits(query: string): Observable<Commit[]> {
         return this._commitsCollection.pipe(
             tap((repos) => {
                 const filteredRepos = repos.filter(repo => 
@@ -137,7 +135,7 @@ export class CommitsService
         )
     }
 
-    toggleCommitValidity(commit: Commit): Observable<boolean>{
+    toggleCommitValidity(commit: Commit): Observable<boolean> {
         commit.is_valid = !commit.is_valid
         const commitDoc = this._firestore.doc(`commits/${commit.hash}`);
         commitDoc.update(commit);
@@ -154,7 +152,7 @@ export class CommitsService
     /**
      * Get tags
      */
-    getTags(): Observable<string[]>{
+    getTags(): Observable<string[]> {
         return this._httpClient.get<string[]>('api/apps/commits/tags').pipe(
             tap((tags) => {
                 this._tags.next(tags);
@@ -167,7 +165,7 @@ export class CommitsService
      *
      * @param tag
      */
-    createTag(tag: string): Observable<string>{
+    createTag(tag: string): Observable<string> {
         return this.defects$.pipe(
             take(1),
             switchMap(tags => this._httpClient.post<string>('api/apps/commits/tag', {tag}).pipe(
@@ -189,7 +187,7 @@ export class CommitsService
      * @param id
      * @param tag
      */
-    updateTag(oldTag: string, newTag: string): Observable<string>{
+    updateTag(oldTag: string, newTag: string): Observable<string> {
         return this.defects$.pipe(
             take(1),
             switchMap(tags => this._httpClient.patch<string>('api/apps/commits/tag', {
@@ -219,8 +217,7 @@ export class CommitsService
      *
      * @param id
      */
-    deleteTag(tag: string): Observable<boolean>
-    {
+    deleteTag(tag: string): Observable<boolean> {
         return this.defects$.pipe(
             take(1),
             switchMap(tags => this._httpClient.delete('api/apps/commits/tag', {params: {tag}}).pipe(
@@ -281,8 +278,7 @@ export class FixedFilesService {
     /**
      * Constructor
      */
-    constructor(private _httpClient: HttpClient, private _firestore: AngularFirestore) {
-
+    constructor(private _firestore: AngularFirestore) {
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -305,7 +301,6 @@ export class FixedFilesService {
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
-
     getFixedFiles(): Observable<FixedFile[]> {
         return this._filesCollection.pipe(
             map((files) => {
@@ -319,7 +314,7 @@ export class FixedFilesService {
         );    
     }
 
-    updateFixedFile(file: FixedFile): Observable<boolean>{
+    updateFixedFile(file: FixedFile): Observable<boolean> {
         file.is_valid = !file.is_valid
         this._firestore.doc(`fixed-files/${file.id}`).update(file);
         return of(true)

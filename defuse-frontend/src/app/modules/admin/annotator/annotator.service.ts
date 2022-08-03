@@ -115,13 +115,13 @@ export class CommitsService {
 
     searchCommits(query: string): Observable<Commit[]> {
         return this._commitsCollection.pipe(
-            tap((repos) => {
-                const filteredRepos = repos.filter(repo => 
-                    repo.hash.includes(query?.toLowerCase())
-                    || repo.msg.includes(query?.toLowerCase())
-                    || repo.defects.includes(query?.toLowerCase())
+            tap((commits) => {
+                const filteredCommits = commits.filter(commit => 
+                    commit.hash.includes(query?.toLowerCase())
+                    || commit.msg.includes(query?.toLowerCase())
+                    || commit.defects.includes(query?.toLowerCase())
                 ); 
-                this._commits.next(filteredRepos);
+                this._commits.next(filteredCommits);
             })
         )
     }

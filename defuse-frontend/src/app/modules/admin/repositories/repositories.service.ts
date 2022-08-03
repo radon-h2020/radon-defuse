@@ -126,7 +126,7 @@ export class RepositoriesService
         )
     }
 
-    searchRepositories(query: string): Observable<Repository[]>{
+    searchRepositories(query: string): Observable<Repository[]> {
         return this.repositoriesCollection.pipe(
             tap((repos) => {
                 const filteredRepos = repos.filter(repo => repo.full_name.toLowerCase().includes(query?.toLowerCase())); 
@@ -135,13 +135,13 @@ export class RepositoriesService
         )
     }
 
-    createRepository(url: string, token?: string): Observable<Repository>{
+    createRepository(url: string, token?: string): Observable<Repository> {
         let api_url = `/backend-api/repository?url=${url}`;
         if(token) api_url += `&token=${token}`;
         return this._httpClient.post<any>(api_url, {observe:'response'})
     }
 
-    deleteRepository(id: string): Observable<any>{
+    deleteRepository(id: string): Observable<any> {
         const URL = `/backend-api/repository?id=${id}`;
         return this._httpClient.delete<any>(URL, {observe:'response'});
     }

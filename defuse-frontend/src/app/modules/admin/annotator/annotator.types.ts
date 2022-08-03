@@ -7,6 +7,15 @@ export interface Commit {
     repository_id: string;
 }
 
+export interface CommitsPagination {
+    length: number;
+    size: number;
+    page: number;
+    lastPage: number;
+    startIndex: number;
+    endIndex: number;
+}
+
 export interface Defect {
     id: string;
     title: string;
@@ -19,13 +28,4 @@ export interface FixedFile {
     hash_bic: string;
     is_valid: boolean;
     repository_id: string;
-}
-
-export interface CommitsPagination {
-    length: number;
-    size: number;
-    page: number;
-    lastPage: number;
-    startIndex: number;
-    endIndex: number;
 }

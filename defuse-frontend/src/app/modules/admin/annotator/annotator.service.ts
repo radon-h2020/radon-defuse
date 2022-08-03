@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { BehaviorSubject, filter, map, Observable, of, switchMap, take, tap, throwError } from 'rxjs';
+import { BehaviorSubject, map, Observable, of, switchMap, take, tap } from 'rxjs';
 import { Commit, FixedFile, CommitsPagination, Defect } from 'app/modules/admin/annotator/annotator.types';
-import { repositories } from 'app/mock-api/apps/repositories/data';
 
 @Injectable({
     providedIn: 'root'
@@ -16,9 +15,6 @@ export class CommitsService {
     private _commit: BehaviorSubject<Commit | null> = new BehaviorSubject(null);
     private _commits: BehaviorSubject<Commit[] | null> = new BehaviorSubject(null);
     private _pagination: BehaviorSubject<CommitsPagination | null> = new BehaviorSubject({ length: 0, size: 10, page: 0, lastPage: 0, startIndex: 0, endIndex: 0 } as CommitsPagination);
-
-    private _tags: BehaviorSubject<string[] | null> = new BehaviorSubject(null);
-
 
 
     /**
@@ -47,11 +43,6 @@ export class CommitsService {
         this._commitsCollection = this._firestore.collection('commits', ref => ref.where('repository_id', '==', id)).snapshotChanges().pipe(map(changes => {
             return changes.map(item => { return item.payload.doc.data() as Commit; })
         }))
-    }
-
-
-    get defects$(): Observable<string[]> {
-        return this._tags.asObservable();
     }
 
     // -----------------------------------------------------------------------------------------------------

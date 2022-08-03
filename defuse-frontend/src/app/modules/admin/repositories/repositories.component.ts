@@ -39,10 +39,9 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
         private _repositoriesService: RepositoriesService,
         private _router: Router)
     {
-
     }
 
-    private getRepositories(pageIndex: number = 0, pageSize: number=10){
+    private getRepositories(pageIndex: number = 0, pageSize: number=10) {
         this._repositoriesService.getRepositoriesPage(pageIndex, pageSize)
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((response) => {
@@ -55,7 +54,7 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
     /**
      * On init
      */
-    ngOnInit(): void{
+    ngOnInit(): void {
 
         // Get the pagination
         this._repositoriesService.pagination$
@@ -126,8 +125,7 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
     /**
      * On destroy
      */
-    ngOnDestroy(): void
-    {
+    ngOnDestroy(): void {
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();

@@ -1,23 +1,14 @@
-import { AfterViewInit,
-         ChangeDetectionStrategy, 
-         ChangeDetectorRef, 
-         Component, 
-         OnDestroy, 
-         OnInit, 
-         ViewChild, 
-         ViewEncapsulation } from '@angular/core';
-
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDrawer } from '@angular/material/sidenav';
 import { MatDialog } from '@angular/material/dialog'
 import { MatPaginator } from '@angular/material/paginator';
-import { Observable, map, Subject, switchMap, take, takeUntil } from 'rxjs';
-import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
+import { Observable, Subject, switchMap, takeUntil } from 'rxjs';
 import { Commit, CommitsPagination } from 'app/modules/admin/annotator/annotator.types';
 import { CommitsService } from 'app/modules/admin/annotator/annotator.service'
 import { StartMiningDialog } from './dialogs/start.component';
-import { Repository, RepositoryPagination } from '../repositories/repositories.types';
+import { Repository } from '../repositories/repositories.types';
 import { RepositoriesService } from '../repositories/repositories.service';
 
 @Component({
@@ -26,8 +17,7 @@ import { RepositoriesService } from '../repositories/repositories.service';
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
-{
+export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
     @ViewChild(MatPaginator) private _paginator: MatPaginator;
 
@@ -55,11 +45,10 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
      */
     constructor(
         private _activatedRoute: ActivatedRoute,
-        private _commitsService: CommitsService,
-        private _repositoriesService: RepositoriesService,
         private _changeDetectorRef: ChangeDetectorRef,
+        private _commitsService: CommitsService,
         public _dialog: MatDialog,
-        private _fuseMediaWatcherService: FuseMediaWatcherService,
+        private _repositoriesService: RepositoriesService,
         private _router: Router)
     {
     }
@@ -178,7 +167,7 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy
         this._changeDetectorRef.markForCheck();
     }
 
-    onSelectRepository(repository){
+    onSelectRepository(repository) {
         this.selectedRepository = repository
         this._commitsService.repositoryId = this.selectedRepository.id;
         this.getCommits()

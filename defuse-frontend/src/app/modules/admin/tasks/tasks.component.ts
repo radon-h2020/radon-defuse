@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { Task } from 'app/modules/admin/tasks/tasks.types';
 import { TasksService } from 'app/modules/admin/tasks/tasks.service';
+import { TaskLogDialog } from './dialogs/log.component';
 
 @Component({
     selector       : 'tasks-list',
@@ -24,6 +26,7 @@ export class TasksComponent implements OnInit, OnDestroy {
      */
     constructor(
         private _changeDetectorRef: ChangeDetectorRef,
+        private _dialog: MatDialog,
         private _tasksService: TasksService,
     )
     {
@@ -74,16 +77,16 @@ export class TasksComponent implements OnInit, OnDestroy {
     Visualize task's log
     @param id: task id
     */
-    onVisualizeLog(taskId){
-        // this._tasksService.getLog(taskId)
-        //     .subscribe(log => {
-        //         // Open Dialog and show log
-        //         let dialogRef = this._dialog.open(TaskLogDialogComponent, {
-        //             width: '100%',
-        //             height: '90%',
-        //             data: { log: log }
-        //         });
-        // });
+    onVisualizeLog(task){
+        this._tasksService.getLog(task)
+            .subscribe(log => {
+                // Open Dialog and show log
+                let dialogRef = this._dialog.open(TaskLogDialog, {
+                    width: '100%',
+                    height: '90%',
+                    data: { log: log }
+                });
+        });
     }
 
     /**

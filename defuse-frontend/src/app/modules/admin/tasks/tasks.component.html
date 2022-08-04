@@ -77,7 +77,7 @@
                                         <ng-container *ngIf="task.failed">
                                             <span class="absolute top-0 right-0 left-0 flex items-center justify-end h-3">
                                                 <mat-icon
-                                                (click)="onVisualizeLog()"
+                                                (click)="onVisualizeLog(task)"
                                                 #tooltip="matTooltip"
                                                 matTooltip="Visualize log"
                                                 class="flex items-center justify-center px-1 ml-4 mt-3"

@@ -32,7 +32,7 @@ export class ModelsService {
     // -----------------------------------------------------------------------------------------------------
     // @ Accessors
     // -----------------------------------------------------------------------------------------------------
-    get tasks$(): Observable<PredictiveModel[]> {
+    get models$(): Observable<PredictiveModel[]> {
         return this._models.asObservable();
     }
 

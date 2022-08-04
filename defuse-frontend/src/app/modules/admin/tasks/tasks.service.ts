@@ -61,6 +61,11 @@ export class TasksService {
       return of(true);
     }
 
+    getLog(task: Task): Observable<string>{
+      const URL = `/backend-api/log?task_id=${task.id}`;
+      return this._httpClient.get<string>(URL)
+    }
+
     mine(repositoryId: string, language: string): Observable<any> {
         const URL = `/backend-api/mine?id=${repositoryId}&language=${language}`;
         return this._httpClient.get<any>(URL, {observe:'response'})

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { BehaviorSubject, map, Observable, of, switchMap, take, tap, throwError } from 'rxjs';
+import { BehaviorSubject, map, Observable, of } from 'rxjs';
 
 import { Task } from 'app/modules/admin/tasks/tasks.types';
 
@@ -48,7 +48,7 @@ export class TasksService {
       );      
     }
 
-    deleteTask(task: Task): Observable<boolean>{
+    deleteTask(task: Task): Observable<boolean> {
       if (!task || task.in_progress){
         return of(false);
       }

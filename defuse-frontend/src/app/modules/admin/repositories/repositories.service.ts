@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { BehaviorSubject, map, Observable, of, switchMap, take, tap, throwError } from 'rxjs';
+import { BehaviorSubject, map, Observable, of, switchMap, take, tap } from 'rxjs';
 
 import { Repository, RepositoryPagination } from 'app/modules/admin/repositories/repositories.types';
 
@@ -93,7 +93,6 @@ export class RepositoriesService
     
                 this._pagination.next(pagination);
     
-                // return pagination
                 return { repositories, pagination }
             })
         );      
@@ -106,7 +105,6 @@ export class RepositoriesService
         return this._repositories.pipe(
             take(1),
             map((repos) => {
-                // Find the contact
                 const repo = repos.find(repo => repo.id === id) || null;
                 this._repository.next(repo);
                 return repo

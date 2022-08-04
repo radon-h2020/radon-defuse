@@ -1,9 +1,5 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
-import { FuseNavigationService } from '@fuse/components/navigation';
 import { Task } from 'app/modules/admin/tasks/tasks.types';
 import { TasksService } from 'app/modules/admin/tasks/tasks.service';
 

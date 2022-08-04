@@ -77,6 +77,7 @@ export const appRoutes: Route[] = [
             {path: 'example', loadChildren: () => import('app/modules/admin/example/example.module').then(m => m.ExampleModule)},
             {path: 'repositories', loadChildren: () => import('app/modules/admin/repositories/repositories.module').then(m => m.RepositoriesModule)},
             {path: 'annotator', loadChildren: () => import('app/modules/admin/annotator/annotator.module').then(m => m.AnnotatorModule)},
+            {path: 'tasks', loadChildren: () => import('app/modules/admin/tasks/tasks.module').then(m => m.TasksModule)},
         ]
     },
     // {
@@ -88,7 +89,7 @@ export const appRoutes: Route[] = [
     //         layout: 'empty'
     //     },
     //     children   : [
-    //         {path: 'annotator', loadChildren: () => import('app/modules/admin/annotator/annotator.module').then(m => m.AnnotatorModule)},
+    //         {path: 'tasks', loadChildren: () => import('app/modules/admin/tasks/tasks.module').then(m => m.TasksModule)},
     //     ]
     // }
 ];

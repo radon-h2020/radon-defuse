@@ -1,0 +1,144 @@
+<div class="absolute inset-0 flex flex-col min-w-0 overflow-hidden">
+
+    <!-- Main -->
+    <div class="flex flex-col flex-auto">
+
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between py-8 px-6 md:px-8">
+            <!-- Title -->
+            <div>
+                <div class="text-4xl font-extrabold tracking-tight leading-none">Tasks</div>
+                <div class="ml-0.5 font-medium text-secondary">
+                    <div *ngIf="tasksCount.completed > 0">{{tasksCount.completed}} succeeded </div>
+                    <div *ngIf="tasksCount.failed > 0">{{tasksCount.failed}} failed</div>
+                    <div *ngIf="tasksCount.in_progress > 0">{{tasksCount.in_progress}} in progress</div>
+                </div>
+            </div>
+        </div>
+
+        <ng-container *ngIf="tasks$ | async as tasks">
+
+            <!-- Tasks list -->
+            <ng-container *ngIf="tasks && tasks.length > 0; else noTasks">
+                <!-- Task -->
+                <ng-container *ngFor="let task of tasks; let first = first; trackBy: trackByFn">
+                    <div class="group w-full select-none h-16 hover:bg-gray-200 dark:hover:bg-hover"
+                        [ngClass]="{'text-hint': task.completed}"
+                        [class.border-t]="first">
+
+                        <!-- Task content -->
+                        <div class="relative flex items-center h-full pl-10 pr-10  grid grid-cols-6 gap-4">
+
+                            <span class="col-span-1 flex flex-shrink-0 items-center">
+                                <!-- Id -->
+                                <div class="text-sm text-left flex-auto mr-2 truncate ml-4">
+                                    <ng-container>
+                                        <span>{{task.id}}</span>
+                                    </ng-container>
+                                </div>
+                            </span>
+
+
+                            <!-- Name -->
+                            <div class="col-span-1 flex flex-col items-start justify-center truncate">
+                                <div class="text-sm flex-auto mr-2 truncate ml-4" style="text-align:left">
+                                    <ng-container>
+                                        <span>{{task.name | titlecase}}</span>
+                                    </ng-container>
+                                    <ng-container *ngIf="task.defect">
+                                        <span>&nbsp;{{task.defect}}</span>
+                                    </ng-container>
+                                    <ng-container *ngIf="task.validation">
+                                        <span>&nbsp;per {{task.validation}}</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+
+                            <!-- Language -->
+                            <div class="col-span-1 flex flex-col items-start justify-center">
+                                <div class="text-sm flex-auto mr-2 truncate ml-4">
+                                    <ng-container>
+                                        <span>{{task.language | titlecase}}</span>
+                                    </ng-container>
+                                </div>
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-span-1 flex flex-col items-start justify-center">
+                          
+                                
+                                <div class="relative flex items-center px-4 leading-6 rounded-full mr-8 uppercase"
+                                    [ngClass]="{'text-blue-800  bg-blue-200 dark:text-blue-50   dark:bg-blue-600': task.in_progress,
+                                                'text-green-800 bg-green-200 dark:text-green-50 dark:bg-green-600': task.completed,
+                                                'text-red-800   bg-red-200 dark:text-red-50     dark:bg-red-600': task.failed}">
+
+                                    <span class="text-xs text-center font-medium min-w-20 flex-shrink-0 items-center">
+                                        <ng-container *ngIf="task.completed">Completed</ng-container>
+                                        <ng-container *ngIf="task.failed">
+                                            <span class="absolute top-0 right-0 left-0 flex items-center justify-end h-3">
+                                                <mat-icon
+                                                (click)="onVisualizeLog()"
+                                                #tooltip="matTooltip"
+                                                matTooltip="Visualize log"
+                                                class="flex items-center justify-center px-1 ml-4 mt-3"
+                                                style="transform: scale(0.75); cursor: pointer;">info</mat-icon>
+                                            </span>
+                                            Failed
+                                        </ng-container>
+                                        <ng-container *ngIf="task.in_progress">
+                                            <span class="absolute top-0 right-0 left-0 flex items-center justify-end h-3">
+                                                <mat-icon
+                                                    class="flex items-center justify-center px-1 ml-4 mt-3 animate-spin-slow"
+                                                    [svgIcon]="'heroicons_solid:cog'"></mat-icon>
+                                            </span>
+                                            In progress
+                                        </ng-container>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- StartedAt -->
+                            <div class="col-span-1 flex flex-col items-start justify-center">
+                                <div class="text-sm whitespace-nowrap text-secondary">
+                                    {{task.started_at * 1000 | date:'LLL dd HH:mm:ss'}}
+                                </div>
+                            </div>
+
+                            <!-- EndedAt -->
+                            <div class="col-span-1 flex flex-col items-start justify-center">
+                                <ng-container *ngIf="task.ended_at">
+                                    <div class="text-sm whitespace-nowrap text-secondary ml-4">
+                                    {{ task.ended_at * 1000 | date:'LLL dd HH:mm:ss'}}
+                                    </div>
+                                </ng-container>
+                            </div>
+
+                            <div class="md:hidden absolute flex items-center justify-center inset-y-0 left-0 w-8 cursor-pointer ml-3 md:group-hover:flex">
+                                <ng-container *ngIf="task.completed || task.failed">
+                                
+                                <mat-icon
+                                    class="icon-size-5 text-warn"
+                                    (click)="onDelete()"
+                                    [matTooltip]="'Delete'"
+                                    [svgIcon]="'heroicons_outline:x-circle'"></mat-icon>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+
+            </ng-container>
+        </ng-container>
+
+        <ng-template #noTasks>
+            <div class="flex flex-auto flex-col items-center justify-center bg-gray-100 dark:bg-transparent">
+                <mat-icon
+                    class="icon-size-24"
+                    [svgIcon]="'heroicons_outline:clipboard-list'"></mat-icon>
+                <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">There are not tasks!</div>
+            </div>
+        </ng-template>
+
+    </div>
+
+</div>

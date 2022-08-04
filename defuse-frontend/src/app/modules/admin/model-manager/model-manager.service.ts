@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, map } from 'rxjs';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 
-import { PredictiveModel } from 'app/modules/admin/model-manager/predictive-model.model';
+import { PredictiveModel } from 'app/modules/admin/model-manager/model-manager.types';
 
 
 @Injectable({
@@ -13,11 +13,6 @@ export class ModelsService {
 
     private _modelsCollection: Observable<PredictiveModel[]>;
     private _models: BehaviorSubject<PredictiveModel[] | null> = new BehaviorSubject([]);
-
-    
-    repositoryId: number;
-    models: Observable<PredictiveModel[]>;
-    modelDoc: AngularFirestoreDocument<PredictiveModel>;
 
     constructor(private _httpClient: HttpClient, private _firestore: AngularFirestore){
         this._modelsCollection = _firestore.collection('models').snapshotChanges().pipe(map(changes => {

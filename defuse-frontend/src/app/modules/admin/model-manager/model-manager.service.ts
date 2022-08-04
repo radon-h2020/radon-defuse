@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, map } from 'rxjs';
-import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore'
+import { BehaviorSubject, Observable, map } from 'rxjs';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 
 import { PredictiveModel } from 'app/modules/admin/model-manager/predictive-model.model';
 

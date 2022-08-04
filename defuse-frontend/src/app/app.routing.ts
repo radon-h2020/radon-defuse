@@ -78,6 +78,7 @@ export const appRoutes: Route[] = [
             {path: 'repositories', loadChildren: () => import('app/modules/admin/repositories/repositories.module').then(m => m.RepositoriesModule)},
             {path: 'annotator', loadChildren: () => import('app/modules/admin/annotator/annotator.module').then(m => m.AnnotatorModule)},
             {path: 'tasks', loadChildren: () => import('app/modules/admin/tasks/tasks.module').then(m => m.TasksModule)},
+            {path: 'models', loadChildren: () => import('app/modules/admin/model-manager/model-manager.module').then(m => m.ModelManagerModule)},
         ]
     },
     // {

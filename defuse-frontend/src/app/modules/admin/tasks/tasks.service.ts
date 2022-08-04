@@ -54,7 +54,7 @@ export class TasksService {
       }
 
       if (task && task.failed){
-        this._httpClient.delete<any>(`/api/log?task_id=${task.id}`)
+        this._httpClient.delete<any>(`/backend-api/log?task_id=${task.id}`)
       } 
       
       this._firestore.doc(`tasks/${task.id}`).delete();

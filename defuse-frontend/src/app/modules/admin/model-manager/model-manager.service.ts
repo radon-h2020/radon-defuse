@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, map } from 'rxjs';
+import { BehaviorSubject, of, Observable, map, switchMap, take } from 'rxjs';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 
 import { PredictiveModel } from 'app/modules/admin/model-manager/model-manager.types';
@@ -12,6 +12,7 @@ import { PredictiveModel } from 'app/modules/admin/model-manager/model-manager.t
 export class ModelsService {
 
     private _modelsCollection: Observable<PredictiveModel[]>;
+    private _model: BehaviorSubject<PredictiveModel | null> = new BehaviorSubject(null);
     private _models: BehaviorSubject<PredictiveModel[] | null> = new BehaviorSubject([]);
 
     constructor(private _httpClient: HttpClient, private _firestore: AngularFirestore){
@@ -31,6 +32,10 @@ export class ModelsService {
         return this._models.asObservable();
     }
 
+    get model$(): Observable<PredictiveModel> {
+        return this._model.asObservable();
+    }
+
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
@@ -41,7 +46,18 @@ export class ModelsService {
                 return models
             })
         );      
-      }
+    }
+
+    getModel(id: string): Observable<PredictiveModel> {
+        return this._models.pipe(
+            take(1),
+            map((models) => {
+                const model = models.find(model => model.id === id) || null;
+                this._model.next(model);
+                return model
+            })
+        )
+    }
 
     deleteModel(model: PredictiveModel): Observable<any>{
         const URL = `/backend-api/model?id=${model.id}`;

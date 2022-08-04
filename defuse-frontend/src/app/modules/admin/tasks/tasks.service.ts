@@ -48,6 +48,19 @@ export class TasksService {
       );      
     }
 
+    deleteTask(task: Task): Observable<boolean>{
+      if (!task || task.in_progress){
+        return of(false);
+      }
+
+      if (task && task.failed){
+        this._httpClient.delete<any>(`/api/log?task_id=${task.id}`)
+      } 
+      
+      this._firestore.doc(`tasks/${task.id}`).delete();
+      return of(true);
+    }
+
     mine(repositoryId: string, language: string): Observable<any> {
         const URL = `/backend-api/mine?id=${repositoryId}&language=${language}`;
         return this._httpClient.get<any>(URL, {observe:'response'})

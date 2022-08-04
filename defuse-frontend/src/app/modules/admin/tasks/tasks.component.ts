@@ -69,7 +69,26 @@ export class TasksComponent implements OnInit, OnDestroy {
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
+    onDelete(task){
+        this._tasksService.deleteTask(task)
+            .subscribe(deleted => this._changeDetectorRef.markForCheck());
+    }
 
+    /**
+    Visualize task's log
+    @param id: task id
+    */
+    onVisualizeLog(taskId){
+        // this._tasksService.getLog(taskId)
+        //     .subscribe(log => {
+        //         // Open Dialog and show log
+        //         let dialogRef = this._dialog.open(TaskLogDialogComponent, {
+        //             width: '100%',
+        //             height: '90%',
+        //             data: { log: log }
+        //         });
+        // });
+    }
 
     /**
      * Track by function for ngFor loops

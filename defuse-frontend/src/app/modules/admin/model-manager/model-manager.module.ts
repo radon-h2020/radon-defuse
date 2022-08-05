@@ -21,7 +21,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 
 
 // import { DialogAnalyticsComponent } from './dialog-analytics/dialog-analytics.component';
-// import { DialogTrainModelComponent } from './dialog-train-model/dialog-train-model.component';
+import { TrainModelDialog } from 'app/modules/admin/model-manager/dialogs/train.component';
 import { ModelManagerComponent } from 'app/modules/admin/model-manager/model-manager.component';
 import { ModelManagerListComponent } from 'app/modules/admin/model-manager/list/list.component';
 import { modelManagerRoutes } from 'app/modules/admin/model-manager/model-manager.routing';
@@ -31,7 +31,7 @@ import { ModelManagerDetailsComponent } from 'app/modules/admin/model-manager/de
 @NgModule({
     declarations: [
         // DialogAnalyticsComponent,
-        // DialogTrainModelComponent,
+        TrainModelDialog,
         ModelManagerComponent,
         ModelManagerDetailsComponent,
         ModelManagerListComponent,

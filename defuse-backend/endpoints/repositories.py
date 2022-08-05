@@ -93,12 +93,19 @@ class Repositories(Resource):
         until = datetime.datetime.strptime(until, '%Y-%m-%d')
         pushed_after = datetime.datetime.strptime(pushed_after, '%Y-%m-%d')
 
+        analyzed_days = 0
+        total_days = (until - since).days + 1
+        github_crawler = GithubRepositoriesCollector(access_token=args.get('token'))
+        
+        self.db.collection('tasks').document(task_id).update({
+            'progress_value': 0,
+        })
+
         try:
 
             while since <= until:
 
-                github_crawler = GithubRepositoriesCollector(
-                    access_token=args.get('token'),
+                for repo in github_crawler.collect_repositories(
                     since=since,
                     until=since + datetime.timedelta(days=1),
                     pushed_after=pushed_after,
@@ -107,9 +114,7 @@ class Repositories(Resource):
                     min_stars=args.get('min_stars', 0),
                     min_watchers=0,
                     primary_language=args.get('language') if args.get('language') not in ('ansible', 'tosca') else None
-                )
-
-                for repo in github_crawler.collect_repositories():
+                ):
 
                     if args.get('language') == 'ansible' and not is_ansible_repository(f'{repo["owner"]}/{repo["name"]}', repo['description'], repo['dirs']):
                         continue
@@ -118,13 +123,26 @@ class Repositories(Resource):
                     else:
                         repo_ref = self.db.collection('repositories').document(str(repo['id']))
                         repo_ref.set({
-                            'id': repo['id'],
+                            'id': str(repo['id']),
                             'full_name': f'{repo["owner"]}/{repo["name"]}',
                             'url': repo['url'],
                             'default_branch': repo['default_branch']
                         })
 
                 since += datetime.timedelta(days=1)
+                analyzed_days += 1
+                self.db.collection('tasks').document(task_id).update({
+                    'analyzed': analyzed_days,
+                    'total': total_days,
+                    'progress_value': int(100 * analyzed_days / total_days),
+                    'quota': github_crawler.quota, 
+                    'quota_reset_at': github_crawler.quota_reset_at
+                })
+
+                if github_crawler.quota < 30:
+                    reset_at = datetime.datetime.strptime(github_crawler.quota_reset_at)
+                    seconds_to_wait = (reset_at - datetime.datetime.now()).seconds
+                    time.sleep(seconds_to_wait)
 
             status = 'completed'
 

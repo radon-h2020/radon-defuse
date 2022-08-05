@@ -15,11 +15,11 @@ export const defaultNavigation: FuseNavigationItem[] = [
         icon : 'heroicons_outline:home',
         link : '/annotator'
     },{
-        id   : 'models',
-        title: 'Models',
+        id   : 'model-manager',
+        title: 'Model Manager',
         type : 'basic',
         icon : 'heroicons_outline:beaker',
-        link : '/models'
+        link : '/model-manager'
     },{
         id   : 'tasks',
         title: 'Tasks',
@@ -42,11 +42,11 @@ export const compactNavigation: FuseNavigationItem[] = [
         icon : 'heroicons_outline:home',
         link : '/annotator'
     },{
-        id   : 'models',
-        title: 'Models',
+        id   : 'model-manager',
+        title: 'Model Manager',
         type : 'basic',
         icon : 'heroicons_outline:beaker',
-        link : '/models'
+        link : '/model-manager'
     },{
         id   : 'tasks',
         title: 'Tasks',
@@ -69,11 +69,11 @@ export const futuristicNavigation: FuseNavigationItem[] = [
         icon : 'heroicons_outline:home',
         link : '/annotator'
     },{
-        id   : 'models',
-        title: 'Models',
+        id   : 'model-manager',
+        title: 'Model Manager',
         type : 'basic',
         icon : 'heroicons_outline:beaker',
-        link : '/models'
+        link : '/model-manager'
     },{
         id   : 'tasks',
         title: 'Tasks',
@@ -96,11 +96,11 @@ export const horizontalNavigation: FuseNavigationItem[] = [
         icon : 'heroicons_outline:home',
         link : '/annotator'
     },{
-        id   : 'models',
-        title: 'Models',
+        id   : 'model-manager',
+        title: 'Model Manager',
         type : 'basic',
         icon : 'heroicons_outline:beaker',
-        link : '/models'
+        link : '/model-manager'
     },{
         id   : 'tasks',
         title: 'Tasks',

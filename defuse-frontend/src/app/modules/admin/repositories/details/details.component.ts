@@ -120,8 +120,21 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy {
         });
     }
 
-    calculateMetrics(){
-        return false // TODO
+    onCalculateMetrics(): void{
+        this._repositoriesService.calculateMetrics(this.repository)
+            .subscribe((response) => {
+
+                if ( response.status != 204 ) {
+                    this._snackBar.open('Could not calculate metrics', 'Dismiss', { duration: 3000 });
+                } else {                            
+                    this._snackBar.open('Scoring started. You will see the updates soon', 'Dismiss', { duration: 3000 });
+                    this.closeDrawer()
+                    this._router.navigate(['../'], {relativeTo: this._activatedRoute});
+                }
+            });
+
+                // Mark for check
+        this._changeDetectorRef.markForCheck();
     }
 
     /**

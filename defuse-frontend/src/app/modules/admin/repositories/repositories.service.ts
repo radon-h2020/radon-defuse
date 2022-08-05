@@ -133,6 +133,11 @@ export class RepositoriesService
         )
     }
 
+    calculateMetrics(repository: Repository): Observable<any>{
+        const URL = `/backend-api/repository?id=${repository.id}`;
+        return this._httpClient.patch<any>(URL, {observe:'response'});
+    }
+
     createRepository(url: string, token?: string): Observable<Repository> {
         let api_url = `/backend-api/repository?url=${url}`;
         if(token) api_url += `&token=${token}`;

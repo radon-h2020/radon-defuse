@@ -124,6 +124,11 @@ export class RepositoriesService
         return this._httpClient.patch<any>(URL, {observe:'response'});
     }
 
+    collectRepositories(token: string, start: string, end: string, pushedAfter: string, language: string, minStars: number, minReleases: number): Observable<any>{
+        let api_url = '/backend-api/repositories';
+        return this._httpClient.post<any>(api_url, {token: token, start: start, end: end, pushed_after: pushedAfter, language: language, min_stars: minStars, min_releases: minReleases}, {observe:'response'});
+    }
+
     createRepository(url: string, token?: string): Observable<Repository> {
         let api_url = `/backend-api/repository?url=${url}`;
         if(token) api_url += `&token=${token}`;

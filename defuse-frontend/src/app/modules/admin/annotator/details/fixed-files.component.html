@@ -2,11 +2,11 @@
     <ng-container *ngIf="fixedFiles.length; else noFiles">
         <ng-container *ngFor="let file of fixedFiles; trackBy: trackByFn">
             
-            <div class="group w-full select-none" 
+            <div class="group w-full select-none border-t" 
                 [ngClass]="{'bg-warn-50 dark:bg-transparent': !file.is_valid}">
     
                 <!-- File content -->
-                <div class="relative flex items-center h-full pl-5 pt-1 pb-1">
+                <div class="relative flex items-center h-full pt-1 pb-1">
                 
                     <!-- (In)validate commit button -->
                     <button class="mr-2 -ml-2.5 leading-none"
@@ -26,9 +26,13 @@
                     </button>
     
                     <div class="flex flex-auto items-center min-w-0 h-full pr-7 p-2">
-                        <div class="font-medium leading-5 truncate"> {{ file.filepath }} </div>
+                        <a class="font-medium leading-5 truncate cursor-pointer" 
+                           [matTooltip]="'View file'"
+                           [href]="commit.url.replace('/commit/', '/blob/') + '/' + file.filepath" target="_blank">
+                            {{ file.filepath }}
+                        </a>
                     </div>
-    
+
                     <a class="cursor-pointer" [href]="commit.url.substring(0, commit.url.length - 40) + file.hash_bic" target="_blank">
                         <div class="flex items-center justify-center py-1 px-3 mr-3 rounded-full leading-normal text-red-500 bg-red-100 dark:text-red-300 dark:bg-red-700"
                             [matTooltip]="'The bug-introducing commit'">

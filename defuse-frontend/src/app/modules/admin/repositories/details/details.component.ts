@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, Renderer2, TemplateRef, ViewChild, ViewContainerRef, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UntypedFormGroup } from '@angular/forms';
 import { MatDrawerToggleResult } from '@angular/material/sidenav';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Subject, takeUntil } from 'rxjs';
@@ -8,6 +7,8 @@ import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { Repository } from 'app/modules/admin/repositories/repositories.types';
 import { RepositoriesComponent } from 'app/modules/admin/repositories/repositories.component';
 import { RepositoriesService } from 'app/modules/admin/repositories/repositories.service';
+import { TasksService } from '../../tasks/tasks.service';
+import { Task } from '../../tasks/tasks.types';
 
 @Component({
     selector       : 'repository-details',
@@ -17,9 +18,11 @@ import { RepositoriesService } from 'app/modules/admin/repositories/repositories
 })
 export class RepositoryDetailsComponent implements OnInit, OnDestroy {
     
+    isCalculatingMetrics: boolean
+    
     repository: Repository;
-    repositoryForm: UntypedFormGroup;
     repositories: Repository[];
+    
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -30,6 +33,7 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy {
         private _changeDetectorRef: ChangeDetectorRef,
         private _repositoriesComponent: RepositoriesComponent,
         private _repositoriesService: RepositoriesService,
+        private _tasksService: TasksService,
         private _fuseConfirmationService: FuseConfirmationService,
         private _router: Router,
         private _snackBar: MatSnackBar
@@ -41,14 +45,8 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy {
     // @ Lifecycle hooks
     // -----------------------------------------------------------------------------------------------------
 
-    /**
-     * On init
-     */
-    ngOnInit(): void {
-        // Open the drawer
-        this._repositoriesComponent.matDrawer.open();
 
-        // Get the repository
+    getRepository() {
         this._repositoriesService.getRepository(this._activatedRoute.snapshot.params.id)
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((repository: Repository) => {
@@ -62,6 +60,29 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy {
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+    }
+
+    /**
+     * On init
+     */
+    ngOnInit(): void {
+        // Open the drawer
+        this._repositoriesComponent.matDrawer.open();
+
+        this.getRepository()
+
+        // Get in progress tasks for calculating metrics
+        this._tasksService.getTasksInProgress()
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((tasks: Task[]) => {        
+                this.isCalculatingMetrics = tasks.some(task => task.repository_id == this.repository.id && task.name == 'score')
+                
+                if ( !this.isCalculatingMetrics ){
+                    this.getRepository()
+                }
+
+                this._changeDetectorRef.markForCheck();
+            })
     }
 
     /**

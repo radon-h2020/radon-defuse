@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, Renderer2, TemplateRef, ViewChild, ViewContainerRef, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDrawerToggleResult } from '@angular/material/sidenav';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -146,7 +146,7 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy {
             .subscribe((response) => {
 
                 if ( response.status && response.status != 202 ) {
-                    this._snackBar.open('Could not calculate metrics', 'Dismiss', { duration: 3000 });
+                    this._snackBar.open('Could not calculate metrics', 'Dismiss', { duration: 3000 });                
                 } else {                            
                     this._snackBar.open('Scoring started. You will see the updates soon', 'Dismiss', { duration: 3000 });
                 }

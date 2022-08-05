@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, combineLatest, of, Observable, map, switchMap, take } from 'rxjs';
+import { BehaviorSubject, combineLatest, of, Observable, map, switchMap, take, throwError } from 'rxjs';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { uniq } from 'lodash'
 
@@ -17,9 +17,6 @@ export class ModelManagerService {
     private _items: BehaviorSubject<Items | null> = new BehaviorSubject(null);
 
     private _modelsCollection: Observable<PredictiveModel[]>;
-    
-    private _model: BehaviorSubject<PredictiveModel | null> = new BehaviorSubject(null);
-    private _models: BehaviorSubject<PredictiveModel[] | null> = new BehaviorSubject([]);
 
     constructor(private _httpClient: HttpClient, private _firestore: AngularFirestore){
         this._modelsCollection = _firestore.collection('models').snapshotChanges().pipe(map(changes => {
@@ -40,15 +37,6 @@ export class ModelManagerService {
 
     get item$(): Observable<Item> {
         return this._item.asObservable();
-    }
-
-
-    get models$(): Observable<PredictiveModel[]> {
-        return this._models.asObservable();
-    }
-
-    get model$(): Observable<PredictiveModel> {
-        return this._model.asObservable();
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -118,83 +106,30 @@ export class ModelManagerService {
         );  
     }
 
-
-    getModelsByRepository(id: string): Observable<PredictiveModel[]> {
-        return this._modelsCollection = this._firestore.collection('models', ref => ref.where('repository_id', '==', id)).snapshotChanges().pipe(map(changes => {
-            return changes.map(item => {
-                const model = item.payload.doc.data() as PredictiveModel;
-                model.id = item.payload.doc.id
-                return model
-            })
-        })).pipe(
-            map((models) => {
-                this._models.next(models);
-                return models
-            })
-        );  
-
-
-        // // See if the folder id exist
-        // const folderId = request.params.get('folderId') === 'null' ? null : request.params.get('folderId');
-
-        // // Filter the items by folder id. If folder id is null,
-        // // that means we want to root items which have folder id
-        // // of null
-        // items = items.filter(item => item.folderId === folderId);
-
-        // // Separate the items by folders and files
-        // const folders = items.filter(item => item.type === 'folder');
-        // const files = items.filter(item => item.type !== 'folder');
-
-        // // Sort the folders and files alphabetically by filename
-        // folders.sort((a, b) => a.name.localeCompare(b.name));
-        // files.sort((a, b) => a.name.localeCompare(b.name));
-
-        // // Figure out the path and attach it to the response
-        // // Prepare the empty paths array
-        // const pathItems = cloneDeep(this._items);
-        // const path = [];
-
-        // // Prepare the current folder
-        // let currentFolder = null;
-
-        // // Get the current folder and add it as the first entry
-        // if ( folderId )
-        // {
-        //     currentFolder = pathItems.find(item => item.id === folderId);
-        //     path.push(currentFolder);
-        // }
-
-        // // Start traversing and storing the folders as a path array
-        // // until we hit null on the folder id
-        // while ( currentFolder?.folderId )
-        // {
-        //     currentFolder = pathItems.find(item => item.id === currentFolder.folderId);
-        //     if ( currentFolder )
-        //     {
-        //         path.unshift(currentFolder);
-        //     }
-        // }
-
-        // return [
-        //     200,
-        //     {
-        //         folders,
-        //         files,
-        //         path
-        //     }
-        // ];
-    }
-
-    getModel(id: string): Observable<PredictiveModel> {
-        return this._models.pipe(
+    getItemById(id: string): Observable<Item> {
+        return this._items.pipe(
             take(1),
-            map((models) => {
-                const model = models.find(model => model.id === id) || null;
-                this._model.next(model);
-                return model
+            map((items) => {
+
+                // Find within the folders and files
+                const item = [...items.folders, ...items.files].find(value => value.id === id) || null;
+
+                // Update the item
+                this._item.next(item);
+
+                // Return the item
+                return item;
+            }),
+            switchMap((item) => {
+
+                if ( !item )
+                {
+                    return throwError('Could not found the item with id of ' + id + '!');
+                }
+
+                return of(item);
             })
-        )
+        );
     }
 
     deleteModel(model: PredictiveModel): Observable<any>{

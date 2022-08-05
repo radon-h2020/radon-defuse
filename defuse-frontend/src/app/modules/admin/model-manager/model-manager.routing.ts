@@ -1,9 +1,9 @@
 import { Route } from '@angular/router';
-// import { CanDeactivateFileManagerDetails } from 'app/modules/admin/apps/file-manager/file-manager.guards';
-// import { ModelManagerDetailsComponent } from 'app/modules/admin/apps/model-manager/details/details.component';
+import { CanDeactivateModelManagerDetails } from 'app/modules/admin/model-manager/model-manager.guards';
 import { ModelManagerComponent } from 'app/modules/admin/model-manager/model-manager.component';
+import { ModelManagerDetailsComponent } from 'app/modules/admin/model-manager/details/details.component';
 import { ModelManagerListComponent } from 'app/modules/admin/model-manager/list/list.component';
-import { ModelManagerFolderResolver, ModelManagerItemsResolver } from './model-manager.resolver';
+import { ModelManagerFolderResolver, ModelManagerItemResolver, ModelManagerItemsResolver } from './model-manager.resolver';
 
 
 export const modelManagerRoutes: Route[] = [
@@ -18,14 +18,14 @@ export const modelManagerRoutes: Route[] = [
                     item: ModelManagerFolderResolver
                 },
                 children : [
-                    // {
-                    //     path         : 'details/:id',
-                    //     component    : ModelManagerDetailsComponent,
-                    //     resolve      : {
-                    //         item: FileManagerItemResolver
-                    //     },
-                    //     canDeactivate: [CanDeactivateFileManagerDetails]
-                    // }
+                    {
+                        path         : 'details/:id',
+                        component    : ModelManagerDetailsComponent,
+                        resolve      : {
+                            item: ModelManagerItemResolver
+                        },
+                        canDeactivate: [CanDeactivateModelManagerDetails]
+                    }
                 ]
             },
             {
@@ -35,14 +35,14 @@ export const modelManagerRoutes: Route[] = [
                     items: ModelManagerItemsResolver
                 },
                 children : [
-                    // {
-                    //     path         : 'details/:id',
-                    //     component    : FileManagerDetailsComponent,
-                    //     resolve      : {
-                    //         item: FileManagerItemResolver
-                    //     },
-                    //     canDeactivate: [CanDeactivateFileManagerDetails]
-                    // }
+                    {
+                        path         : 'details/:id',
+                        component    : ModelManagerDetailsComponent,
+                        resolve      : {
+                            item: ModelManagerItemResolver
+                        },
+                        canDeactivate: [CanDeactivateModelManagerDetails]
+                    }
                 ]
             }
         ]

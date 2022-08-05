@@ -4,7 +4,7 @@ export interface Repository {
     full_name: string;
     default_branch?: string,
     language?: string;
-    comments_ratio?: number;
+    comment_ratio?: number;
     commit_frequency?: number;
     core_contributors?: number;
     has_ci?: boolean;

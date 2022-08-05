@@ -44,12 +44,13 @@
                     </div>
                     <!-- Actions -->
                     <div class="mt-4 sm:mt-0">
-                        <!-- Upload button -->
+                        <!-- Train button -->
                         <button
                             mat-flat-button
+                            (click)="onTrainModel()"
                             [color]="'primary'">
                             <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                            <span class="ml-2 mr-1">Upload file</span>
+                            <span class="ml-2 mr-1">Train a model</span>
                         </button>
                     </div>
                 </div>

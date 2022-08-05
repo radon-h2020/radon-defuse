@@ -68,7 +68,15 @@
                     </div>
                 </div>
 
-                <mat-progress-bar *ngIf="isCollectingRepositories" mode="buffer" [value]="progressbarValue" ></mat-progress-bar>
+                <ng-container *ngIf="crawlingTask">
+                    <mat-progress-bar mode="buffer" [value]="crawlingTask.progress_value" ></mat-progress-bar>
+                    <div class=" w-full p-6 items-center text-center bg-amber-100 text-amber-800 dark:bg-amber-600 dark:text-amber-50" style="margin:0 auto;">
+                        <div > Analyzing day {{ crawlingTask.analyzed + 1 }} of {{ crawlingTask.total }} ({{ crawlingTask.progress_value }}%) </div>
+                        <div *ngIf="crawlingTask.quota > 0" class="mt-2">Remaining quota with this token: {{ crawlingTask.quota }} </div>
+
+                    </div>
+
+                </ng-container>
 
                 <div class="flex flex-auto overflow-hidden">
 

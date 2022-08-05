@@ -23,8 +23,7 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
     @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
     @ViewChild(MatPaginator) private _paginator: MatPaginator;
 
-    isCollectingRepositories: boolean
-    progressbarValue: number = 1
+    crawlingTask: Task
 
     pagination: RepositoryPagination;
 
@@ -107,11 +106,9 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
             .subscribe((tasks: Task[]) => {        
                 const task = tasks.find(task => task.name == 'crawling')
                 if ( task ){
-                    this.isCollectingRepositories = true
-                    this.progressbarValue = task.progress_value > 0 ? task.progress_value : 1
+                    this.crawlingTask = task
                 } else {
-                    this.isCollectingRepositories = false
-                    this.progressbarValue = 1
+                    this.crawlingTask = null
                 }
 
                 this._changeDetectorRef.markForCheck();
@@ -206,10 +203,8 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
                     .subscribe(response => {
 
                         if (response.status && response.status == 202 ) {
-                            this.isCollectingRepositories = true
                             // this._snackBar.open('Repository collection started!', 'Dismiss', { duration: 3000, });
                         } else {
-                            this.isCollectingRepositories = false
                             // this._snackBar.open('Could not delete the repository', 'Dismiss', { duration: 3000 });
                         }
 

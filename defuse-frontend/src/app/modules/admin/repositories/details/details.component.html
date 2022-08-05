@@ -148,8 +148,9 @@
         <div class="grid grid-cols-2 gap-4 w-full mt-8">
             <button
                 class="flex-auto"
-                mat-flat-button
-                [color]="'primary'">
+                [color]="'primary'"
+                (click)="onCalculateMetrics()"
+                mat-flat-button>
                 Calculate metrics
             </button>
             <button

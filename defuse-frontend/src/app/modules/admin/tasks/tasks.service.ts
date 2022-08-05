@@ -75,8 +75,13 @@ export class TasksService {
     }
 
     mine(repositoryId: string, language: string): Observable<any> {
-        const URL = `/backend-api/mine?id=${repositoryId}&language=${language}`;
-        return this._httpClient.get<any>(URL, {observe:'response'})
+      const URL = `/backend-api/mine?id=${repositoryId}&language=${language}`;
+      return this._httpClient.get<any>(URL, {observe:'response'})
+    }
+
+    train(repositoryId: string, defect: string, language: string, validation: string, metrics: string): Observable<any> {
+      const URL = `/backend-api/train?id=${repositoryId}&defect=${defect}&language=${language}&validation=${validation}&metrics=${metrics}`;
+      return this._httpClient.get<any>(URL, {observe:'response'})
     }
 
 }

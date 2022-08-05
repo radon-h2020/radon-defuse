@@ -1,0 +1,111 @@
+<div class="relative flex flex-col w-full h-full">
+
+    <!-- Dismiss button -->
+    <div class="absolute top-0 right-0 pt-4 pr-4">
+        <button
+            mat-icon-button
+            [matDialogClose]="undefined">
+            <mat-icon
+                class="text-secondary"
+                [svgIcon]="'heroicons_outline:x'"></mat-icon>
+        </button>
+    </div>
+
+    <!-- Content -->
+    <div class="flex flex-col sm:flex-row flex-auto items-center sm:items-start p-8 pb-6 sm:pb-8">
+
+        <div class="flex flex-col items-center sm:items-start mt-4 sm:mt-0 sm:pr-8 space-y-1 text-center sm:text-left">
+
+            <!-- Title -->
+            <div class="text-xl leading-6 font-medium">Collect repositories</div>
+
+            <!-- Form -->
+            <div class="text-secondary">from GitHub</div>
+
+            <div class="flex flex-col mt-4 pt-6 border-t space-y-8">
+                
+                <!-- Token (compulsory) -->
+                <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
+                    <mat-icon matPrefix [svgIcon]="'heroicons_outline:key'"></mat-icon>
+                    <input
+                        matInput
+                        type="password"
+                        [(ngModel)]="data.token"
+                        [autocomplete]="'off'"
+                        [placeholder]="'APIs token'">
+                </mat-form-field>
+
+                <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
+                    <mat-label>Collect repositories created between</mat-label>
+                    <mat-date-range-input [formGroup]="data.dateRange" [rangePicker]="picker" [max]="maxDate" [min]="minDate">
+                        <input matStartDate formControlName="start" placeholder="Start date">
+                        <input matEndDate formControlName="end" placeholder="End date">
+                    </mat-date-range-input>
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-date-range-picker #picker></mat-date-range-picker>
+        
+                    <mat-error *ngIf="data.dateRange.controls.start.hasError('matStartDateInvalid')">Invalid start date</mat-error>
+                    <mat-error *ngIf="data.dateRange.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
+                </mat-form-field>
+        
+                <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
+                  <mat-label>Last pushed after</mat-label>
+                  <input matInput [(ngModel)]="data.pushedAfter" [matDatepicker]="pickerPushedAfter" placeholder="Pushed after this date"  [max]="maxDate" [min]="minDate">
+                  <mat-datepicker-toggle matSuffix [for]="pickerPushedAfter"></mat-datepicker-toggle>
+                  <mat-datepicker #pickerPushedAfter></mat-datepicker>
+                </mat-form-field>
+        
+                <!-- Min number of stars -->
+                <mat-form-field appearance="fill">
+                  <mat-label>Minimum number of stars</mat-label>
+                  <input matInput [(ngModel)]="data.minStars" type="number" value="0" min="0">
+                </mat-form-field>
+        
+                <!-- Min number of releases -->
+                <mat-form-field appearance="fill">
+                  <mat-label>Minimum number of releases</mat-label>
+                  <input matInput [(ngModel)]="data.minReleases" type="number" value="0" min="0">
+                </mat-form-field>
+        
+                <!-- Language -->
+                <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
+                    <mat-label>Written in</mat-label>
+                    <mat-select [(ngModel)]="data.language" name="language" [placeholder]="'Select language'" required cdkFocusInitial>
+                        <mat-option *ngFor="let language of languages" [value]="language.value">
+                            {{language.viewValue}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-center sm:justify-end px-6 py-4 space-x-3">
+
+        <!-- Cancel -->
+        <button
+            mat-stroked-button
+            [matDialogClose]="'cancelled'">
+            Cancel
+        </button>
+
+        <!-- Confirm -->
+        <button
+            mat-flat-button
+            [color]="'primary'"
+            [matDialogClose]="{
+                'token':data.token,
+                'start':data.dateRange.value.start,
+                'end': data.dateRange.value.end,
+                'pushedAfter': data.pushedAfter,
+                'minStars': data.minStars,
+                'minReleases': data.minReleases,
+                'language': data.language }">
+            Confirm
+        </button>
+
+    </div>
+
+</div>

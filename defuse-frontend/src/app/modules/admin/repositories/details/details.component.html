@@ -9,8 +9,7 @@
         </a>
     </div>
 
-    <ng-container *ngIf="repository">
-    
+    <ng-container *ngIf="repository; else noRepository">
         <!-- Name & Type -->
         <div class="flex flex-col items-start">
             <div class="text-xl font-medium">{{repository.full_name}}</div>
@@ -164,4 +163,7 @@
 
     </ng-container>
 
+    <ng-template #noRepository>
+        <mat-spinner style="margin:0 auto;" ></mat-spinner>
+    </ng-template>
 </div>

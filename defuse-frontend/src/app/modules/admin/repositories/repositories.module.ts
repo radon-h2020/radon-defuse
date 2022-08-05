@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -35,6 +36,7 @@ import { AddRepositoryDialog } from './dialogs/add.component';
         MatIconModule,
         MatInputModule,
         MatPaginatorModule,
+        MatProgressSpinnerModule,
         MatSidenavModule,
         MatSnackBarModule,
         MatTooltipModule,

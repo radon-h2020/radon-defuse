@@ -124,13 +124,14 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy {
         this._repositoriesService.calculateMetrics(this.repository)
             .subscribe((response) => {
 
-                if ( response.status != 204 ) {
+                if ( response.status && response.status != 202 ) {
                     this._snackBar.open('Could not calculate metrics', 'Dismiss', { duration: 3000 });
                 } else {                            
                     this._snackBar.open('Scoring started. You will see the updates soon', 'Dismiss', { duration: 3000 });
                     this.closeDrawer()
                     this._router.navigate(['../'], {relativeTo: this._activatedRoute});
                 }
+
             });
 
                 // Mark for check

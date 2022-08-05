@@ -98,6 +98,8 @@ class Repositories(Resource):
         github_crawler = GithubRepositoriesCollector(access_token=args.get('token'))
         
         self.db.collection('tasks').document(task_id).update({
+            'analyzed': analyzed_days,
+            'total': total_days,
             'progress_value': 0,
         })
 

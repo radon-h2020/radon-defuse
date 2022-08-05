@@ -167,6 +167,8 @@ class Repository(Resource):
                 calculate_issue_frequency=False,
                 calculate_repository_size=True)
 
+            scores['modified_at'] = time.time()
+
             doc_ref = self.db.collection('repositories').document(str(repo_doc.get('id')))
             doc_ref.update(scores)
 

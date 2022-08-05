@@ -11,6 +11,7 @@ export interface Repository {
     has_license?: boolean;
     iac_ratio?: number;
     size?: number;
+    modified_at?: number; 
 }
 
 export interface RepositoryPagination {

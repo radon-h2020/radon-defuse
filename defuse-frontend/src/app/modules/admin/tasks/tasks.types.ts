@@ -3,6 +3,7 @@ export interface Task {
     name: string;
     language: string;
     status: string;
+    repository_id?: string;
     started_at: number;
     ended_at?: number;
 

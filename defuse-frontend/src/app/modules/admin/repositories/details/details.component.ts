@@ -120,7 +120,7 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy {
         });
     }
 
-    onCalculateMetrics(): void{
+    onCalculateMetrics(): void {
         this._repositoriesService.calculateMetrics(this.repository)
             .subscribe((response) => {
 
@@ -128,8 +128,6 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy {
                     this._snackBar.open('Could not calculate metrics', 'Dismiss', { duration: 3000 });
                 } else {                            
                     this._snackBar.open('Scoring started. You will see the updates soon', 'Dismiss', { duration: 3000 });
-                    this.closeDrawer()
-                    this._router.navigate(['../'], {relativeTo: this._activatedRoute});
                 }
 
             });
@@ -144,8 +142,7 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy {
      * @param index
      * @param item
      */
-    trackByFn(index: number, item: any): any
-    {
+    trackByFn(index: number, item: any): any {
         return item.id || index;
     }
 }

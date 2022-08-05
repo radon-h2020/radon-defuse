@@ -8,6 +8,9 @@ import { Observable, Subject, switchMap, takeUntil } from 'rxjs';
 import { Repository, RepositoryPagination } from 'app/modules/admin/repositories/repositories.types';
 import { RepositoriesService } from 'app/modules/admin/repositories/repositories.service'
 import { AddRepositoryDialog } from './dialogs/add.component';
+import { TasksService } from '../tasks/tasks.service';
+import { Task } from '../tasks/tasks.types';
+import { CollectRepositoriesDialog } from './dialogs/collect.component';
 
 @Component({
     selector     : 'repositories',
@@ -19,6 +22,9 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
 {
     @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
     @ViewChild(MatPaginator) private _paginator: MatPaginator;
+
+    isCollectingRepositories: boolean
+    progressbarValue: number = 1
 
     pagination: RepositoryPagination;
 
@@ -37,7 +43,8 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
         private _changeDetectorRef: ChangeDetectorRef,
         public _dialog: MatDialog,
         private _repositoriesService: RepositoriesService,
-        private _router: Router)
+        private _router: Router,
+        private _tasksService: TasksService)
     {
     }
 
@@ -93,7 +100,23 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
                 )
             ).subscribe();
 
-            
+        
+        // Subscribe to 'in progress' tasks to observe Crawl task
+        this._tasksService.getTasksInProgress()
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((tasks: Task[]) => {        
+                const task = tasks.find(task => task.name == 'crawling')
+                if ( task ){
+                    this.isCollectingRepositories = true
+                    this.progressbarValue = task.progress_value > 0 ? task.progress_value : 1
+                } else {
+                    this.isCollectingRepositories = false
+                    this.progressbarValue = 1
+                }
+
+                this._changeDetectorRef.markForCheck();
+            })
+        
         // Subscribe to MatDrawer opened change
         this.matDrawer.openedChange.subscribe((opened) => {
             if ( !opened )
@@ -175,6 +198,25 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
         })
     }
 
+    onCollectRepositories(): void {
+        let dialogRef = this._dialog.open(CollectRepositoriesDialog);
+        dialogRef.afterClosed().subscribe(selection => {
+            if( selection && selection.token ){
+                this._repositoriesService.collectRepositories(selection.token, selection.start, selection.end, selection.pushedAfter, selection.language, selection.minStars, selection.minReleases)
+                    .subscribe(response => {
+
+                        if (response.status && response.status == 202 ) {
+                            this.isCollectingRepositories = true
+                            // this._snackBar.open('Repository collection started!', 'Dismiss', { duration: 3000, });
+                        } else {
+                            this.isCollectingRepositories = false
+                            // this._snackBar.open('Could not delete the repository', 'Dismiss', { duration: 3000 });
+                        }
+
+                });
+            }
+        })
+    }
 
     /**
      * Track by function for ngFor loops

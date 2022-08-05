@@ -47,18 +47,28 @@
                                 [autocomplete]="'off'"
                                 [placeholder]="'Search repositories'">
                         </mat-form-field>
+                        
+                        <!-- Crawl repositories button -->
+                        <button
+                            class="flex-auto ml-4"
+                            (click)="onCollectRepositories()"
+                            mat-stroked-button>
+                            Collect repositories
+                        </button>
+
                         <!-- Add product button -->
                         <button
                             class="ml-4"
                             mat-flat-button
                             [color]="'primary'"
                             (click)="onAddRepository()">
-                            <mat-icon [svgIcon]="'heroicons_solid:plus'"></mat-icon>
-                            <span class="ml-2 mr-1">Add</span>
+                            <span class="ml-2 mr-1">Add Repository</span>
                         </button>
+                        
                     </div>
                 </div>
 
+                <mat-progress-bar *ngIf="isCollectingRepositories" mode="buffer" [value]="progressbarValue" ></mat-progress-bar>
 
                 <div class="flex flex-auto overflow-hidden">
 
@@ -69,11 +79,11 @@
                             <ng-container *ngIf="repositories.length; else noRepositories">
                                 <ng-container *ngFor="let repository of repositories; let i = index; trackBy: trackByFn">
                                     <!-- Group -->
-                                    <ng-container *ngIf="i === 0 || repository.full_name.charAt(0) !== repositories[i - 1].full_name.charAt(0)">
+                                    <!-- <ng-container *ngIf="i === 0 || repository.full_name.charAt(0) !== repositories[i - 1].full_name.charAt(0)">
                                         <div class="z-10 sticky top-0 -mt-px px-6 py-1 md:px-8 border-t border-b font-medium uppercase text-secondary bg-gray-50 dark:bg-gray-900">
                                             {{repository.full_name.charAt(0)}}
                                         </div>
-                                    </ng-container>
+                                    </ng-container> -->
                                     <!-- Repository -->
                                     <a class="z-20 flex items-center px-6 py-4 md:px-8 cursor-pointer border-b hover:bg-gray-100 dark:hover:bg-hover"
                                        [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectedRepository || selectedRepository.id !== repository.id,

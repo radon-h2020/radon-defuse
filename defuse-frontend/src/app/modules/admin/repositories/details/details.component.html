@@ -20,6 +20,8 @@
 
         <!-- Information -->
         <div class="text-lg font-medium mt-8">Information</div>
+        <mat-progress-bar *ngIf="isCalculatingMetrics" mode="indeterminate"></mat-progress-bar>
+
         <div class="flex flex-col mt-4 border-t border-b divide-y font-medium">
 
             <!-- Core Contributors -->

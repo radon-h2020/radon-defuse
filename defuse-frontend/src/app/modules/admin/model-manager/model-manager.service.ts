@@ -6,6 +6,7 @@ import { uniq } from 'lodash'
 
 import { Item, Items, PredictiveModel } from 'app/modules/admin/model-manager/model-manager.types';
 import { Repository } from '../repositories/repositories.types';
+import { repositories } from 'app/mock-api/apps/repositories/data';
 
 
 @Injectable({
@@ -48,6 +49,11 @@ export class ModelManagerService {
             switchMap((models) => {
                 let repositoryIds = folderId ? [folderId] : uniq(models.map(model => model.repository_id))
 
+                if ( models.length == 0 ){
+                    this._items.next({ folders: [], files: [] } as Items);
+                    return throwError( 'There are no models' )
+                }
+
                 return combineLatest(
                     of(models),
                     combineLatest(
@@ -86,6 +92,7 @@ export class ModelManagerService {
                 }
             }),
             map((result: Item[]) => { 
+
 
                 const foldersCount = result.filter(item => item.type == 'folder').length
                 result.sort((a, b) => a.name.localeCompare(b.name));

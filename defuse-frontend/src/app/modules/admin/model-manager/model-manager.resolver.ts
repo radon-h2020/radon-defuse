@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, Observable, of, map, throwError } from 'rxjs';
 import { Item, Items } from 'app/modules/admin/model-manager/model-manager.types';
 import { ModelManagerService } from 'app/modules/admin/model-manager/model-manager.service'
 
@@ -12,7 +12,8 @@ export class ModelManagerItemsResolver implements Resolve<any>
     /**
      * Constructor
      */
-    constructor(private _modelManagerService: ModelManagerService)
+    constructor(private _modelManagerService: ModelManagerService,
+        private _router: Router,)
     {
     }
 
@@ -28,7 +29,18 @@ export class ModelManagerItemsResolver implements Resolve<any>
      */
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Items>
     {
-        return this._modelManagerService.getItems();
+        return this._modelManagerService.getItems()
+                    .pipe(
+                        map((items) => { 
+                            return items
+                        }),
+                        catchError((error) => {
+                            // Log the error
+                            console.error(error);
+
+                            return of( { folders: [], files: [] } as Items);
+                        })
+                    )
     }
 }
 

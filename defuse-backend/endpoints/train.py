@@ -38,7 +38,7 @@ class Train(Resource):
 
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, required=True, location='args')
+        parser.add_argument('id', type=str, required=True, location='args')
         parser.add_argument('language', type=str, required=True, location='args', choices=('ansible', 'tosca'))
         parser.add_argument('metrics', type=str, required=True, location='args', choices=('product', 'process'))
         parser.add_argument('validation', type=str, required=True, location='args', choices=('commit', 'release'))

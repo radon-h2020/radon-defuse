@@ -48,6 +48,14 @@ export class TasksService {
       );      
     }
 
+    getTasksInProgress(): Observable<Task[]> {
+      return this._tasksCollection.pipe(
+          map((tasks) => {
+            return tasks.filter(task => task.in_progress)
+          })
+      );      
+    }
+
     deleteTask(task: Task): Observable<boolean> {
       if (!task || task.in_progress){
         return of(false);

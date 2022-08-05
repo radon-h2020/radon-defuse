@@ -26,11 +26,11 @@
                     <div>
                         <div class="text-4xl font-extrabold tracking-tight leading-none">Model Manager</div>
                         <div class="flex items-center mt-0.5 font-medium text-secondary">
-                            <ng-container *ngIf="!items.files.length">
+                            <ng-container *ngIf="items && !items.files.length">
                                 {{items.folders.length}} folders, {{items.files.length}} files
                             </ng-container>
                             <!-- Breadcrumbs -->
-                            <ng-container *ngIf="items.files.length">
+                            <ng-container *ngIf="items && items.files.length">
                                 <div class="flex items-center space-x-2">
                                     <a
                                         class="text-primary cursor-pointer"

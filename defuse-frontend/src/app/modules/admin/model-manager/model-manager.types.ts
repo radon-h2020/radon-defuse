@@ -6,13 +6,12 @@ export interface PredictiveModel {
     language: string;
     mcc: number;
     average_precision: number;
-    name?: string;
-    created_at?: string;
 }
 
 export interface Item {
     id?: string;
     folderId?: string;
+    folderName?: string;
     name?: string;
     createdBy?: string;
     createdAt?: string;

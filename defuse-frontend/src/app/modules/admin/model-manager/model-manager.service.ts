@@ -68,6 +68,7 @@ export class ModelManagerService {
                         return {
                             id: model.id,
                             folderId: folderId,
+                            folderName: repositories.find(repo => repo.id == folderId).full_name,
                             name: `${model.language} ${model.defect}`,
                             type: 'joblib'
                         } as Item

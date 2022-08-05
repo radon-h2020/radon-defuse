@@ -103,7 +103,7 @@ export class RepositoryDetailsComponent implements OnInit, OnDestroy {
                     .subscribe((response) => {
 
                         // Return if the repository wasn't deleted...
-                        if ( response.status != 204 ) {
+                        if (response.status && response.status != 204 ) {
                             this._snackBar.open('Could not delete the repository', 'Dismiss', { duration: 3000 });
                             return;
                         } else {                            

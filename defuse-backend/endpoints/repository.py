@@ -126,14 +126,13 @@ class Repository(Resource):
     def patch(self):
         """ Compute scores for repository """
         parser = reqparse.RequestParser()
-        parser.add_argument('id', type=int, required=True, location='args')
+        parser.add_argument('id', type=str, required=True, location='args')
         self.args = parser.parse_args()
 
         # Create Task
         task_id = self.db.collection('tasks').add({
             'name': 'score',
             'repository_id': self.args.get('id'),
-            'language': self.args.get('language'),
             'status': 'progress',
             'started_at': time.time()
         })[1].id

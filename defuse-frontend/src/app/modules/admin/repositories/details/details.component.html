@@ -47,8 +47,8 @@
                     
                     <mat-icon 
                         class="mr-2" 
-                        [ngClass] = "{ 'text-red-600 dark:text-red-600'    : repository.size < 100,
-                                    'text-green-400 dark:text-green-400': repository.size >= 100}"
+                        [ngClass] = "{ 'text-red-600 dark:text-red-600'    : repository.repository_size < 100,
+                                    'text-green-400 dark:text-green-400': repository.repository_size >= 100}"
                         [svgIcon]="'mat_outline:code'"></mat-icon>
                 
                         Code lines

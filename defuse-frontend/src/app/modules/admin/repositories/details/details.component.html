@@ -53,7 +53,7 @@
                 
                         Code lines
                 </div>
-                <div> {{ repository.repository_size ? repository.repository_size : 'NA' }} </div>
+                <div> {{ repository.repository_size >= 0 ? repository.repository_size : 'NA' }} </div>
             </div>
 
             <!-- Commit frequency -->
@@ -70,7 +70,7 @@
                         Commit frequency
                 </div>
                 <div class="flex items-baseline whitespace-nowrap">
-                    <div> {{ repository.commit_frequency ? repository.commit_frequency : 'NA' }} </div>
+                    <div> {{ repository.commit_frequency >= 0 ? repository.commit_frequency : 'NA' }} </div>
                     <div class="ml-2 text-secondary">/ month</div>
                 </div>
             </div>
@@ -89,7 +89,7 @@
                         Comment ratio
                 </div>
                 <div class="flex items-baseline whitespace-nowrap">
-                    <div> {{ repository.comments_ratio ? repository.comments_ratio : 'NA' }} </div>
+                    <div> {{ repository.comments_ratio >= 0 ? repository.comments_ratio : 'NA' }} </div>
                     <div class="ml-2 text-secondary">%</div>
                 </div>
             </div>
@@ -108,7 +108,7 @@
                         Ratio of Infrastructure-as-Code files
                 </div>
                 <div class="flex items-baseline whitespace-nowrap">
-                    <div> {{ repository.iac_ratio ? repository.iac_ratio : 'NA' }} </div>
+                    <div> {{ repository.iac_ratio >= 0 ? repository.iac_ratio : 'NA' }} </div>
                     <div class="ml-2 text-secondary">%</div>
                 </div>
             </div>

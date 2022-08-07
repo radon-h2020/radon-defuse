@@ -10,7 +10,7 @@ export interface Repository {
     has_ci?: boolean;
     has_license?: boolean;
     iac_ratio?: number;
-    size?: number;
+    repository_size?: number;
     modified_at?: number; 
 }
 

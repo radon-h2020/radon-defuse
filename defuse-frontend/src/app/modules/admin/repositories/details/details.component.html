@@ -89,7 +89,7 @@
                         Comment ratio
                 </div>
                 <div class="flex items-baseline whitespace-nowrap">
-                    <div> {{ repository.comments_ratio >= 0 ? repository.comments_ratio : 'NA' }} </div>
+                    <div> {{ repository.comments_ratio * 100 | number:'1.0-0' }} </div>
                     <div class="ml-2 text-secondary">%</div>
                 </div>
             </div>
@@ -108,7 +108,7 @@
                         Ratio of Infrastructure-as-Code files
                 </div>
                 <div class="flex items-baseline whitespace-nowrap">
-                    <div> {{ repository.iac_ratio >= 0 ? repository.iac_ratio : 'NA' }} </div>
+                    <div> {{ repository.iac_ratio * 100 | number:'1.0-0' }} </div>
                     <div class="ml-2 text-secondary">%</div>
                 </div>
             </div>

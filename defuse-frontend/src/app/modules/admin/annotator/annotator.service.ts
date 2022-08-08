@@ -49,7 +49,9 @@ export class CommitsService {
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
     exportCommitsToCSV(): Observable<any> {
-        return this._commitsCollection.pipe(
+        const collectionRef = this._firestore.collection('commits').valueChanges()
+        
+        return collectionRef.pipe(
             map((commits) => {
                 const replacer = (key, value) => (value === null ? '' : value);
                 const header = Object.keys(commits[0]);
@@ -302,8 +304,9 @@ export class FixedFilesService {
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
     exportFilesToCSV(): Observable<any> {
-        return this._filesCollection.pipe(
-            map((files) => {
+        const collectionRef = this._firestore.collection('fixed-files').valueChanges()
+        return collectionRef.pipe(
+            map(files => {
                 const replacer = (key, value) => (value === null ? '' : value);
                 const header = Object.keys(files[0]);
 
@@ -324,6 +327,8 @@ export class FixedFilesService {
                 a.click();
                 window.URL.revokeObjectURL(url);
                 a.remove();
+
+                return null
             })
         )
     }

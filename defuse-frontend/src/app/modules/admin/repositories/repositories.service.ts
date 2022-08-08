@@ -49,6 +49,33 @@ export class RepositoriesService
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
 
+    exportRepositoriesToCSV(): Observable<any> {
+        return this._repositoriesCollection.pipe(
+            map((repositories) => {
+                const replacer = (key, value) => (value === null ? '' : value);
+                const header = Object.keys(repositories[0]);
+
+                const csv = repositories.map(repository =>
+                  header
+                    .map((attribute) => JSON.stringify(repository[attribute], replacer))
+                    .join(',')
+                );
+
+                csv.unshift(header.join(','));
+                const csvArray = csv.join('\r\n');
+                const a = document.createElement('a');
+                const blob = new Blob([csvArray], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+
+                a.href = url;
+                a.download = 'repositories.csv';
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+            })
+        )
+    }
+
     getRepositoriesPage(pageIndex: number = 0, pageSize: number=10): Observable<any> {
         return this._repositoriesCollection.pipe(
             map((repositories) => {

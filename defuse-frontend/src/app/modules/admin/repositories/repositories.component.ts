@@ -213,6 +213,11 @@ export class RepositoriesComponent implements AfterViewInit, OnInit, OnDestroy
         })
     }
 
+    onExport(): void {
+        this._repositoriesService.exportRepositoriesToCSV()
+            .subscribe();
+    }
+
     /**
      * Track by function for ngFor loops
      *

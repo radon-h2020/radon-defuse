@@ -93,14 +93,57 @@
                                         </div>
                                     </ng-container> -->
                                     <!-- Repository -->
-                                    <a class="z-20 flex items-center px-6 py-4 md:px-8 cursor-pointer border-b hover:bg-gray-100 dark:hover:bg-hover"
+                                    <a class="z-20 items-center px-6 py-4 md:px-8 cursor-pointer border-b hover:bg-gray-100 dark:hover:bg-hover"
+                                       style="align-items:center"
                                        [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectedRepository || selectedRepository.id !== repository.id,
                                                    'bg-primary-50 dark:bg-hover': selectedRepository && selectedRepository.id === repository.id}"
                                        [routerLink]="['./', repository.id]">
                                 
-                                        <div class="min-w-0 ml-4">
-                                            <div class="font-medium leading-5 truncate">{{repository.full_name}}</div>
-                                            <!-- <div class="leading-5 truncate text-secondary">{{repository.language}}</div> -->
+                                       
+                                        <div class="font-medium leading-5 truncate">{{repository.full_name}}</div>
+                                        <div class="flex items-center justify-end min-w-0">
+                                            <mat-icon 
+                                                class="icon-size-5 mr-6" 
+                                                [matTooltip]="'Core contributors'"
+                                                [ngClass] = "{ 'text-red-600 dark:text-red-600'    : repository.core_contributors < 2,
+                                                               'text-green-400 dark:text-green-400': repository.core_contributors >= 2}"  
+                                                [svgIcon]="'mat_outline:supervised_user_circle'"></mat-icon>
+                                            <mat-icon 
+                                                class="icon-size-5 mr-6"
+                                                [matTooltip]="'Lines of code'" 
+                                                [ngClass] = "{ 'text-red-600 dark:text-red-600'     : repository.repository_size < 100,
+                                                                'text-green-400 dark:text-green-400': repository.repository_size >= 100}" 
+                                                    [svgIcon]="'mat_outline:code'"></mat-icon>
+                                            <mat-icon 
+                                                class="icon-size-5 mr-6" 
+                                                [matTooltip]="'Commit frequency'"
+                                                [ngClass] = "{ 'text-red-600 dark:text-red-600'     : repository.commit_frequency < 2,
+                                                                'text-green-400 dark:text-green-400': repository.commit_frequency >= 2}"
+                                                [svgIcon]="'mat_outline:linear_scale'"></mat-icon>
+                                            <mat-icon 
+                                                class="icon-size-5 mr-6" 
+                                                [matTooltip]="'Comment ratio'"
+                                                [ngClass] = "{ 'text-red-600 dark:text-red-600'     : repository.comments_ratio < 0.1,
+                                                                'text-green-400 dark:text-green-400': repository.comments_ratio >= 0.01}"  
+                                                [svgIcon]="'mat_outline:comment'"></mat-icon>
+                                            <mat-icon 
+                                                class="icon-size-5 mr-6"
+                                                [matTooltip]="'Ratio of IaC files'" 
+                                                [ngClass] = "{ 'text-red-600 dark:text-red-600' : repository.iac_ratio < 0.1,
+                                                            'text-green-400 dark:text-green-400': repository.iac_ratio >= 0.1}" 
+                                                [svgIcon]="'mat_outline:description'"></mat-icon>
+                                            <mat-icon 
+                                                class="icon-size-5 mr-6" 
+                                                [matTooltip]="'License'"
+                                                [ngClass] = "{ 'text-red-600 dark:text-red-600'    : !repository.has_license,
+                                                                'text-green-400 dark:text-green-400': repository.has_license }"  
+                                                [svgIcon]="'mat_outline:copyright'"></mat-icon>
+                                            <mat-icon 
+                                                class="icon-size-5 mr-6" 
+                                                [matTooltip]="'Continuous Integration'"
+                                                [ngClass] = "{ 'text-red-600 dark:text-red-600'    : !repository.has_ci,
+                                                                'text-green-400 dark:text-green-400': repository.has_ci }"  
+                                                [svgIcon]="'mat_outline:all_inclusive'"></mat-icon>
                                         </div>
                                     </a>
                                 </ng-container>

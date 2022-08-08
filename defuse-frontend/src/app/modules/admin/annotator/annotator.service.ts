@@ -48,6 +48,32 @@ export class CommitsService {
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
+    exportCommitsToCSV(): Observable<any> {
+        return this._commitsCollection.pipe(
+            map((commits) => {
+                const replacer = (key, value) => (value === null ? '' : value);
+                const header = Object.keys(commits[0]);
+
+                const csv = commits.map(commit =>
+                  header
+                    .map((attribute) => JSON.stringify(commit[attribute], replacer))
+                    .join(',')
+                );
+
+                csv.unshift(header.join(','));
+                const csvArray = csv.join('\r\n');
+                const a = document.createElement('a');
+                const blob = new Blob([csvArray], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+
+                a.href = url;
+                a.download = 'commits.csv';
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+            })
+        )
+    }
 
     getCommitsPage(pageIndex: number = 0, pageSize: number=10): Observable<any> {
         return this._commitsCollection.pipe(
@@ -244,6 +270,11 @@ export class FixedFilesService {
      * Constructor
      */
     constructor(private _firestore: AngularFirestore) {
+        this._filesCollection = this._firestore.collection('fixed-files').snapshotChanges().pipe(map(changes => {
+            return changes.map(item => { 
+                return item.payload.doc.data() as FixedFile; 
+            })
+        }))
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -270,6 +301,33 @@ export class FixedFilesService {
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
+    exportFilesToCSV(): Observable<any> {
+        return this._filesCollection.pipe(
+            map((files) => {
+                const replacer = (key, value) => (value === null ? '' : value);
+                const header = Object.keys(files[0]);
+
+                const csv = files.map(file =>
+                  header
+                    .map((attribute) => JSON.stringify(file[attribute], replacer))
+                    .join(',')
+                );
+
+                csv.unshift(header.join(','));
+                const csvArray = csv.join('\r\n');
+                const a = document.createElement('a');
+                const blob = new Blob([csvArray], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+
+                a.href = url;
+                a.download = 'fixed-files.csv';
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+            })
+        )
+    }
+
     getFixedFiles(): Observable<FixedFile[]> {
         return this._filesCollection.pipe(
             map((files) => {

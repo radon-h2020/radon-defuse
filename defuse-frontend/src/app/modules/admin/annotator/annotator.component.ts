@@ -7,7 +7,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subject, switchMap, takeUntil } from 'rxjs';
 import { Commit, CommitsPagination, Defect } from 'app/modules/admin/annotator/annotator.types';
-import { CommitsService, DefectsService } from 'app/modules/admin/annotator/annotator.service'
+import { CommitsService, DefectsService, FixedFilesService } from 'app/modules/admin/annotator/annotator.service'
 import { StartMiningDialog } from './dialogs/start.component';
 import { Repository } from '../repositories/repositories.types';
 import { RepositoriesService } from '../repositories/repositories.service';
@@ -49,6 +49,7 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy {
         private _changeDetectorRef: ChangeDetectorRef,
         private _commitsService: CommitsService,
         private _defectsService: DefectsService,
+        private _fixedFilesService: FixedFilesService,
         public _dialog: MatDialog,
         private _repositoriesService: RepositoriesService,
         private _router: Router,
@@ -173,6 +174,14 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy {
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe(() => this._changeDetectorRef.markForCheck())    
         }
+    }
+
+    onExport(): void {
+        this._commitsService.exportCommitsToCSV()
+            .subscribe();
+
+        this._fixedFilesService.exportFilesToCSV()
+            .subscribe();
     }
 
     onSelectRepository(repository) {

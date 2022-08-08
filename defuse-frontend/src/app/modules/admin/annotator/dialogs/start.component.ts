@@ -20,7 +20,7 @@ export class StartMiningDialog implements OnInit {
   selectedLanguage: string;
 
   ngOnInit(): void {
-      this.selectedLanguage = null // this.languages[0].value;
+      this.selectedLanguage = this.languages[0].value;
   }
 
 }

@@ -1,20 +1,21 @@
-<div class="absolute inset-0 flex flex-col min-w-0 overflow-auto">
+<div class="absolute inset-0 flex flex-col min-w-0">
 
-    <!-- Main -->
-    <div class="flex flex-col flex-auto">
-
-        <!-- Header -->
-        <div class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between py-8 px-6 md:px-8">
-            <!-- Title -->
-            <div>
-                <div class="text-4xl font-extrabold tracking-tight leading-none">Tasks</div>
-                <div class="ml-0.5 font-medium text-secondary">
-                    <div *ngIf="tasksCount.completed > 0">{{tasksCount.completed}} succeeded </div>
-                    <div *ngIf="tasksCount.failed > 0">{{tasksCount.failed}} failed</div>
-                    <div *ngIf="tasksCount.in_progress > 0">{{tasksCount.in_progress}} in progress</div>
-                </div>
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between py-8 px-6 md:px-8 mt-4 overflow-hidden">
+        <!-- Title -->
+        <div class="mb-4">
+            <div class="text-4xl font-extrabold tracking-tight leading-none">Tasks</div>
+            <div class="ml-0.5 font-medium text-secondary">
+                <div *ngIf="tasksCount.completed > 0">{{tasksCount.completed}} succeeded </div>
+                <div *ngIf="tasksCount.failed > 0">{{tasksCount.failed}} failed</div>
+                <div *ngIf="tasksCount.in_progress > 0">{{tasksCount.in_progress}} in progress</div>
             </div>
         </div>
+    </div>
+
+    <!-- Main -->
+    <div class="flex flex-col flex-auto overflow-auto">
+
 
         <ng-container *ngIf="tasks$ | async as tasks">
 
@@ -22,7 +23,8 @@
             <ng-container *ngIf="tasks && tasks.length > 0; else noTasks">
                 <!-- Task -->
                 <ng-container *ngFor="let task of tasks; let first = first; trackBy: trackByFn">
-                    <div class="group w-full select-none h-16 hover:bg-gray-200 dark:hover:bg-hover"
+                    
+                    <div class="group w-full select-none h-16 hover:bg-gray-200 dark:hover:bg-hover py-2"
                         [ngClass]="{'text-hint': task.completed}"
                         [class.border-t]="first">
 

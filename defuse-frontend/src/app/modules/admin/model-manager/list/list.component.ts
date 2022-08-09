@@ -1,13 +1,10 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog'
 import { MatDrawer } from '@angular/material/sidenav';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { Item, Items } from 'app/modules/admin/model-manager/model-manager.types';
 import { ModelManagerService } from 'app/modules/admin/model-manager/model-manager.service';
-import { TrainModelDialog } from '../dialogs/train.component';
 import { TasksService } from '../../tasks/tasks.service';
 
 @Component({
@@ -30,12 +27,9 @@ export class ModelManagerListComponent implements OnInit, OnDestroy
     constructor(
         private _activatedRoute: ActivatedRoute,
         private _changeDetectorRef: ChangeDetectorRef,
-        public _dialog: MatDialog,
         private _router: Router,
         private _modelManagerService: ModelManagerService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
-        private _snackBar: MatSnackBar,
-        private _tasksService: TasksService
     )
     {
     }
@@ -97,44 +91,6 @@ export class ModelManagerListComponent implements OnInit, OnDestroy
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * On backdrop clicked
-     */
-    onBackdropClicked(): void {
-        // Go back to the list
-        this._router.navigate(['./'], {relativeTo: this._activatedRoute});
-
-        // Mark for check
-        this._changeDetectorRef.markForCheck();
-    }
-
-    onTrainModel(): void {
-
-        let dialogRef = this._dialog.open(TrainModelDialog);
-        dialogRef.afterClosed().subscribe(selection => {
-            if( selection && selection.repository && selection.defect && selection.language && selection.validation && selection.metrics ){
-
-                this._tasksService.train(
-                    selection.repository, 
-                    selection.defect, 
-                    selection.language, 
-                    selection.validation, 
-                    selection.metrics).subscribe(response => {
-
-                    let message = ''
-        
-                    if (response.status === 202) {
-                        message = 'Mining started'
-                    } else {
-                        message = 'Some errors have occurred'
-                    }
-        
-                    this._snackBar.open(message, 'Dismiss', { duration: 3000 });
-                })
-            }
-        })
-    }
 
     /**
      * Track by function for ngFor loops

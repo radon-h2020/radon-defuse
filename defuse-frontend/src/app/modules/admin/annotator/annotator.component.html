@@ -71,6 +71,9 @@
 
                         <!-- Defects filter button -->
                         <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full sm:w-36">
+                            <mat-icon class="icon-size-5" 
+                                matPrefix 
+                                [svgIcon]="'heroicons_outline:filter'"></mat-icon>
                             <mat-select
                                 [value]="'all'"
                                 (selectionChange)="onFilterByDefect($event)">
@@ -96,20 +99,35 @@
                                 [placeholder]="'Search repositories'">
                         </mat-form-field>
 
-                        <!-- Add product button -->
-                        <button
-                            class="ml-4"
-                            mat-flat-button
-                            [color]="'primary'"
-                            (click)="onMineRepository()">
-                            <mat-icon [svgIcon]="'heroicons_solid:plus'"></mat-icon>
-                            <span class="ml-2 mr-1">Mine</span>
+                        <button class="ml-3"
+                            mat-icon-button
+                            [matMenuTriggerFor]="repositoryActions">
+                            <span class="relative">
+                                <mat-icon
+                                    [svgIcon]="'heroicons_outline:dots-vertical'"></mat-icon>
+                            </span>
                         </button>
 
-
-                        <button class="ml-4" mat-icon-button color="accent" aria-label="Export button" (click)="onExport()">
-                            <mat-icon>download</mat-icon>
-                        </button>
+                        <mat-menu
+                            [xPosition]="'before'"
+                            #repositoryActions="matMenu">
+                            <button mat-menu-item
+                                (click)="onMineRepository()">
+                                <mat-icon [svgIcon]="'heroicons_outline:annotation'"></mat-icon>
+                                <span>Annotate</span>
+                            </button>
+                            <button mat-menu-item>
+                                <mat-icon [svgIcon]="'heroicons_outline:beaker'"></mat-icon>
+                                <span>Build model</span>
+                            </button>
+                            <mat-divider class="my-2"></mat-divider>
+                            <button
+                                mat-menu-item
+                                (click)="onExport()">
+                                <mat-icon [svgIcon]="'heroicons_outline:download'"></mat-icon>
+                                <span>Download</span>
+                            </button>
+                        </mat-menu>
                     </div>
                 </div>
 
@@ -181,11 +199,26 @@
                             [pageSizeOptions]="[5, 10, 25]"
                             [showFirstLastButtons]="true"></mat-paginator>
 
-                        <!-- No commits -->
+                        <!-- No commits template -->
                         <ng-template #noCommits>
-                            <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">There are no commits!</div>
+                            <div class="flex flex-auto flex-col items-center justify-center bg-gray-100 dark:bg-transparent">
+                                <mat-icon
+                                    class="icon-size-24"
+                                    [svgIcon]="'heroicons_outline:folder-open'"></mat-icon>
+                                
+                                <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">There are no commits!</div>
+                                
+                                <button
+                                    class="mt-6"
+                                    mat-flat-button
+                                    [color]="'primary'"
+                                    (click)="onMineRepository()">
+                                    <mat-icon [svgIcon]="'heroicons_outline:annotation'"></mat-icon>
+                                    <span class="ml-2 mr-1">Start annotating</span>
+                                </button>
+                                
+                            </div>
                         </ng-template>
-                    
                     </div>
                 </div>
 

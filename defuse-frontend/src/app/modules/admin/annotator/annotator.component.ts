@@ -12,6 +12,7 @@ import { StartMiningDialog } from './dialogs/start.component';
 import { Repository } from '../repositories/repositories.types';
 import { RepositoriesService } from '../repositories/repositories.service';
 import { TasksService } from '../tasks/tasks.service';
+import { TrainModelDialog } from '../model-manager/dialogs/train.component';
 
 @Component({
     selector     : 'annotator',
@@ -193,6 +194,33 @@ export class AnnotatorComponent implements AfterViewInit, OnInit, OnDestroy {
     onToggleCommitValidity(commit: Commit): void {
         this._commitsService.toggleCommitValidity(commit)
         this._changeDetectorRef.markForCheck();
+    }
+
+    onTrainModel(): void {
+
+        let dialogRef = this._dialog.open(TrainModelDialog, { data: { repository: this.selectedRepository }});
+        dialogRef.afterClosed().subscribe(selection => {
+            if( selection && selection.repository && selection.defect && selection.language && selection.validation && selection.metrics ){
+
+                this._tasksService.train(
+                    selection.repository, 
+                    selection.defect, 
+                    selection.language, 
+                    selection.validation, 
+                    selection.metrics).subscribe(response => {
+
+                    let message = ''
+        
+                    if (response.status === 202) {
+                        message = 'Mining started'
+                    } else {
+                        message = 'Some errors have occurred'
+                    }
+        
+                    this._snackBar.open(message, 'Dismiss', { duration: 3000 });
+                })
+            }
+        })
     }
 
     onMineRepository(): void {

@@ -1,9 +1,11 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Subject, takeUntil } from 'rxjs';
 
 import { DefectsService } from '../../annotator/annotator.service';
 import { Defect } from '../../annotator/annotator.types';
 import { RepositoriesService } from '../../repositories/repositories.service';
+import { Repository } from '../../repositories/repositories.types';
 
 export interface DialogViewItem {
     value: string,
@@ -44,11 +46,19 @@ export class TrainModelDialog implements OnInit, OnDestroy {
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
+
     constructor(
+        @Inject(MAT_DIALOG_DATA) data: { repository: Repository },
         private _changeDetectorRef: ChangeDetectorRef,
         private _defectsService: DefectsService,
         private _repositoriesService: RepositoriesService
     ) {
+        
+        if (data && data.repository){
+            this.repositories = [{ value: data.repository.id, viewValue: data.repository.full_name }]
+            this.selectedRepository = this.repositories[0].value;
+        }
+
         this.selectedLanguage = this.languages[0].value;
         this.selectedMetrics = this.metrics[0].value;
         this.selectedValidation = this.validations[0].value;
@@ -70,19 +80,22 @@ export class TrainModelDialog implements OnInit, OnDestroy {
                 this._changeDetectorRef.markForCheck();
             });
 
-        // Get repositories
-        this._repositoriesService.getRepositoriesPage(0, 10000)
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe(response => {
-                this.repositories = []
+        if ( !this.selectedRepository ){
 
-                response.repositories.forEach(repo => this.repositories.push({ value: repo.id, viewValue: repo.full_name } as DialogViewItem ));
+            // Get repositories
+            this._repositoriesService.getRepositoriesPage(0, 10000)
+                .pipe(takeUntil(this._unsubscribeAll))
+                .subscribe(response => {
+                    this.repositories = []
 
-                this.selectedRepository = this.repositories[0].value;
+                    response.repositories.forEach(repo => this.repositories.push({ value: repo.id, viewValue: repo.full_name } as DialogViewItem ));
 
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
+                    this.selectedRepository = this.repositories[0].value;
+
+                    // Mark for check
+                    this._changeDetectorRef.markForCheck();
+                });
+        }
     }
 
     ngOnDestroy(): void {

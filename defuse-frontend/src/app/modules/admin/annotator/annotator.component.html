@@ -116,7 +116,8 @@
                                 <mat-icon [svgIcon]="'heroicons_outline:annotation'"></mat-icon>
                                 <span>Annotate</span>
                             </button>
-                            <button mat-menu-item>
+                            <button mat-menu-item
+                                (click)="onTrainModel()">
                                 <mat-icon [svgIcon]="'heroicons_outline:beaker'"></mat-icon>
                                 <span>Build model</span>
                             </button>

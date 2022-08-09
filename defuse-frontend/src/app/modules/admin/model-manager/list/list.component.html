@@ -78,10 +78,8 @@
                                 <div class="flex flex-col flex-auto justify-center text-center text-sm font-medium">
                                     <div
                                         class="truncate"
-                                        [matTooltip]="file.name">{{file.name}}</div>
-                                    <ng-container *ngIf="file.contents">
-                                        <div class="text-secondary truncate">{{file.contents}}</div>
-                                    </ng-container>
+                                        [matTooltip]="file.name">{{ file.name | titlecase }}
+                                    </div>
                                 </div>
                             </a>
                         </ng-container>

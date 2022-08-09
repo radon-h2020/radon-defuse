@@ -9,61 +9,46 @@
         </a>
     </div>
 
-    <!-- Preview -->
-    <div class="aspect-w-9 aspect-h-6 mt-8">
-        <div class="flex items-center justify-center border rounded-lg bg-gray-50 dark:bg-card">
-            <ng-container *ngIf="item.type === 'folder'">
-                <mat-icon
-                    class="icon-size-24 text-hint"
-                    [svgIcon]="'heroicons_outline:folder'"></mat-icon>
-            </ng-container>
-            <ng-container *ngIf="item.type !== 'folder'">
-                <mat-icon
-                    class="icon-size-24 text-hint"
-                    [svgIcon]="'heroicons_outline:document'"></mat-icon>
-            </ng-container>
+    <ng-container *ngIf="item">
+
+
+        <!-- Name & Type -->
+        <div class="flex flex-row items-start mt-8">
+            <div class="text-xl font-medium">{{item.name}}</div>
+            <div
+                class="mt-1.5 ml-1 px-1.5 bg-primary-600 rounded text-sm font-semibold leading-5 text-white">
+                .{{item.type}}
+            </div>
         </div>
-    </div>
 
-    <!-- Name & Type -->
-    <div class="flex flex-col items-start mt-8">
-        <div class="text-xl font-medium">{{item.name}}</div>
-        <div
-            class="mt-1 px-1.5 rounded text-sm font-semibold leading-5 text-white"
-            [class.bg-indigo-600]="item.type === 'folder'"
-            [class.bg-primary-600]="item.type === 'joblib'">
-            {{item.type}}
+        <!-- Information -->
+        <div class="text-lg font-medium mt-8">Information</div>
+        <!-- <div class="flex flex-col mt-4 border-t border-b divide-y font-medium">
+            <div class="flex items-center justify-between py-3">
+                <div class="text-secondary">Created At</div>
+                <div>{{item.createdAt}}</div>
+            </div>
+            <div class="flex items-center justify-between py-3">
+                <div class="text-secondary">Size</div>
+                <div>{{item.size}}</div>
+            </div>
+        </div> -->
+
+
+        <!-- Actions -->
+        <div class="grid grid-cols-2 gap-4 w-full mt-8">
+            <button
+                class="flex-auto"
+                mat-flat-button
+                [color]="'primary'">
+                Download
+            </button>
+            <button
+                class="flex-auto"
+                [color]="'warn'"
+                mat-stroked-button>
+                Delete
+            </button>
         </div>
-    </div>
-
-    <!-- Information -->
-    <div class="text-lg font-medium mt-8">Information</div>
-    <div class="flex flex-col mt-4 border-t border-b divide-y font-medium">
-        <div class="flex items-center justify-between py-3">
-            <div class="text-secondary">Created At</div>
-            <div>{{item.createdAt}}</div>
-        </div>
-        <div class="flex items-center justify-between py-3">
-            <div class="text-secondary">Size</div>
-            <div>{{item.size}}</div>
-        </div>
-    </div>
-
-
-    <!-- Actions -->
-    <div class="grid grid-cols-2 gap-4 w-full mt-8">
-        <button
-            class="flex-auto"
-            mat-flat-button
-            [color]="'primary'">
-            Download
-        </button>
-        <button
-            class="flex-auto"
-            [color]="'warn'"
-            mat-stroked-button>
-            Delete
-        </button>
-    </div>
-
+    </ng-container>
 </div>

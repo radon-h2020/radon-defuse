@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { MatDrawerToggleResult } from '@angular/material/sidenav';
+import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { ModelManagerListComponent } from 'app/modules/admin/model-manager/list/list.component';
 import { ModelManagerService } from 'app/modules/admin/model-manager/model-manager.service';
 import { Item } from 'app/modules/admin/model-manager/model-manager.types';
 
@@ -20,8 +19,8 @@ export class ModelManagerDetailsComponent implements OnInit, OnDestroy
      * Constructor
      */
     constructor(
+        private _activatedRoute: ActivatedRoute,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _modelManagerListComponent: ModelManagerListComponent,
         private _modelManagerService: ModelManagerService
     )
     {
@@ -35,16 +34,11 @@ export class ModelManagerDetailsComponent implements OnInit, OnDestroy
      * On init
      */
     ngOnInit(): void {
-        // Open the drawer
-        this._modelManagerListComponent.matDrawer.open();
 
         // Get the item
-        this._modelManagerService.item$
+        this._modelManagerService.getItemById(this._activatedRoute.snapshot.params.id)
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((item: Item) => {
-
-                // Open the drawer in case it is closed
-                this._modelManagerListComponent.matDrawer.open();
 
                 // Get the item
                 this.item = item;
@@ -66,13 +60,6 @@ export class ModelManagerDetailsComponent implements OnInit, OnDestroy
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Close the drawer
-     */
-    closeDrawer(): Promise<MatDrawerToggleResult> {
-        return this._modelManagerListComponent.matDrawer.close();
-    }
 
     /**
      * Track by function for ngFor loops

@@ -104,8 +104,8 @@
                                        [routerLink]="['./', repository.id]">
                                 
                                        
-                                        <div class="font-medium leading-5 truncate">{{repository.full_name}}</div>
-                                        <div class="flex items-center justify-end min-w-0">
+                                        <span class="font-medium leading-5 truncate">{{repository.full_name}}</span>
+                                        <span class="flex items-center justify-end min-w-0" style="float: right;">
                                             <mat-icon 
                                                 class="icon-size-5 mr-6" 
                                                 [matTooltip]="'Core contributors'"
@@ -143,12 +143,12 @@
                                                                 'text-green-400 dark:text-green-400': repository.has_license }"  
                                                 [svgIcon]="'mat_outline:copyright'"></mat-icon>
                                             <mat-icon 
-                                                class="icon-size-5 mr-6" 
+                                                class="icon-size-5" 
                                                 [matTooltip]="'Continuous Integration'"
                                                 [ngClass] = "{ 'text-red-600 dark:text-red-600'    : !repository.has_ci,
                                                                 'text-green-400 dark:text-green-400': repository.has_ci }"  
                                                 [svgIcon]="'mat_outline:all_inclusive'"></mat-icon>
-                                        </div>
+                                        </span>
                                     </a>
                                 </ng-container>
                             </ng-container>

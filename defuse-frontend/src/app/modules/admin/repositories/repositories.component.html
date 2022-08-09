@@ -48,27 +48,37 @@
                                 [placeholder]="'Search repositories'">
                         </mat-form-field>
                         
-                        <!-- Crawl repositories button -->
-                        <button
-                            class="flex-auto ml-4"
-                            (click)="onCollectRepositories()"
-                            mat-stroked-button>
-                            Collect repositories
+                        <button class="ml-3"
+                            mat-icon-button
+                            [matMenuTriggerFor]="repositoryListActions">
+                            <span class="relative">
+                                <mat-icon
+                                    [svgIcon]="'heroicons_outline:dots-vertical'"></mat-icon>
+                            </span>
                         </button>
 
-                        <!-- Add product button -->
-                        <button
-                            class="ml-4"
-                            mat-flat-button
-                            [color]="'primary'"
-                            (click)="onAddRepository()">
-                            <span class="ml-2 mr-1">Add Repository</span>
-                        </button>
+                        <mat-menu
+                            [xPosition]="'before'"
+                            #repositoryListActions="matMenu">
+                            <button mat-menu-item
+                                (click)="onAddRepository()">
+                                <mat-icon [svgIcon]="'feather:plus-circle'"></mat-icon>
+                                <span>Add repository</span>
+                            </button>
+                            <button mat-menu-item
+                                (click)="onCollectRepositories()">
+                                <mat-icon [svgIcon]="'feather:github'"></mat-icon>
+                                <span>Collect from GitHub</span>
+                            </button>
+                            <mat-divider class="my-2"></mat-divider>
+                            <button
+                                mat-menu-item
+                                (click)="onExport()">
+                                <mat-icon [svgIcon]="'feather:download'"></mat-icon>
+                                <span>Download</span>
+                            </button>
+                        </mat-menu>
 
-                        <button class="ml-4" mat-icon-button color="accent" aria-label="Export button" (click)="onExport()">
-                            <mat-icon>download</mat-icon>
-                        </button>
-                        
                     </div>
                 </div>
 
@@ -123,7 +133,7 @@
                                                 [matTooltip]="'Commit frequency'"
                                                 [ngClass] = "{ 'text-red-600 dark:text-red-600'     : repository.commit_frequency < 2,
                                                                 'text-green-400 dark:text-green-400': repository.commit_frequency >= 2}"
-                                                [svgIcon]="'mat_outline:linear_scale'"></mat-icon>
+                                                [svgIcon]="'feather:git-commit'"></mat-icon>
                                             <mat-icon 
                                                 class="icon-size-5 mr-6" 
                                                 [matTooltip]="'Comment ratio'"
@@ -164,7 +174,22 @@
 
                         <!-- No repositories -->
                         <ng-template #noRepositories>
-                            <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">There are no repositories!</div>
+                            <div class="flex flex-auto flex-col items-center justify-center bg-gray-100 dark:bg-transparent">
+                                <mat-icon
+                                    class="icon-size-24"
+                                    [svgIcon]="'heroicons_outline:folder-open'"></mat-icon>
+                                
+                                <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">There are no repositories!</div>
+                                
+                                <button
+                                    class="mt-6"
+                                    mat-flat-button
+                                    [color]="'primary'"
+                                    (click)="onAddRepository()">
+                                    <mat-icon [svgIcon]="'feather:plus-circle'"></mat-icon>
+                                    <span class="ml-2 mr-1">Add a repository</span>
+                                </button>
+                            </div>
                         </ng-template>
                     </div>
                 </div>

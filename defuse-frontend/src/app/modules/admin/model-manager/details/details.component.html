@@ -26,11 +26,11 @@
             <!-- Actions -->
             <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
                 
-                <button mat-icon-button color="accent" aria-label="Download">
+                <button mat-icon-button color="accent" aria-label="Download" (click)="onDownload()">
                     <mat-icon svgIcon="feather:download"></mat-icon>
                 </button>
 
-                <button class="ml-4" mat-icon-button color="warn" aria-label="Delete">
+                <button class="ml-4" mat-icon-button color="warn" aria-label="Delete" (click)="onDelete()">
                     <mat-icon svgIcon="feather:trash"></mat-icon>
                 </button>
 

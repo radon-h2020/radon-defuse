@@ -43,6 +43,23 @@ export class ModelManagerService {
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
+    deleteModel(id: string): Observable<any>{
+        const URL = `/backend-api/model?id=${id}`;
+        return this._httpClient.delete<any>(URL, {observe:'response'});
+    }
+
+    downloadModel(id: string): void{
+        
+        const URL = `/backend-api/model?id=${id}`;
+        const a = document.createElement('a');
+        a.href = URL;
+        a.target = '_blank';
+        a.download = `${id}.joblib`;
+        a.click();
+        window.URL.revokeObjectURL(URL);
+        a.remove();
+    }
+    
     getAnalytics(modelId: string): Observable<any>{
         const URL = `/backend-api/report?model_id=${modelId}`;
         return this._httpClient.get<any>(URL, {observe:'response'}).pipe(
@@ -207,10 +224,5 @@ export class ModelManagerService {
                 return of(item);
             })
         );
-    }
-
-    deleteModel(model: PredictiveModel): Observable<any>{
-        const URL = `/backend-api/model?id=${model.id}`;
-        return this._httpClient.delete<any>(URL, {observe:'response'});
     }
 }

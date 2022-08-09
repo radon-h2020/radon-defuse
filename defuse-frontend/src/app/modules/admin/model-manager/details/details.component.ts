@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { ApexOptions } from 'ng-apexcharts';
 import { Subject, takeUntil } from 'rxjs';
 import { ModelManagerService } from 'app/modules/admin/model-manager/model-manager.service';
@@ -27,7 +28,9 @@ export class ModelManagerDetailsComponent implements OnInit, OnDestroy
     constructor(
         private _activatedRoute: ActivatedRoute,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _modelManagerService: ModelManagerService
+        private _fuseConfirmationService: FuseConfirmationService,
+        private _modelManagerService: ModelManagerService,
+        private _router: Router,
     )
     {
     }
@@ -71,11 +74,6 @@ export class ModelManagerDetailsComponent implements OnInit, OnDestroy
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
     }
-
-    // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
-    // -----------------------------------------------------------------------------------------------------
-
 
     private _prepareChartData(): void {
         // AUC-PR
@@ -245,6 +243,43 @@ export class ModelManagerDetailsComponent implements OnInit, OnDestroy
         };
 
     }
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Public methods
+    // -----------------------------------------------------------------------------------------------------
+    onDelete(){
+
+        // Open the confirmation dialog
+        const confirmation = this._fuseConfirmationService.open({
+            title  : 'Delete model',
+            message: 'Are you sure you want to delete this model? This action cannot be undone!',
+            actions: {
+                confirm: {
+                    label: 'Delete'
+                }
+            }
+        });
+
+        // Subscribe to the confirmation dialog closed action
+        confirmation.afterClosed().subscribe((result) => {
+
+            // If the confirm button pressed...
+            if ( result === 'confirmed' ) {
+                this._modelManagerService.deleteModel(this.item.id).subscribe(response => {
+                    // navigate back to folders
+                    if (response && response.status == 204){
+                        // Navigate back to model manager
+                        this._router.navigate(['../../'], {relativeTo: this._activatedRoute});
+                    }
+                })
+            }
+        })
+    }
+
+    onDownload(){
+        this._modelManagerService.downloadModel(this.item.id)
+    }
+
 
     /**
      * Track by function for ngFor loops

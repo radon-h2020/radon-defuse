@@ -33,17 +33,7 @@ export const modelManagerRoutes: Route[] = [
                 component: ModelManagerListComponent,
                 resolve  : {
                     items: ModelManagerItemsResolver
-                },
-                children : [
-                    {
-                        path         : 'details/:id',
-                        component    : ModelManagerDetailsComponent,
-                        resolve      : {
-                            item: ModelManagerItemResolver
-                        },
-                        canDeactivate: [CanDeactivateModelManagerDetails]
-                    }
-                ]
+                }
             }
         ]
     }

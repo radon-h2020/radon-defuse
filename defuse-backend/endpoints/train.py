@@ -20,7 +20,6 @@ from .classifier import DefectPredictor
 
 from enum import Enum
 
-
 class Status(Enum):
     COMPLETED = 'completed'
     FAILED = 'failed'
@@ -95,7 +94,7 @@ class Train(Resource):
 
         for doc in commits:
             doc = doc.to_dict()
-            if self.args.get('defect').upper() in doc['defects']:
+            if self.args.get('defect').lower() in doc['defects']:
                 miner.fixing_commits.append(doc['hash'])
 
         miner.sort_commits(miner.fixing_commits)

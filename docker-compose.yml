@@ -26,4 +26,4 @@ services:
       - 4200
     volumes:
       - /app/node_modules
-      - ./defuse-frontend:/app
+# For development only:       - ./defuse-frontend:/app

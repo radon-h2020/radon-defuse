@@ -21,7 +21,6 @@ import { MatTableModule } from '@angular/material/table';
 import { NgApexchartsModule } from 'ng-apexcharts';
 
 
-// import { DialogAnalyticsComponent } from './dialog-analytics/dialog-analytics.component';
 import { TrainModelDialog } from 'app/modules/admin/model-manager/dialogs/train.component';
 import { ModelManagerComponent } from 'app/modules/admin/model-manager/model-manager.component';
 import { ModelManagerListComponent } from 'app/modules/admin/model-manager/list/list.component';
@@ -31,7 +30,6 @@ import { ModelManagerDetailsComponent } from 'app/modules/admin/model-manager/de
 
 @NgModule({
     declarations: [
-        // DialogAnalyticsComponent,
         TrainModelDialog,
         ModelManagerComponent,
         ModelManagerDetailsComponent,

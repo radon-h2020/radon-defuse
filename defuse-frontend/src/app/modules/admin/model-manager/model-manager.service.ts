@@ -43,6 +43,75 @@ export class ModelManagerService {
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
+    getAnalytics(modelId: string): Observable<any>{
+        const URL = `/backend-api/report?model_id=${modelId}`;
+        return this._httpClient.get<any>(URL, {observe:'response'}).pipe(
+                map(response => {
+                    const body = response['body']
+
+                    let overall = {}
+                    let series = {}
+
+                    for (let evaluationMeasure in body['series']) {
+                            let data = []
+
+                            Object.entries(body['series'][evaluationMeasure]).forEach(([key,value]) => {
+                                const roundedValue = Math.round(+value * Math.pow(10, 2)) / Math.pow(10, 2);
+                                data.push({x: +key+1, y: roundedValue})
+                            })
+
+                            series[evaluationMeasure] = data
+                    }
+
+                    for (let evaluationMeasure in body['overall']) {
+                        const roundedValue = Math.round(+body['overall'][evaluationMeasure] * Math.pow(10, 2)) / Math.pow(10, 2);
+                        overall[evaluationMeasure] = roundedValue
+                    }
+                    
+                    const aucPR = {
+                        overallAucPR  : overall['auc-pr'],
+                        numReleases   : series['auc-pr'].length,
+                        series        : [
+                            {
+                                name: 'AucPR',
+                                data: series['auc-pr']
+                            }
+                        ]
+                    }
+                    
+                    
+                    const mcc = {
+                        overallMcc  : overall['mcc'],
+                        numReleases   : series['mcc'].length,
+                        series        : [
+                            {
+                                name: 'MCC',
+                                data: series['mcc']
+                            }
+                        ]
+                    }
+                    
+                    const precisionVsRecall = {
+                        overallPrecision  : overall['precision'],
+                        overallRecall : overall['recall'],
+                        numReleases   : series['precision'].length,
+                        series        : [
+                            {
+                                name: 'Precision',
+                                data: series['precision']
+                            },
+                            {
+                                name: 'Recall',
+                                data: series['recall']
+                            }
+                        ]
+                    }
+
+                    return { aucPR, mcc, precisionVsRecall }
+                })
+           );
+    }
+    
     getItems(folderId: string | null = null): Observable<Items> {
 
         return this._modelsCollection.pipe(

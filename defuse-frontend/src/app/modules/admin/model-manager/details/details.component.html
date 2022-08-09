@@ -1,0 +1,147 @@
+<div class=" flex-col flex-auto px-6 md:px-8">
+
+    <ng-container *ngIf="item">
+
+        <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+    
+            <!-- Close button -->
+            <a mat-icon-button
+                [routerLink]="['../../']">
+                <mat-icon [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
+            </a>
+
+            <div>
+                <!-- Name & Type -->
+                <div class="flex flex-row items-start mt-4">
+                    <div class="text-xl font-medium">{{ item.name | titlecase }}</div>
+                    <div
+                        class="mt-1.5 ml-1 px-1.5 bg-primary-600 rounded text-sm font-semibold leading-5 text-white">
+                        .{{item.type}}
+                    </div>
+                </div>
+    
+                <div class="text-sm text-secondary font-medium">ID: {{item.id}}</div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+                
+                <button mat-icon-button color="accent" aria-label="Download" (click)="onDownload()">
+                    <mat-icon svgIcon="feather:download"></mat-icon>
+                </button>
+
+                <button class="ml-4" mat-icon-button color="warn" aria-label="Delete" (click)="onDelete()">
+                    <mat-icon svgIcon="feather:trash"></mat-icon>
+                </button>
+
+            </div>
+        </div>
+        
+        
+        <ng-container *ngIf="data; else noData">
+            
+            <!-- Charts -->
+            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 gap-8 w-full mt-6">
+
+                <!-- AUC-PR -->
+                <div class="sm:col-span-2 lg:col-span-1 flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden">
+                    <div class="flex items-start justify-between m-6 mb-0">
+                        <div class="text-lg font-medium tracking-tight leading-6 truncate">AUC Precision-Recall</div>
+                    </div>
+                    <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
+                        <div class="text-7xl font-bold tracking-tighter leading-tight">{{ data.aucPR.overallAucPR }}</div>
+                    </div>
+                    <div class="flex flex-col flex-auto h-20">
+                        <apx-chart
+                            class="flex-auto w-full h-full"
+                            [chart]="chartAucPR.chart"
+                            [colors]="chartAucPR.colors"
+                            [series]="chartAucPR.series"
+                            [stroke]="chartAucPR.stroke"
+                            [tooltip]="chartAucPR.tooltip"
+                            [xaxis]="chartAucPR.xaxis"
+                            [yaxis]="chartAucPR.yaxis"></apx-chart>
+                    </div>
+                </div>
+
+                <!-- MCC -->
+                <div class="flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden">
+                    <div class="flex items-start justify-between m-6 mb-0">
+                        <div class="text-lg font-medium tracking-tight leading-6 truncate">Matthew Correlation Coefficient</div>
+                    </div>
+                    <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
+                        <div class="text-7xl font-bold tracking-tighter leading-tight">{{ data.mcc.overallMcc }}</div>
+                    </div>
+                    <div class="flex flex-col flex-auto h-20">
+                        <apx-chart
+                            class="flex-auto w-full h-full"
+                            [chart]="chartMcc.chart"
+                            [colors]="chartMcc.colors"
+                            [series]="chartMcc.series"
+                            [stroke]="chartMcc.stroke"
+                            [tooltip]="chartMcc.tooltip"
+                            [xaxis]="chartMcc.xaxis"
+                            [yaxis]="chartMcc.yaxis"></apx-chart>
+                    </div>
+                </div>
+            </div>
+            
+
+            <!-- Precision vs. Recall -->
+            <ng-container *ngIf="chartPrecisionVsRecall">
+                <div class="flex flex-col flex-auto mt-8 bg-card shadow rounded-2xl overflow-hidden">
+                    <div class="flex items-start justify-between m-6 mb-0">
+                        <div class="text-lg font-medium tracking-tight leading-6 truncate">Precision vs. Recall</div>
+                    </div>
+                    <div class="flex items-start mt-6 mx-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-12">
+                            <div class="flex flex-col">
+                                <div class="flex items-center">
+                                    <div class="font-medium text-secondary leading-5">Mean Test Precision</div>
+                                    <mat-icon
+                                        class="ml-1.5 icon-size-4 text-hint"
+                                        [svgIcon]="'heroicons_solid:information-circle'"
+                                        [matTooltip]="'Average precision is...'"></mat-icon>
+                                </div>
+                                <div class="flex items-start mt-2">
+                                    <div class="text-4xl font-bold tracking-tight leading-none">{{ this.data.precisionVsRecall.overallPrecision }}</div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col">
+                                <div class="flex items-center">
+                                    <div class="font-medium text-secondary leading-5">Mean Test Recall</div>
+                                    <mat-icon
+                                        class="ml-1.5 icon-size-4 text-hint"
+                                        [svgIcon]="'heroicons_solid:information-circle'"
+                                        [matTooltip]="'Average Recall is...'"></mat-icon>
+                                </div>
+                                <div class="flex items-start mt-2">
+                                    <div class="text-4xl font-bold tracking-tight leading-none">{{ this.data.precisionVsRecall.overallRecall }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col flex-auto h-80 mt-3">
+                        <apx-chart
+                            class="flex-auto w-full h-full"
+                            [chart]="chartPrecisionVsRecall.chart"
+                            [colors]="chartPrecisionVsRecall.colors"
+                            [dataLabels]="chartPrecisionVsRecall.dataLabels"
+                            [grid]="chartPrecisionVsRecall.grid"
+                            [legend]="chartPrecisionVsRecall.legend"
+                            [series]="chartPrecisionVsRecall.series"
+                            [stroke]="chartPrecisionVsRecall.stroke"
+                            [tooltip]="chartPrecisionVsRecall.tooltip"
+                            [xaxis]="chartPrecisionVsRecall.xaxis"
+                            [yaxis]="chartPrecisionVsRecall.yaxis"></apx-chart>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container>
+
+    </ng-container>
+
+    <ng-template #noData>
+        <mat-spinner style="margin:0 auto;" ></mat-spinner>
+    </ng-template>
+</div>

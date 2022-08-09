@@ -1,0 +1,171 @@
+<div class="flex flex-col flex-auto p-6 md:p-8">
+
+    <!-- Close button -->
+    <div class="flex items-center justify-end">
+        <a
+            mat-icon-button
+            [routerLink]="['../']">
+            <mat-icon [svgIcon]="'heroicons_outline:x'"></mat-icon>
+        </a>
+    </div>
+
+    <ng-container *ngIf="repository; else noRepository">
+        <!-- Name & Type -->
+        <div class="flex flex-col items-start">
+            <div class="text-xl font-medium">{{repository.full_name}}</div>
+            <a class="hover:underline text-xs font-medium text-primary-500" [href]="repository.url" target="_blank">
+                {{repository.url}}
+            </a>
+        </div>
+
+        <!-- Information -->
+        <div class="text-lg font-medium mt-8">Information</div>
+        <mat-progress-bar *ngIf="isCalculatingMetrics" mode="indeterminate"></mat-progress-bar>
+
+        <div class="flex flex-col mt-4 border-t border-b divide-y font-medium">
+
+            <!-- Core Contributors -->
+            <div class="flex items-center justify-between py-3">
+                <div class="flex items-center text-secondary"
+                    [matTooltip]="'Positive if the project has at least 2 contributors whose total number of commits accounts for 80% or more of the total contributions'">
+                    
+                    <mat-icon 
+                        class="mr-2" 
+                        [ngClass] = "{ 'text-red-600 dark:text-red-600'    : repository.core_contributors < 2,
+                                    'text-green-400 dark:text-green-400': repository.core_contributors >= 2}"
+                        [svgIcon]="'mat_outline:supervised_user_circle'"></mat-icon>
+                    
+                        Core contributors
+                </div>
+                <div> {{ repository.core_contributors ? repository.core_contributors : 'NA' }} </div>
+            </div>
+
+            <!-- Lines of Code -->
+            <div class="flex items-center justify-between py-3">
+                <div class="flex items-center text-secondary"
+                    [matTooltip]="'Positive if the project has at least 100 code lines'">
+                    
+                    <mat-icon 
+                        class="mr-2" 
+                        [ngClass] = "{ 'text-red-600 dark:text-red-600'    : repository.repository_size < 100,
+                                    'text-green-400 dark:text-green-400': repository.repository_size >= 100}"
+                        [svgIcon]="'mat_outline:code'"></mat-icon>
+                
+                        Code lines
+                </div>
+                <div> {{ repository.repository_size >= 0 ? repository.repository_size : 'NA' }} </div>
+            </div>
+
+            <!-- Commit frequency -->
+            <div class="flex items-center justify-between py-3">
+                <div class="flex items-center text-secondary"
+                    [matTooltip]="'Positive if the project has at least 2 commits per month'">
+                    
+                    <mat-icon 
+                        class="mr-2" 
+                        [ngClass] = "{ 'text-red-600 dark:text-red-600'    : repository.commit_frequency < 2,
+                                    'text-green-400 dark:text-green-400': repository.commit_frequency >= 2}"
+                        [svgIcon]="'feather:git-commit'"></mat-icon>
+                    
+                        Commit frequency
+                </div>
+                <div class="flex items-baseline whitespace-nowrap">
+                    <div> {{ repository.commit_frequency >= 0 ? repository.commit_frequency : 'NA' }} </div>
+                    <div class="ml-2 text-secondary">/ month</div>
+                </div>
+            </div>
+
+            <!-- Comment ratio -->
+            <div class="flex items-center justify-between py-3">
+                <div class="flex items-center text-secondary"
+                    [matTooltip]="'Positive if at least 1 code line every 100 lines'">
+                    
+                    <mat-icon 
+                        class="mr-2" 
+                        [ngClass] = "{ 'text-red-600 dark:text-red-600'    : repository.comments_ratio < 0.1,
+                                    'text-green-400 dark:text-green-400': repository.comments_ratio >= 0.01}"
+                        [svgIcon]="'mat_outline:comment'"></mat-icon>
+                    
+                        Comment ratio
+                </div>
+                <div class="flex items-baseline whitespace-nowrap">
+                    <div> {{ repository.comments_ratio * 100 | number:'1.0-0' }} </div>
+                    <div class="ml-2 text-secondary">%</div>
+                </div>
+            </div>
+
+            <!-- IaC ratio -->
+            <div class="flex items-center justify-between py-3">
+                <div class="flex items-center text-secondary"
+                    [matTooltip]="'Positive if at least 10% of the files are IaC files'">
+                    
+                    <mat-icon 
+                        class="mr-2" 
+                        [ngClass] = "{ 'text-red-600 dark:text-red-600'    : repository.iac_ratio < 0.1,
+                                    'text-green-400 dark:text-green-400': repository.iac_ratio >= 0.1}" 
+                        [svgIcon]="'mat_outline:description'"></mat-icon>
+                    
+                        Ratio of Infrastructure-as-Code files
+                </div>
+                <div class="flex items-baseline whitespace-nowrap">
+                    <div> {{ repository.iac_ratio * 100 | number:'1.0-0' }} </div>
+                    <div class="ml-2 text-secondary">%</div>
+                </div>
+            </div>
+
+            <!-- License -->
+            <div class="flex items-center justify-between py-3">
+                <div class="flex items-center text-secondary"
+                    [matTooltip]="'Positive if the repository has a license'">
+                    
+                    <mat-icon class="mr-2" 
+                            [ngClass] = "{ 'text-red-600 dark:text-red-600'    : !repository.has_license,
+                                            'text-green-400 dark:text-green-400': repository.has_license }"  
+                            [svgIcon]="'mat_outline:copyright'"></mat-icon>
+                    
+                        License
+                </div>
+                <div> {{ repository.has_license ? 'Yes' : 'No' }} </div>
+            </div>
+
+            <!-- Continuous integration -->
+            <div class="flex items-center justify-between py-3">
+                <div class="flex items-center text-secondary"
+                    [matTooltip]="'Positive if the repository uses continuous integration'">
+                    
+                    <mat-icon class="mr-2" 
+                            [ngClass] = "{ 'text-red-600 dark:text-red-600'    : !repository.has_ci,
+                                            'text-green-400 dark:text-green-400': repository.has_ci }"  
+                            [svgIcon]="'mat_outline:all_inclusive'"></mat-icon>
+                    
+                        Continuous integration
+                </div>
+                <div> {{ repository.has_ci ? 'Yes' : 'No' }} </div>
+            </div>
+        </div>
+
+
+        <!-- Actions -->
+        <div class="grid grid-cols-2 gap-4 w-full mt-8">
+            <button
+                class="flex-auto"
+                [color]="'primary'"
+                (click)="onCalculateMetrics()"
+                mat-flat-button>
+                Calculate metrics
+            </button>
+            <button
+                class="flex-auto"
+                [color]="'warn'"
+                (click)="onDeleteRepository()"
+                mat-stroked-button>
+                Delete
+            </button>
+        </div>
+
+    </ng-container>
+
+    <ng-template #noRepository>
+        <mat-spinner style="margin:0 auto;" ></mat-spinner>
+    </ng-template>
+</div>

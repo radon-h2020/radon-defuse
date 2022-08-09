@@ -1,0 +1,229 @@
+<div class="sm:absolute sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent">
+    
+    <!-- Project selector -->
+    <div class="relative flex self-start pt-2 pb-1 pl-5 pr-4 mt-1 cursor-pointer overflow-hidden rounded-t-xl border border-b-0 bg-card"
+        [matMenuTriggerFor]="repositoriesMenu"
+        matRipple>
+
+        <div class="flex items-center">
+            <div class="overflow-hidden">
+                <div class="font-medium leading-6 truncate">{{ selectedRepository ? selectedRepository.full_name : 'Select repository' }}</div>
+            </div>
+            <div class="flex items-center justify-center pl-2">
+                <mat-icon
+                    class="icon-size-5"
+                    [svgIcon]="'heroicons_solid:chevron-down'"></mat-icon>
+            </div>
+        </div>
+
+        <mat-menu #repositoriesMenu="matMenu"
+            [xPosition]="'before'">
+
+            <ng-container *ngIf="repositories$ | async as repositories">
+                <ng-container *ngFor="let repository of repositories; trackBy: trackRepositoriesByFn">
+                    <button
+                        [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectedRepository || selectedRepository.id !== repository.id,
+                                'bg-primary-50 dark:bg-hover': selectedRepository && selectedRepository.id === repository.id}"
+                        (click)="onSelectRepository(repository)"
+                        mat-menu-item>{{repository.full_name}}
+                    </button>
+                </ng-container>
+            </ng-container>
+        </mat-menu>
+    </div>
+
+
+    <mat-drawer-container
+        class="flex-auto h-full bg-card dark:bg-transparent"
+        (backdropClick)="onBackdropClicked()">
+
+        <!-- Drawer -->
+        <mat-drawer
+            class="w-full md:w-160 dark:bg-gray-900"
+            [mode]="'over'"
+            [opened]="false"
+            [position]="'end'"
+            [disableClose]="true"
+            #matDrawer>
+            <router-outlet></router-outlet>
+        </mat-drawer>
+
+        <mat-drawer-content class="flex flex-col">
+            
+                <!-- Header -->
+                <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+                    <!-- Title -->
+                    <div>
+                        <div class="text-4xl font-extrabold tracking-tight leading-none">Commits</div>
+                        <div class="ml-0.5 font-medium text-secondary">
+                            <ng-container *ngIf="commitsCount > 0">
+                                {{commitsCount}}
+                            </ng-container>
+                            {{commitsCount | i18nPlural: {
+                            '=0'   : 'No commits',
+                            '=1'   : 'commit',
+                            'other': 'commits'
+                        } }}
+                        </div>
+                    </div>
+                    <!-- Actions -->
+                    <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+
+                        <!-- Defects filter button -->
+                        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript w-full sm:w-36">
+                            <mat-icon class="icon-size-5" 
+                                matPrefix 
+                                [svgIcon]="'heroicons_outline:filter'"></mat-icon>
+                            <mat-select
+                                [value]="'all'"
+                                (selectionChange)="onFilterByDefect($event)">
+                                <mat-option [value]="'all'">All</mat-option>
+                                <ng-container *ngIf="defects$ | async as defects">
+                                    <ng-container *ngFor="let defect of defects; trackBy: trackByDefect">
+                                        <mat-option [value]="defect.title">{{ defect.title }}</mat-option>
+                                    </ng-container>
+                                </ng-container>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <!-- Search -->
+                        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-64 ml-4">
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:search'"></mat-icon>
+                            <input
+                                matInput
+                                [formControl]="searchInputControl"
+                                [autocomplete]="'off'"
+                                [placeholder]="'Search repositories'">
+                        </mat-form-field>
+
+                        <button class="ml-3"
+                            mat-icon-button
+                            [matMenuTriggerFor]="repositoryActions">
+                            <span class="relative">
+                                <mat-icon
+                                    [svgIcon]="'heroicons_outline:dots-vertical'"></mat-icon>
+                            </span>
+                        </button>
+
+                        <mat-menu
+                            [xPosition]="'before'"
+                            #repositoryActions="matMenu">
+                            <button mat-menu-item
+                                (click)="onMineRepository()">
+                                <mat-icon [svgIcon]="'heroicons_outline:annotation'"></mat-icon>
+                                <span>Annotate</span>
+                            </button>
+                            <button mat-menu-item
+                                (click)="onTrainModel()">
+                                <mat-icon [svgIcon]="'heroicons_outline:beaker'"></mat-icon>
+                                <span>Build model</span>
+                            </button>
+                            <mat-divider class="my-2"></mat-divider>
+                            <button
+                                mat-menu-item
+                                (click)="onExport()">
+                                <mat-icon [svgIcon]="'heroicons_outline:download'"></mat-icon>
+                                <span>Download</span>
+                            </button>
+                        </mat-menu>
+                    </div>
+                </div>
+
+
+                <div class="flex flex-auto overflow-hidden">
+
+                    <!-- Commits list -->
+                    <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto">
+
+                        <ng-container *ngIf="commits$ | async as commits">
+                            <ng-container *ngIf="commits.length; else noCommits">
+                                <ng-container *ngFor="let commit of commits; let i = index; trackBy: trackCommitsByFn">
+                                    
+                                    <div class="group w-full select-none hover:bg-gray-100 dark:hover:bg-hover" 
+                                    [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectedCommit || selectedCommit.hash !== commit.hash,
+                                                'bg-primary-50 dark:bg-hover': selectedCommit && selectedCommit.hash === commit.hash,
+                                                'bg-warn-50 dark:bg-transparent': !commit.is_valid}">
+
+                                        <!-- Commit content -->
+                                        <div class="relative flex items-center h-full pl-10">
+                                        
+                                            <!-- (In)validate commit button -->
+                                            <button class="mr-2 -ml-2.5 leading-none"
+                                                    (click)="onToggleCommitValidity(commit)"
+                                                    mat-icon-button>
+                                        
+                                                <ng-container *ngIf="commit.is_valid">
+                                                    <mat-icon
+                                                        class="text-primary"
+                                                        [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
+                                                </ng-container>
+                                                <ng-container *ngIf="!commit.is_valid">
+                                                    <mat-icon
+                                                        class="text-warn"
+                                                        [svgIcon]="'heroicons_outline:x-circle'"></mat-icon>
+                                                </ng-container>
+                                            </button>
+
+                                            <a class="flex flex-auto items-center min-w-0 h-full pr-7 p-4 cursor-pointer" 
+                                            [routerLink]="['./', commit.hash]">
+                                                
+                                                <div class="min-w-0 ml-4">
+                                                    <div class="font-medium text-secondary leading-5 truncate">{{commit.hash}}</div>
+                                                    
+                                                    <ng-container *ngIf="commit.msg">
+                                                        <div class="leading-5 truncate mt-1">{{commit.msg | titlecase}}</div>
+                                                    </ng-container>
+
+                                                    <!-- Tags -->  
+                                                    <div class="flex flex-wrap items-center mt-2">
+                                                        <ng-container *ngFor="let tag of commit.defects">
+                                                            <div class="flex items-center justify-center py-1 px-3 mr-3 rounded-full leading-normal text-gray-500 bg-gray-100 dark:text-gray-300 dark:bg-gray-700">
+                                                                <span class="text-sm font-medium whitespace-nowrap">{{tag}}</span>
+                                                            </div>
+                                                        </ng-container>
+                                                    </div> 
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                            </ng-container>
+                        </ng-container>
+                        
+                        <mat-paginator class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+                            [length]="pagination.length"
+                            [pageIndex]="pagination.page"
+                            [pageSize]="pagination.size"
+                            [pageSizeOptions]="[5, 10, 25]"
+                            [showFirstLastButtons]="true"></mat-paginator>
+
+                        <!-- No commits template -->
+                        <ng-template #noCommits>
+                            <div class="flex flex-auto flex-col items-center justify-center bg-gray-100 dark:bg-transparent">
+                                <mat-icon
+                                    class="icon-size-24"
+                                    [svgIcon]="'heroicons_outline:folder-open'"></mat-icon>
+                                
+                                <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">There are no commits!</div>
+                                
+                                <button
+                                    class="mt-6"
+                                    mat-flat-button
+                                    [color]="'primary'"
+                                    (click)="onMineRepository()">
+                                    <mat-icon [svgIcon]="'heroicons_outline:annotation'"></mat-icon>
+                                    <span class="ml-2 mr-1">Start annotating</span>
+                                </button>
+                                
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+
+        </mat-drawer-content>
+
+    </mat-drawer-container>             
+</div>

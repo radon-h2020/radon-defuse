@@ -1,0 +1,103 @@
+<div class="flex flex-col flex-auto">
+    
+    <!-- Items list -->
+    <ng-container *ngIf="items && (items.folders.length > 0 || items.files.length > 0); else noItems">
+        <div class="p-6 md:p-8 space-y-8">
+            
+            <!-- Breadcrumbs -->
+            <ng-container *ngIf="items && items.files.length">
+                <div class="flex items-center space-x-2">
+                    <a
+                        class="text-primary cursor-pointer"
+                        [routerLink]="['/model-manager']">Home
+                    </a>
+                    <div class="">/</div>
+                    <div class="text-secondary">{{ items.files[0].folderName }}</div>
+                </div>
+            </ng-container>
+            
+            <!-- Folders -->
+            <ng-container *ngIf="items.folders.length > 0">
+                <div>
+                    <div class="font-medium">Folders</div>
+                    <div
+                        class="flex flex-wrap -m-2 mt-2">
+                        <ng-container *ngFor="let folder of items.folders; trackBy:trackByFn">
+                            <div class="relative w-40 h-40 m-2 p-4 shadow rounded-2xl bg-card">
+                                <a
+                                    class="z-10 absolute inset-0 flex flex-col p-4 cursor-pointer"
+                                    [routerLink]="['/model-manager/folders/', folder.id]">
+                                    <div class="aspect-w-9 aspect-h-6">
+                                        <div class="flex items-center justify-center">
+                                            <!-- Icon -->
+                                            <mat-icon
+                                                class="icon-size-14 text-hint"
+                                                [svgIcon]="'heroicons_outline:folder'"></mat-icon>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col flex-auto justify-center text-center text-sm font-medium">
+                                        <div
+                                            class="truncate"
+                                            [matTooltip]="folder.name">{{folder.name}}</div>
+                                        <ng-container *ngIf="folder.contents">
+                                            <div class="text-secondary truncate">{{folder.contents}}</div>
+                                        </ng-container>
+                                    </div>
+                                </a>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </ng-container>
+
+            <!-- Files -->
+            <ng-container *ngIf="items.files.length > 0">
+                <div>
+                    <div class="font-medium">Files</div>
+                    <div
+                        class="flex flex-wrap -m-2 mt-2">
+                        <ng-container *ngFor="let file of items.files; trackBy:trackByFn">
+                            <a
+                                class="flex flex-col w-40 h-40 m-2 p-4 shadow rounded-2xl cursor-pointer bg-card"
+                                [routerLink]="['./../../details/', file.id]">
+                                <div class="aspect-w-9 aspect-h-6">
+                                    <div class="flex items-center justify-center">
+                                        <!-- Icons -->
+                                        <div class="relative">
+                                            <mat-icon
+                                                class="icon-size-14 text-hint"
+                                                [svgIcon]="'heroicons_outline:document'"></mat-icon>
+                                            <div
+                                                class="absolute left-0 bottom-0 px-1.5 rounded text-sm font-semibold leading-5 text-white"
+                                                [class.bg-primary-600]="file.type === 'joblib'">
+                                                {{file.type}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col flex-auto justify-center text-center text-sm font-medium">
+                                    <div
+                                        class="truncate"
+                                        [matTooltip]="file.name">{{ file.name | titlecase }}
+                                    </div>
+                                </div>
+                            </a>
+                        </ng-container>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </ng-container>
+</div>
+
+<!-- No items template -->
+<ng-template #noItems>
+    <div class="flex flex-auto flex-col items-center justify-center bg-gray-100 dark:bg-transparent mt-8">
+        <mat-icon
+            class="icon-size-24"
+            [svgIcon]="'heroicons_outline:folder-open'"></mat-icon>
+        <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">There are no items!</div>
+    </div>
+</ng-template>
+
+

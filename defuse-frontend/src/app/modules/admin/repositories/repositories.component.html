@@ -1,0 +1,200 @@
+<div class="sm:absolute sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent">
+ 
+    <mat-drawer-container
+    class="flex-auto h-full bg-card dark:bg-transparent"
+    (backdropClick)="onBackdropClicked()">
+
+        <!-- Drawer -->
+        <mat-drawer
+            class="w-full md:w-160 dark:bg-gray-900"
+            [mode]="'over'"
+            [opened]="false"
+            [position]="'end'"
+            [disableClose]="true"
+            #matDrawer>
+            <router-outlet></router-outlet>
+        </mat-drawer>
+
+        <mat-drawer-content class="flex flex-col">
+            
+                <!-- Header -->
+                <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+                    <!-- Title -->
+                    <div>
+                        <div class="text-4xl font-extrabold tracking-tight leading-none">Repositories</div>
+                        <div class="ml-0.5 font-medium text-secondary">
+                            <ng-container *ngIf="repositoriesCount > 0">
+                                {{repositoriesCount}}
+                            </ng-container>
+                            {{repositoriesCount | i18nPlural: {
+                            '=0'   : 'No repositories',
+                            '=1'   : 'repository',
+                            'other': 'repositories'
+                        } }}
+                        </div>
+                    </div>
+                    <!-- Actions -->
+                    <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+                        <!-- Search -->
+                        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-64">
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:search'"></mat-icon>
+                            <input
+                                matInput
+                                [formControl]="searchInputControl"
+                                [autocomplete]="'off'"
+                                [placeholder]="'Search repositories'">
+                        </mat-form-field>
+                        
+                        <button class="ml-3"
+                            mat-icon-button
+                            [matMenuTriggerFor]="repositoryListActions">
+                            <span class="relative">
+                                <mat-icon
+                                    [svgIcon]="'heroicons_outline:dots-vertical'"></mat-icon>
+                            </span>
+                        </button>
+
+                        <mat-menu
+                            [xPosition]="'before'"
+                            #repositoryListActions="matMenu">
+                            <button mat-menu-item
+                                (click)="onAddRepository()">
+                                <mat-icon [svgIcon]="'feather:plus-circle'"></mat-icon>
+                                <span>Add repository</span>
+                            </button>
+                            <button mat-menu-item
+                                (click)="onCollectRepositories()">
+                                <mat-icon [svgIcon]="'feather:github'"></mat-icon>
+                                <span>Collect from GitHub</span>
+                            </button>
+                            <mat-divider class="my-2"></mat-divider>
+                            <button
+                                mat-menu-item
+                                (click)="onExport()">
+                                <mat-icon [svgIcon]="'feather:download'"></mat-icon>
+                                <span>Download</span>
+                            </button>
+                        </mat-menu>
+
+                    </div>
+                </div>
+
+                <ng-container *ngIf="crawlingTask">
+                    <mat-progress-bar mode="buffer" [value]="crawlingTask.progress_value" ></mat-progress-bar>
+                    <div class=" w-full p-6 items-center text-center bg-amber-100 text-amber-800 dark:bg-amber-600 dark:text-amber-50" style="margin:0 auto;">
+                        <div > Analyzing day {{ crawlingTask.analyzed + 1 }} of {{ crawlingTask.total }} ({{ crawlingTask.progress_value }}%) </div>
+                        <div *ngIf="crawlingTask.quota > 0" class="mt-2">Remaining quota with this token: {{ crawlingTask.quota }} </div>
+
+                    </div>
+
+                </ng-container>
+
+                <div class="flex flex-auto overflow-hidden">
+
+                    <!-- Repositories list -->
+                    <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto">
+
+                        <ng-container *ngIf="repositories$ | async as repositories">
+                            <ng-container *ngIf="repositories.length; else noRepositories">
+                                <ng-container *ngFor="let repository of repositories; let i = index; trackBy: trackByFn">
+                                    <!-- Group -->
+                                    <!-- <ng-container *ngIf="i === 0 || repository.full_name.charAt(0) !== repositories[i - 1].full_name.charAt(0)">
+                                        <div class="z-10 sticky top-0 -mt-px px-6 py-1 md:px-8 border-t border-b font-medium uppercase text-secondary bg-gray-50 dark:bg-gray-900">
+                                            {{repository.full_name.charAt(0)}}
+                                        </div>
+                                    </ng-container> -->
+                                    <!-- Repository -->
+                                    <a class="z-20 items-center px-6 py-4 md:px-8 cursor-pointer border-b hover:bg-gray-100 dark:hover:bg-hover"
+                                       style="align-items:center"
+                                       [ngClass]="{'hover:bg-gray-100 dark:hover:bg-hover': !selectedRepository || selectedRepository.id !== repository.id,
+                                                   'bg-primary-50 dark:bg-hover': selectedRepository && selectedRepository.id === repository.id}"
+                                       [routerLink]="['./', repository.id]">
+                                
+                                       
+                                        <span class="font-medium leading-5 truncate">{{repository.full_name}}</span>
+                                        <span class="flex items-center justify-end min-w-0" style="float: right;">
+                                            <mat-icon 
+                                                class="icon-size-5 mr-6" 
+                                                [matTooltip]="'Core contributors'"
+                                                [ngClass] = "{ 'text-red-600 dark:text-red-600'    : repository.core_contributors < 2,
+                                                               'text-green-400 dark:text-green-400': repository.core_contributors >= 2}"  
+                                                [svgIcon]="'mat_outline:supervised_user_circle'"></mat-icon>
+                                            <mat-icon 
+                                                class="icon-size-5 mr-6"
+                                                [matTooltip]="'Lines of code'" 
+                                                [ngClass] = "{ 'text-red-600 dark:text-red-600'     : repository.repository_size < 100,
+                                                                'text-green-400 dark:text-green-400': repository.repository_size >= 100}" 
+                                                    [svgIcon]="'mat_outline:code'"></mat-icon>
+                                            <mat-icon 
+                                                class="icon-size-5 mr-6" 
+                                                [matTooltip]="'Commit frequency'"
+                                                [ngClass] = "{ 'text-red-600 dark:text-red-600'     : repository.commit_frequency < 2,
+                                                                'text-green-400 dark:text-green-400': repository.commit_frequency >= 2}"
+                                                [svgIcon]="'feather:git-commit'"></mat-icon>
+                                            <mat-icon 
+                                                class="icon-size-5 mr-6" 
+                                                [matTooltip]="'Comment ratio'"
+                                                [ngClass] = "{ 'text-red-600 dark:text-red-600'     : repository.comments_ratio < 0.1,
+                                                                'text-green-400 dark:text-green-400': repository.comments_ratio >= 0.01}"  
+                                                [svgIcon]="'mat_outline:comment'"></mat-icon>
+                                            <mat-icon 
+                                                class="icon-size-5 mr-6"
+                                                [matTooltip]="'Ratio of IaC files'" 
+                                                [ngClass] = "{ 'text-red-600 dark:text-red-600' : repository.iac_ratio < 0.1,
+                                                            'text-green-400 dark:text-green-400': repository.iac_ratio >= 0.1}" 
+                                                [svgIcon]="'mat_outline:description'"></mat-icon>
+                                            <mat-icon 
+                                                class="icon-size-5 mr-6" 
+                                                [matTooltip]="'License'"
+                                                [ngClass] = "{ 'text-red-600 dark:text-red-600'    : !repository.has_license,
+                                                                'text-green-400 dark:text-green-400': repository.has_license }"  
+                                                [svgIcon]="'mat_outline:copyright'"></mat-icon>
+                                            <mat-icon 
+                                                class="icon-size-5" 
+                                                [matTooltip]="'Continuous Integration'"
+                                                [ngClass] = "{ 'text-red-600 dark:text-red-600'    : !repository.has_ci,
+                                                                'text-green-400 dark:text-green-400': repository.has_ci }"  
+                                                [svgIcon]="'mat_outline:all_inclusive'"></mat-icon>
+                                        </span>
+                                    </a>
+                                </ng-container>
+                            </ng-container>
+
+                            <mat-paginator class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+                                [length]="pagination.length"
+                                [pageIndex]="pagination.page"
+                                [pageSize]="pagination.size"
+                                [pageSizeOptions]="[5, 10, 25]"
+                                [showFirstLastButtons]="true"></mat-paginator>
+
+                        </ng-container>
+
+                        <!-- No repositories -->
+                        <ng-template #noRepositories>
+                            <div class="flex flex-auto flex-col items-center justify-center bg-gray-100 dark:bg-transparent">
+                                <mat-icon
+                                    class="icon-size-24"
+                                    [svgIcon]="'heroicons_outline:folder-open'"></mat-icon>
+                                
+                                <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">There are no repositories!</div>
+                                
+                                <button
+                                    class="mt-6"
+                                    mat-flat-button
+                                    [color]="'primary'"
+                                    (click)="onAddRepository()">
+                                    <mat-icon [svgIcon]="'feather:plus-circle'"></mat-icon>
+                                    <span class="ml-2 mr-1">Add a repository</span>
+                                </button>
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+
+        </mat-drawer-content>
+
+    </mat-drawer-container>             
+</div>

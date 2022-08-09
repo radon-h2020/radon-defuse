@@ -1,0 +1,60 @@
+<div class="relative flex flex-col w-full h-full">
+
+    <!-- Dismiss button -->
+    <div class="absolute top-0 right-0 pt-4 pr-4">
+        <button
+            mat-icon-button
+            [matDialogClose]="undefined">
+            <mat-icon
+                class="text-secondary"
+                [svgIcon]="'heroicons_outline:x'"></mat-icon>
+        </button>
+    </div>
+
+    <!-- Content -->
+    <div class="flex flex-col sm:flex-row flex-auto items-center sm:items-start p-8 pb-6 sm:pb-8">
+
+        <div class="flex flex-col items-center sm:items-start mt-4 sm:mt-0 sm:pr-8 space-y-1 text-center sm:text-left">
+
+            <!-- Title -->
+            <div class="text-xl leading-6 font-medium">Mine repository</div>
+
+            <!-- Form -->
+            <div class="text-secondary">Gather defect-fixing commits and failure-prone data</div>
+
+            <div class="flex flex-col mt-4 pt-6 border-t space-y-8">
+                
+                <!-- Language -->
+                 <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript min-w-100" appearance="fill">
+                    <mat-label>Language</mat-label>
+                    <mat-select [(ngModel)]="selectedLanguage" name="language" [placeholder]="'Select language'" required cdkFocusInitial>
+                        <mat-option *ngFor="let language of languages" [value]="language.value">
+                            {{language.viewValue}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-center sm:justify-end px-6 py-4 space-x-3">
+
+        <!-- Cancel -->
+        <button
+            mat-stroked-button
+            [matDialogClose]="'cancelled'">
+            Cancel
+        </button>
+
+        <!-- Confirm -->
+        <button
+            mat-flat-button
+            [color]="'primary'"
+            [matDialogClose]="{'language':selectedLanguage}">
+            Start
+        </button>
+
+    </div>
+
+</div>

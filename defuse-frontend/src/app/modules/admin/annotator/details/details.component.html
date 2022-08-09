@@ -1,0 +1,86 @@
+<div class="flex flex-col flex-auto p-6 md:p-8">
+
+    <!-- Close button -->
+    <div class="flex items-center justify-end">
+        <a
+            mat-icon-button
+            [routerLink]="['../']">
+            <mat-icon [svgIcon]="'heroicons_outline:x'"></mat-icon>
+        </a>
+    </div>
+
+    <ng-container *ngIf="commit; else noCommit">
+
+        <!-- Hash and URL -->
+        <div class="flex flex-col items-start">
+            <div class="text-xl font-medium">{{commit.hash}}</div>
+            <a class="hover:underline text-xs font-medium text-primary-500" [href]="commit.url" target="_blank">
+                {{commit.url}}
+            </a>
+        </div>
+
+
+        <!-- Tags -->
+        <div class="flex flex-wrap items-center -m-1.5 mt-6">
+                    
+            <!-- Tags -->
+            <ng-container *ngIf="commit.defects.length">
+                <ng-container *ngFor="let tag of commit.defects; trackBy: trackDefectsByFn">
+                    <div class="flex items-center justify-center px-4 m-1.5 rounded-full leading-9 text-gray-500 bg-gray-100 dark:text-gray-300 dark:bg-gray-700">
+                        <span class="text-md font-medium whitespace-nowrap">{{tag}}</span>
+                    </div>
+                </ng-container>
+            </ng-container>
+
+            <!-- Tags panel and its button -->
+            <div
+                class="flex items-center justify-center px-4 m-1.5 rounded-full leading-9 cursor-pointer text-gray-500 bg-gray-100 dark:text-gray-300 dark:bg-gray-700"
+                (click)="openTagsPanel()"
+                #tagsPanelOrigin>
+
+                <ng-container *ngIf="commit.defects.length">
+                    <mat-icon
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:pencil-alt'"></mat-icon>
+                    <span class="ml-1.5 text-md font-medium whitespace-nowrap">Edit</span>
+                </ng-container>
+
+                <ng-container *ngIf="!commit.defects.length">
+                    <mat-icon
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:plus-circle'"></mat-icon>
+                    <span class="ml-1.5 text-md font-medium whitespace-nowrap">Add</span>
+                </ng-container>
+
+                <!-- Tags panel -->
+                <ng-template #tagsPanel>
+                    <tags-panel [commit]="commit" (onDefectsChanged)="onDefectsChanged($event)"></tags-panel>
+                </ng-template>
+            </div>
+        </div>
+
+        <!-- Message -->
+        <ng-container *ngIf="commit.msg">
+            <div class="flex mt-4">
+                <mat-icon [svgIcon]="'heroicons_outline:menu-alt-2'"></mat-icon>
+                <div class="max-w-none ml-4 prose prose-sm" [innerText]="commit.msg?.length > 200 ? commit.msg?.substring(0, 200) + '...': commit.msg "></div>
+            </div>
+        </ng-container>
+
+        <!-- Fixed files label -->
+        <div class="flex mt-4">
+            <mat-icon [svgIcon]="'heroicons_outline:document-duplicate'"></mat-icon>
+            <div class="max-w-none ml-4 prose prose-sm font-medium text-secondary">Fixed files</div>
+        </div>
+
+        <!-- Fixed files -->
+        <div class="mt-2">
+            <fixed-files-list [commit]="commit"></fixed-files-list>
+        </div>
+
+    </ng-container>
+
+    <ng-template #noCommit>
+        <mat-spinner style="margin:0 auto;" ></mat-spinner>
+    </ng-template>
+</div>

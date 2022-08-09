@@ -3,7 +3,7 @@ version: '3'
 services:
 
   defuse-backend:
-    build: ./backend
+    build: ./defuse-backend
     container_name: defuse-backend
     ports:
       - 5000:5000
@@ -15,15 +15,15 @@ services:
     entrypoint: python3
     command: app.py
     volumes:
-      - ./backend:/app
+      - ./defuse-backend:/app
 
-  defuse-ui:
-    build: ./defuse
-    container_name: defuse-ui
+  defuse-frontend:
+    build: ./defuse-frontend
+    container_name: defuse-frontend
     ports:
       - 4200:4200
     expose:
       - 4200
     volumes:
       - /app/node_modules
-      - ./defuse:/app
+      - ./defuse-frontend:/app

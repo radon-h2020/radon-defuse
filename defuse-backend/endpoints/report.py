@@ -40,21 +40,21 @@ class Report(Resource):
                 recall[i] = model['report'][f'split{i}_test_recall']
 
             report = {
-                'splits': {
+                'series': {
                     'auc-pr': auc_pr,
                     'mcc': mcc,
                     'precision': precision,
                     'recall': recall
                 },
                 'overall': {
-                    'mean_test_auc_pr': model['report']['mean_test_average_precision'],
-                    'std_test_auc_pr': model['report']['std_test_average_precision'],
-                    'mean_test_mcc': model['report']['mean_test_mcc'],
-                    'std_test_mcc': model['report']['std_test_mcc'],
-                    'mean_test_precision': model['report']['mean_test_precision'],
-                    'std_test_precision': model['report']['std_test_precision'],
-                    'mean_test_recall': model['report']['mean_test_recall'],
-                    'std_test_recall': model['report']['std_test_recall']
+                    'auc-pr': model['report']['mean_test_average_precision'],
+                    'auc-pr-std': model['report']['std_test_average_precision'],
+                    'mcc': model['report']['mean_test_mcc'],
+                    'mcc-std': model['report']['std_test_mcc'],
+                    'precision': model['report']['mean_test_precision'],
+                    'precision-std': model['report']['std_test_precision'],
+                    'recall': model['report']['mean_test_recall'],
+                    'recall-std': model['report']['std_test_recall']
                 }
             }
 

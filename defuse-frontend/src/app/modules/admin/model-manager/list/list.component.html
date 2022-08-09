@@ -67,15 +67,6 @@
                                     <ng-container *ngFor="let folder of items.folders; trackBy:trackByFn">
                                         <div class="relative w-40 h-40 m-2 p-4 shadow rounded-2xl bg-card">
                                             <a
-                                                class="absolute z-20 top-1.5 right-1.5 w-8 h-8 min-h-8"
-                                                (click)="$event.preventDefault()"
-                                                [routerLink]="['./details/', folder.id]"
-                                                mat-icon-button>
-                                                <mat-icon
-                                                    class="icon-size-5"
-                                                    [svgIcon]="'heroicons_solid:information-circle'"></mat-icon>
-                                            </a>
-                                            <a
                                                 class="z-10 absolute inset-0 flex flex-col p-4 cursor-pointer"
                                                 [routerLink]="['/model-manager/folders/', folder.id]">
                                                 <div class="aspect-w-9 aspect-h-6">

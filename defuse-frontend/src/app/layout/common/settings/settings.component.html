@@ -1,11 +1,8 @@
-<div
-    class="settings-cog fixed flex items-center justify-center right-0 w-10 h-10 shadow-lg rounded-l-lg z-90 cursor-pointer bg-red-600 bg-opacity-90 print:hidden"
-    style="top: 275px"
-    (click)="settingsDrawer.toggle()">
-    <mat-icon
-        class="icon-size-5 text-white animate-spin-slow"
-        [svgIcon]="'heroicons_solid:cog'"></mat-icon>
-</div>
+<button class="print:hidden" mat-icon-button (click)="settingsDrawer.toggle()">
+    <span class="relative">
+        <mat-icon [svgIcon]="'heroicons_outline:cog'"></mat-icon>
+    </span>
+</button>
 
 <fuse-drawer
     class="w-screen min-w-screen sm:w-100 sm:min-w-100 z-999"

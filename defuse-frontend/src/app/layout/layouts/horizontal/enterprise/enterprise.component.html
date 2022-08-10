@@ -51,7 +51,8 @@
                 <div class="flex items-center pl-2 ml-auto space-x-0.5 sm:space-x-2">
                     <fuse-fullscreen class="hidden md:block"></fuse-fullscreen>
                     <notifications></notifications>
-                    <user [showAvatar]="false"></user>
+                    <!-- <user [showAvatar]="false"></user> -->
+                    <settings></settings>
                 </div>
             </div>
         </div>
@@ -78,7 +79,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="relative flex flex-0 justify-center w-full px-6 md:px-8 z-49 border-t bg-card print:hidden">
+    <div class="relative flex flex-0 justify-center w-full px-6 md:px-8 border-t bg-card print:hidden">
         <div class="flex items-center w-full max-w-360 h-14 sm:h-20">
             <span class="font-medium text-secondary">Defuse &copy; {{currentYear}}</span>
         </div>

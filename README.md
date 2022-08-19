@@ -2,7 +2,7 @@
     <img src="./media/logo-text-small.png"> 
 </p>
 
-<h1 align="center">The commit annotator and model builder for defusing unsuspecting errors</h1>
+<h1 align="center">The data annotator and model builder for software defect prediction</h1>
 
 Watch a tool demo on [YouTube](https://youtu.be/37mmLdCX3jU.mp4)
 

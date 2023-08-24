@@ -14,7 +14,18 @@ The application relies on Firebase's [*Firestore Database*]() and [*Storage*]().
 
 * **Step 2:** [Create](https://firebase.google.com/docs/web/setup#create-firebase-project) a Firebase project. Give it a name of your choice
 
-* **Step 3:** Create a new Firestore database. **Please note:** for quick setup and testing/research create the database in **test mode** instead of production mode. This way you do not have to set specific security rules.
+* **Step 3:** Create a new Firestore database. **Please note:** for quick setup and testing/research create the database in **test mode** instead of production mode. This way you do not have to set specific security rules. If it is in production mode, go to `Firestore Database | Rules` and allow read and write if request.time < timestamp.date(YYYY, MM, DD). For example,
+
+```
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if
+          request.time < timestamp.date(2023, 12, 30);
+    }
+  }
+}
+```
 
 
 ![Alt img](./media/create-firestore-database.png)
@@ -49,6 +60,10 @@ export const environment = {
     - In the Firebase console, open **Settings > Service Accounts**
     - Click **Generate New Private Key**, then confirm by clicking **Generate Key**
     - Rename the JSON file containing the key as `.key.json` and copy it the folder **backend**
+Besides, make sure to create a Storage, similarly to the Firestore Database.
+
+<img width="1288" alt="image" src="https://github.com/radon-h2020/radon-defuse/assets/18099827/e1edb6b8-b803-4aed-9bdf-ad7323e27436">
+
 
 
 ## How to build 

@@ -14,7 +14,7 @@ The application relies on Firebase's [*Firestore Database*]() and [*Storage*]().
 
 * **Step 2:** [Create](https://firebase.google.com/docs/web/setup#create-firebase-project) a Firebase project. Give it a name of your choice
 
-* **Step 3:** Create a new Firestore database
+* **Step 3:** Create a new Firestore database. **Please note:** for quick setup and testing/research create the database in **test mode** instead of production mode. This way you do not have to set specific security rules.
 
 
 ![Alt img](./media/create-firestore-database.png)

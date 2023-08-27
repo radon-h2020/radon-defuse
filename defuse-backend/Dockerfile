@@ -10,7 +10,12 @@ RUN apt-get update \
   && pip3 install --upgrade pip
 
 # Install git
-RUN apt-get install git -y
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common \
+  && add-apt-repository ppa:git-core/ppa -y \
+  && apt update \
+  && apt install -y git
+
+RUN git --version
 
 COPY . /app
 WORKDIR /app
